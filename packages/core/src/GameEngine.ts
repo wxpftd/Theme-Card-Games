@@ -97,11 +97,7 @@ export class GameEngine {
   /**
    * Play a card
    */
-  playCard(
-    playerId: string,
-    cardId: string,
-    targets?: Record<string, string>
-  ): boolean {
+  playCard(playerId: string, cardId: string, targets?: Record<string, string>): boolean {
     if (this.stateManager.currentPlayerId !== playerId) {
       return false; // Not this player's turn
     }
@@ -240,7 +236,7 @@ export class GameEngine {
    * Get card definition by ID
    */
   getCardDefinition(cardId: string): CardDefinition | undefined {
-    return this.theme.cards.find(c => c.id === cardId);
+    return this.theme.cards.find((c) => c.id === cardId);
   }
 
   /**
@@ -254,14 +250,14 @@ export class GameEngine {
    * Get stat definition
    */
   getStatDefinition(statId: string) {
-    return this.theme.stats.find(s => s.id === statId);
+    return this.theme.stats.find((s) => s.id === statId);
   }
 
   /**
    * Get resource definition
    */
   getResourceDefinition(resourceId: string) {
-    return this.theme.resources.find(r => r.id === resourceId);
+    return this.theme.resources.find((r) => r.id === resourceId);
   }
 
   /**

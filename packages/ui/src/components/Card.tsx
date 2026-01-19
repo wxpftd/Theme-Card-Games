@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
 import { CardDefinition, CardRarity } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -97,24 +90,13 @@ export function Card({
       </View>
 
       {/* Name */}
-      <Text
-        style={[
-          styles.name,
-          sizeStyles.name,
-          { color: theme.colors.text },
-        ]}
-        numberOfLines={2}
-      >
+      <Text style={[styles.name, sizeStyles.name, { color: theme.colors.text }]} numberOfLines={2}>
         {card.name}
       </Text>
 
       {/* Description */}
       <Text
-        style={[
-          styles.description,
-          sizeStyles.description,
-          { color: theme.colors.textSecondary },
-        ]}
+        style={[styles.description, sizeStyles.description, { color: theme.colors.textSecondary }]}
         numberOfLines={size === 'small' ? 2 : 4}
       >
         {card.description}
@@ -124,13 +106,8 @@ export function Card({
       {card.tags && card.tags.length > 0 && size !== 'small' && (
         <View style={styles.tags}>
           {card.tags.slice(0, 2).map((tag, index) => (
-            <View
-              key={index}
-              style={[styles.tag, { backgroundColor: theme.colors.background }]}
-            >
-              <Text style={[styles.tagText, { color: theme.colors.textSecondary }]}>
-                {tag}
-              </Text>
+            <View key={index} style={[styles.tag, { backgroundColor: theme.colors.background }]}>
+              <Text style={[styles.tagText, { color: theme.colors.textSecondary }]}>{tag}</Text>
             </View>
           ))}
         </View>

@@ -21,23 +21,13 @@ export function PlayerStats({
   const { theme } = useTheme();
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.surface },
-        style,
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: theme.colors.surface }, style]}>
       {/* Player Name */}
-      <Text style={[styles.playerName, { color: theme.colors.text }]}>
-        {player.name}
-      </Text>
+      <Text style={[styles.playerName, { color: theme.colors.text }]}>{player.name}</Text>
 
       {/* Stats */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>
-          状态
-        </Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>状态</Text>
         <View style={styles.statsGrid}>
           {statDefinitions.map((stat) => {
             const value = player.stats[stat.id] ?? 0;
@@ -48,24 +38,12 @@ export function PlayerStats({
               <View key={stat.id} style={styles.statItem}>
                 <View style={styles.statHeader}>
                   <Text style={styles.statIcon}>{stat.icon}</Text>
-                  <Text
-                    style={[styles.statName, { color: theme.colors.text }]}
-                    numberOfLines={1}
-                  >
+                  <Text style={[styles.statName, { color: theme.colors.text }]} numberOfLines={1}>
                     {compact ? '' : stat.name}
                   </Text>
-                  <Text
-                    style={[styles.statValue, { color: theme.colors.text }]}
-                  >
-                    {value}
-                  </Text>
+                  <Text style={[styles.statValue, { color: theme.colors.text }]}>{value}</Text>
                 </View>
-                <View
-                  style={[
-                    styles.progressBar,
-                    { backgroundColor: theme.colors.background },
-                  ]}
-                >
+                <View style={[styles.progressBar, { backgroundColor: theme.colors.background }]}>
                   <View
                     style={[
                       styles.progressFill,
@@ -84,9 +62,7 @@ export function PlayerStats({
 
       {/* Resources */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>
-          资源
-        </Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>资源</Text>
         <View style={styles.resourcesRow}>
           {resourceDefinitions.map((resource) => {
             const value = player.resources[resource.id] ?? 0;
@@ -94,22 +70,12 @@ export function PlayerStats({
             return (
               <View
                 key={resource.id}
-                style={[
-                  styles.resourceItem,
-                  { backgroundColor: theme.colors.background },
-                ]}
+                style={[styles.resourceItem, { backgroundColor: theme.colors.background }]}
               >
                 <Text style={styles.resourceIcon}>{resource.icon}</Text>
-                <Text style={[styles.resourceValue, { color: theme.colors.text }]}>
-                  {value}
-                </Text>
+                <Text style={[styles.resourceValue, { color: theme.colors.text }]}>{value}</Text>
                 {!compact && (
-                  <Text
-                    style={[
-                      styles.resourceName,
-                      { color: theme.colors.textSecondary },
-                    ]}
-                  >
+                  <Text style={[styles.resourceName, { color: theme.colors.textSecondary }]}>
                     {resource.name}
                   </Text>
                 )}
@@ -122,17 +88,12 @@ export function PlayerStats({
       {/* Active Statuses */}
       {player.statuses.length > 0 && (
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>
-            状态效果
-          </Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>状态效果</Text>
           <View style={styles.statusesRow}>
             {player.statuses.map((status, index) => (
               <View
                 key={index}
-                style={[
-                  styles.statusBadge,
-                  { backgroundColor: theme.colors.warning },
-                ]}
+                style={[styles.statusBadge, { backgroundColor: theme.colors.warning }]}
               >
                 <Text style={styles.statusText}>{status.name}</Text>
                 {status.duration > 0 && (

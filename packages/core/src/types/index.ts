@@ -116,14 +116,7 @@ export interface GameState {
   config: GameConfig;
 }
 
-export type GamePhase =
-  | 'setup'
-  | 'draw'
-  | 'main'
-  | 'action'
-  | 'resolve'
-  | 'end'
-  | 'game_over';
+export type GamePhase = 'setup' | 'draw' | 'main' | 'action' | 'resolve' | 'end' | 'game_over';
 
 export interface GameConfig {
   maxPlayers: number;

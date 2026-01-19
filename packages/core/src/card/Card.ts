@@ -79,7 +79,7 @@ export class Card {
   }
 
   removeModifier(modifierId: string): boolean {
-    const index = this.instance.modifiers.findIndex(m => m.id === modifierId);
+    const index = this.instance.modifiers.findIndex((m) => m.id === modifierId);
     if (index !== -1) {
       this.instance.modifiers.splice(index, 1);
       return true;
@@ -98,7 +98,7 @@ export class Card {
   tickModifiers(): CardModifier[] {
     const expired: CardModifier[] = [];
 
-    this.instance.modifiers = this.instance.modifiers.filter(mod => {
+    this.instance.modifiers = this.instance.modifiers.filter((mod) => {
       if (mod.duration === undefined || mod.duration === -1) {
         return true; // Permanent modifier
       }
@@ -141,7 +141,7 @@ export class Card {
   matches(filter: CardFilter): boolean {
     if (filter.type && this.type !== filter.type) return false;
     if (filter.rarity && this.rarity !== filter.rarity) return false;
-    if (filter.tags && !filter.tags.every(t => this.hasTag(t))) return false;
+    if (filter.tags && !filter.tags.every((t) => this.hasTag(t))) return false;
     if (filter.state && this.state !== filter.state) return false;
     if (filter.minCost !== undefined && this.cost < filter.minCost) return false;
     if (filter.maxCost !== undefined && this.cost > filter.maxCost) return false;

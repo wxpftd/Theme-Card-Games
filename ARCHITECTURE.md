@@ -96,23 +96,28 @@ Theme-Card-Games/
 ## Core Concepts
 
 ### 1. Card System
+
 - **Card**: Basic unit with type, effects, and metadata
 - **Deck**: Collection of cards with shuffle/draw operations
 - **Hand**: Player's current cards
 - **Effect**: Actions triggered by cards
 
 ### 2. State Management
+
 - **GameState**: Central state container
 - **PlayerState**: Individual player data
 - **EventBus**: Pub/sub for game events
 
 ### 3. Turn System
+
 - **TurnManager**: Controls turn flow
 - **Phase**: Game phases (draw, play, resolve, end)
 - **ActionQueue**: Queued player actions
 
 ### 4. Theme Configuration
+
 Each theme defines:
+
 - Card definitions (types, effects, visuals)
 - Game rules and win conditions
 - UI theming (colors, fonts, assets)

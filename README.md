@@ -28,12 +28,12 @@ Theme-Card-Games/
 
 ## Available Themes
 
-| Theme | Status | Description |
-|-------|--------|-------------|
-| 大厂打工 | ✅ Complete | 体验互联网大厂打工人的日常 |
-| 创业 | 🚧 In Progress | 从0到1的创业冒险 |
-| 旅游 | 🚧 In Progress | 说走就走的旅行 |
-| 生育 | 🚧 In Progress | 新手父母的日常 |
+| Theme    | Status         | Description                |
+| -------- | -------------- | -------------------------- |
+| 大厂打工 | ✅ Complete    | 体验互联网大厂打工人的日常 |
+| 创业     | 🚧 In Progress | 从0到1的创业冒险           |
+| 旅游     | 🚧 In Progress | 说走就走的旅行             |
+| 生育     | 🚧 In Progress | 新手父母的日常             |
 
 ## Quick Start
 
@@ -98,17 +98,21 @@ import { myTheme } from '@theme-card-games/theme-my-theme';
 ## Core Concepts
 
 ### Card System
+
 - **Card**: Basic unit with type, effects, and metadata
 - **Deck**: Collection of cards with shuffle/draw operations
 - **Hand**: Player's current cards with play/discard actions
 
 ### Game State
+
 - **GameState**: Central state container
 - **PlayerState**: Individual player data (stats, resources, cards)
 - **EventBus**: Pub/sub system for game events
 
 ### Theme Configuration
+
 Each theme defines:
+
 - Card definitions (types, effects, visuals)
 - Stat and resource definitions
 - Win/lose conditions

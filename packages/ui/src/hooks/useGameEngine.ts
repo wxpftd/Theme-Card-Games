@@ -93,7 +93,7 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
     updateState();
 
     return () => {
-      unsubscribers.forEach(unsub => unsub());
+      unsubscribers.forEach((unsub) => unsub());
     };
   }, [theme, playerId, playerName, autoStart]);
 
@@ -143,12 +143,9 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
   }, [playerId, playerName]);
 
   // Localization helper
-  const t = useCallback(
-    (key: string) => {
-      return engineRef.current?.t(key) ?? key;
-    },
-    []
-  );
+  const t = useCallback((key: string) => {
+    return engineRef.current?.t(key) ?? key;
+  }, []);
 
   return {
     gameState,

@@ -1,10 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
-import {
-  GameState,
-  ThemeConfig,
-  CardDefinition,
-} from '@theme-card-games/core';
+import { GameState, ThemeConfig, CardDefinition } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
 import { PlayerStats } from './PlayerStats';
 import { HandView } from './HandView';
@@ -88,9 +84,7 @@ export function GameBoard({
             },
           ]}
         >
-          <Text style={styles.turnIndicatorText}>
-            {isMyTurn ? '你的回合' : '等待中'}
-          </Text>
+          <Text style={styles.turnIndicatorText}>{isMyTurn ? '你的回合' : '等待中'}</Text>
         </View>
       </View>
 
@@ -105,9 +99,7 @@ export function GameBoard({
 
       {/* Play Area */}
       <View style={[styles.playArea, { backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.playAreaTitle, { color: theme.colors.textSecondary }]}>
-          场上
-        </Text>
+        <Text style={[styles.playAreaTitle, { color: theme.colors.textSecondary }]}>场上</Text>
         {player.playArea.length === 0 ? (
           <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
             暂无打出的卡牌
@@ -119,10 +111,7 @@ export function GameBoard({
               return (
                 <View
                   key={card.instanceId}
-                  style={[
-                    styles.playedCard,
-                    { backgroundColor: theme.colors.background },
-                  ]}
+                  style={[styles.playedCard, { backgroundColor: theme.colors.background }]}
                 >
                   <Text style={[styles.playedCardName, { color: theme.colors.text }]}>
                     {def?.name ?? '???'}

@@ -2,12 +2,7 @@ import React, { useCallback } from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import {
-  useGameEngine,
-  GameBoard,
-  GameOverScreen,
-  useTheme,
-} from '@theme-card-games/ui';
+import { useGameEngine, GameBoard, GameOverScreen, useTheme } from '@theme-card-games/ui';
 import { bigtechWorkerTheme } from '@theme-card-games/theme-bigtech-worker';
 
 export default function GameScreen() {
@@ -59,16 +54,12 @@ export default function GameScreen() {
 
   if (!gameState || !currentPlayer) {
     return (
-      <SafeAreaView
-        style={[styles.container, { backgroundColor: theme.colors.background }]}
-      />
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} />
     );
   }
 
   if (isGameOver) {
-    const winnerPlayer = winner
-      ? gameState.players[winner] ?? null
-      : null;
+    const winnerPlayer = winner ? (gameState.players[winner] ?? null) : null;
 
     let reason = '';
     if (currentPlayer.stats.performance >= 100) {
@@ -82,9 +73,7 @@ export default function GameScreen() {
     }
 
     return (
-      <SafeAreaView
-        style={[styles.container, { backgroundColor: theme.colors.background }]}
-      >
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <GameOverScreen
           winner={winnerPlayer}
           reason={reason}
@@ -100,9 +89,7 @@ export default function GameScreen() {
   }
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <GameBoard
         gameState={gameState}
         themeConfig={bigtechWorkerTheme}

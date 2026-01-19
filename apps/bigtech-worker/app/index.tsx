@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ImageBackground,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '@theme-card-games/ui';
 
@@ -17,9 +11,7 @@ export default function HomeScreen() {
       {/* Logo / Title Area */}
       <View style={styles.header}>
         <Text style={styles.emoji}>🏢</Text>
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          {t('game.title')}
-        </Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>{t('game.title')}</Text>
         <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
           {t('game.subtitle')}
         </Text>
@@ -34,9 +26,7 @@ export default function HomeScreen() {
 
       {/* Stats Preview */}
       <View style={[styles.previewCard, { backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.previewTitle, { color: theme.colors.text }]}>
-          游戏元素
-        </Text>
+        <Text style={[styles.previewTitle, { color: theme.colors.text }]}>游戏元素</Text>
         <View style={styles.statsRow}>
           {config.stats.map((stat) => (
             <View key={stat.id} style={styles.statPreview}>
@@ -51,9 +41,7 @@ export default function HomeScreen() {
           {config.resources.map((resource) => (
             <View key={resource.id} style={styles.resourcePreview}>
               <Text style={styles.resourceEmoji}>{resource.icon}</Text>
-              <Text
-                style={[styles.resourceName, { color: theme.colors.textSecondary }]}
-              >
+              <Text style={[styles.resourceName, { color: theme.colors.textSecondary }]}>
                 {resource.name}
               </Text>
             </View>
@@ -71,11 +59,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.button,
-            styles.secondaryButton,
-            { borderColor: theme.colors.primary },
-          ]}
+          style={[styles.button, styles.secondaryButton, { borderColor: theme.colors.primary }]}
           onPress={() => router.push('/tutorial')}
         >
           <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>
@@ -85,9 +69,7 @@ export default function HomeScreen() {
       </View>
 
       {/* Version */}
-      <Text style={[styles.version, { color: theme.colors.textSecondary }]}>
-        v{config.version}
-      </Text>
+      <Text style={[styles.version, { color: theme.colors.textSecondary }]}>v{config.version}</Text>
     </View>
   );
 }

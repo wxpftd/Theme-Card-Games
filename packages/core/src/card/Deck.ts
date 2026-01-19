@@ -10,7 +10,7 @@ export class Deck {
 
   constructor(definitions?: CardDefinition[]) {
     if (definitions) {
-      this.cards = definitions.map(def => new Card(def));
+      this.cards = definitions.map((def) => new Card(def));
     }
   }
 
@@ -89,7 +89,7 @@ export class Deck {
    * Draw a specific card by filter
    */
   drawSpecific(filter: CardFilter): Card | null {
-    const index = this.cards.findIndex(card => card.matches(filter));
+    const index = this.cards.findIndex((card) => card.matches(filter));
     if (index === -1) return null;
 
     const [card] = this.cards.splice(index, 1);
@@ -154,7 +154,7 @@ export class Deck {
    * Remove a card from the deck (not to discard)
    */
   remove(cardId: string): Card | null {
-    const index = this.cards.findIndex(c => c.id === cardId);
+    const index = this.cards.findIndex((c) => c.id === cardId);
     if (index === -1) return null;
 
     const [card] = this.cards.splice(index, 1);
@@ -166,7 +166,7 @@ export class Deck {
    * Find cards matching a filter
    */
   findCards(filter: CardFilter): Card[] {
-    return this.cards.filter(card => card.matches(filter));
+    return this.cards.filter((card) => card.matches(filter));
   }
 
   /**

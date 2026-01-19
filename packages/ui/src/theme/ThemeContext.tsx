@@ -15,11 +15,7 @@ interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
-export function ThemeProvider({
-  themeConfig,
-  locale = 'zh-CN',
-  children,
-}: ThemeProviderProps) {
+export function ThemeProvider({ themeConfig, locale = 'zh-CN', children }: ThemeProviderProps) {
   const value = useMemo<ThemeContextValue>(
     () => ({
       theme: themeConfig.uiTheme,
@@ -32,9 +28,7 @@ export function ThemeProvider({
     [themeConfig, locale]
   );
 
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme(): ThemeContextValue {

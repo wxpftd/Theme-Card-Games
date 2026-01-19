@@ -1,7 +1,1 @@
-export {
-  ThemeProvider,
-  useTheme,
-  useColors,
-  useSpacing,
-  useBorderRadius,
-} from './ThemeContext';
+export { ThemeProvider, useTheme, useColors, useSpacing, useBorderRadius } from './ThemeContext';

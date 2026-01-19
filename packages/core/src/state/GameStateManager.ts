@@ -29,9 +29,7 @@ export class GameStateManager {
   private playerHands: Map<string, Hand> = new Map();
 
   constructor(options: GameStateManagerOptions) {
-    this.cardDefinitions = new Map(
-      options.cardDefinitions.map(def => [def.id, def])
-    );
+    this.cardDefinitions = new Map(options.cardDefinitions.map((def) => [def.id, def]));
     this.eventBus = options.eventBus ?? new EventBus();
     this.effectResolver = options.effectResolver ?? new EffectResolver();
 
@@ -116,7 +114,11 @@ export class GameStateManager {
       this.state.currentPlayerId = id;
     }
 
-    this.eventBus.emitSimple('custom', { subtype: 'player_joined', playerId: id, name }, this.state);
+    this.eventBus.emitSimple(
+      'custom',
+      { subtype: 'player_joined', playerId: id, name },
+      this.state
+    );
 
     return playerState;
   }
@@ -184,7 +186,11 @@ export class GameStateManager {
     this.state.turn = 1;
 
     this.eventBus.emitSimple('game_started', {}, this.state);
-    this.eventBus.emitSimple('turn_started', { turn: 1, playerId: this.state.currentPlayerId }, this.state);
+    this.eventBus.emitSimple(
+      'turn_started',
+      { turn: 1, playerId: this.state.currentPlayerId },
+      this.state
+    );
 
     return true;
   }
@@ -229,11 +235,15 @@ export class GameStateManager {
         if (overflow) {
           // Hand is full, discard the card
           deck.discard(card);
-          this.eventBus.emitSimple('card_discarded', {
-            playerId,
-            cardId: card.id,
-            reason: 'hand_full',
-          }, this.state);
+          this.eventBus.emitSimple(
+            'card_discarded',
+            {
+              playerId,
+              cardId: card.id,
+              reason: 'hand_full',
+            },
+            this.state
+          );
         } else {
           drawn.push(card);
           // Sync to player state
@@ -244,7 +254,7 @@ export class GameStateManager {
     }
 
     // Sync deck state
-    player.deck = deck.getCards().map(c => c.getInstance());
+    player.deck = deck.getCards().map((c) => c.getInstance());
 
     return drawn;
   }
@@ -293,13 +303,17 @@ export class GameStateManager {
     player.playArea.push(card.getInstance());
 
     // Sync hand state
-    player.hand = hand.getCards().map(c => c.getInstance());
+    player.hand = hand.getCards().map((c) => c.getInstance());
 
-    this.eventBus.emitSimple('card_played', {
-      playerId,
-      cardId,
-      effects: results,
-    }, this.state);
+    this.eventBus.emitSimple(
+      'card_played',
+      {
+        playerId,
+        cardId,
+        effects: results,
+      },
+      this.state
+    );
 
     return true;
   }
@@ -324,8 +338,8 @@ export class GameStateManager {
     deck.discard(card);
 
     // Sync states
-    player.hand = hand.getCards().map(c => c.getInstance());
-    player.discardPile = deck.getDiscardPile().map(c => c.getInstance());
+    player.hand = hand.getCards().map((c) => c.getInstance());
+    player.discardPile = deck.getDiscardPile().map((c) => c.getInstance());
 
     this.eventBus.emitSimple('card_discarded', { playerId, cardId }, this.state);
 
@@ -342,12 +356,16 @@ export class GameStateManager {
     const before = player.stats[stat] ?? 0;
     player.stats[stat] = before + delta;
 
-    this.eventBus.emitSimple('stat_changed', {
-      playerId,
-      stat,
-      before,
-      after: player.stats[stat],
-    }, this.state);
+    this.eventBus.emitSimple(
+      'stat_changed',
+      {
+        playerId,
+        stat,
+        before,
+        after: player.stats[stat],
+      },
+      this.state
+    );
 
     return true;
   }
@@ -362,12 +380,16 @@ export class GameStateManager {
     const before = player.stats[stat] ?? 0;
     player.stats[stat] = value;
 
-    this.eventBus.emitSimple('stat_changed', {
-      playerId,
-      stat,
-      before,
-      after: value,
-    }, this.state);
+    this.eventBus.emitSimple(
+      'stat_changed',
+      {
+        playerId,
+        stat,
+        before,
+        after: value,
+      },
+      this.state
+    );
 
     return true;
   }
@@ -382,12 +404,16 @@ export class GameStateManager {
     const before = player.resources[resource] ?? 0;
     player.resources[resource] = Math.max(0, before + delta);
 
-    this.eventBus.emitSimple('resource_changed', {
-      playerId,
-      resource,
-      before,
-      after: player.resources[resource],
-    }, this.state);
+    this.eventBus.emitSimple(
+      'resource_changed',
+      {
+        playerId,
+        resource,
+        before,
+        after: player.resources[resource],
+      },
+      this.state
+    );
 
     return true;
   }
@@ -398,10 +424,14 @@ export class GameStateManager {
   endTurn(): void {
     const currentPlayer = this.state.currentPlayerId;
 
-    this.eventBus.emitSimple('turn_ended', {
-      turn: this.state.turn,
-      playerId: currentPlayer,
-    }, this.state);
+    this.eventBus.emitSimple(
+      'turn_ended',
+      {
+        turn: this.state.turn,
+        playerId: currentPlayer,
+      },
+      this.state
+    );
 
     // Move to next player
     const playerIds = Object.keys(this.state.players);
@@ -421,10 +451,14 @@ export class GameStateManager {
 
     this.setPhase('draw');
 
-    this.eventBus.emitSimple('turn_started', {
-      turn: this.state.turn,
-      playerId: this.state.currentPlayerId,
-    }, this.state);
+    this.eventBus.emitSimple(
+      'turn_started',
+      {
+        turn: this.state.turn,
+        playerId: this.state.currentPlayerId,
+      },
+      this.state
+    );
   }
 
   /**
@@ -480,12 +514,18 @@ export class GameStateManager {
 
   private checkThreshold(value: number, operator: string, threshold: number): boolean {
     switch (operator) {
-      case '>': return value > threshold;
-      case '<': return value < threshold;
-      case '>=': return value >= threshold;
-      case '<=': return value <= threshold;
-      case '==': return value === threshold;
-      default: return false;
+      case '>':
+        return value > threshold;
+      case '<':
+        return value < threshold;
+      case '>=':
+        return value >= threshold;
+      case '<=':
+        return value <= threshold;
+      case '==':
+        return value === threshold;
+      default:
+        return false;
     }
   }
 
@@ -495,11 +535,15 @@ export class GameStateManager {
   endGame(winnerId: string | null, reason: string): void {
     this.state.phase = 'game_over';
 
-    this.eventBus.emitSimple('game_ended', {
-      winnerId,
-      reason,
-      finalState: deepClone(this.state),
-    }, this.state);
+    this.eventBus.emitSimple(
+      'game_ended',
+      {
+        winnerId,
+        reason,
+        finalState: deepClone(this.state),
+      },
+      this.state
+    );
   }
 
   /**
