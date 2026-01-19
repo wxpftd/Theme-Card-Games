@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "大厂生存指南",
+    "slug": "bigtech-worker-card-game",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1E88E5"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.themecardgames.bigtechworker",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CFBundleDisplayName": "大厂生存指南"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1E88E5"
+      },
+      "package": "com.themecardgames.bigtechworker"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "scheme": "bigtech-worker"
+  }
+}
