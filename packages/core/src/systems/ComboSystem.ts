@@ -1,10 +1,4 @@
-import {
-  ComboDefinition,
-  ComboState,
-  CardDefinition,
-  GameState,
-  ResolvedEffect,
-} from '../types';
+import { ComboDefinition, ComboState, CardDefinition, GameState, ResolvedEffect } from '../types';
 import { EffectResolver, EffectContext } from '../card/EffectResolver';
 import { EventBus } from '../event';
 
