@@ -12,6 +12,11 @@ import {
   RandomEventConfig,
   RandomEventResult,
   ResolvedEffect,
+  AchievementDefinition,
+  DifficultyDefinition,
+  DailyChallengeConfig,
+  DifficultyLevel,
+  GameSessionStats,
 } from '../types';
 import { EventBus } from '../event';
 import { Card, Deck, Hand, EffectResolver } from '../card';
@@ -19,6 +24,9 @@ import { ComboSystem } from '../systems/ComboSystem';
 import { StatusEffectSystem } from '../systems/StatusEffectSystem';
 import { CardUpgradeSystem } from '../systems/CardUpgradeSystem';
 import { RandomEventSystem, RandomEventCustomHandler } from '../systems/RandomEventSystem';
+import { AchievementSystem, CustomAchievementChecker } from '../systems/AchievementSystem';
+import { DifficultySystem, CustomDifficultyRuleHandler } from '../systems/DifficultySystem';
+import { DailyChallengeSystem, CustomChallengeChecker } from '../systems/DailyChallengeSystem';
 import { generateId, deepClone } from '../utils';
 
 export interface GameStateManagerOptions {
@@ -30,6 +38,12 @@ export interface GameStateManagerOptions {
   randomEventDefinitions?: RandomEventDefinition[];
   randomEventConfig?: RandomEventConfig;
   randomEventCustomHandlers?: Record<string, RandomEventCustomHandler>;
+  achievementDefinitions?: AchievementDefinition[];
+  achievementCustomCheckers?: Record<string, CustomAchievementChecker>;
+  difficultyDefinitions?: DifficultyDefinition[];
+  difficultyCustomRuleHandlers?: Record<string, CustomDifficultyRuleHandler>;
+  dailyChallengeConfig?: DailyChallengeConfig;
+  dailyChallengeCustomCheckers?: Record<string, CustomChallengeChecker>;
   eventBus?: EventBus;
   effectResolver?: EffectResolver;
 }
@@ -50,6 +64,9 @@ export class GameStateManager {
   private statusEffectSystem: StatusEffectSystem | null = null;
   private cardUpgradeSystem: CardUpgradeSystem | null = null;
   private randomEventSystem: RandomEventSystem | null = null;
+  private achievementSystem: AchievementSystem | null = null;
+  private difficultySystem: DifficultySystem | null = null;
+  private dailyChallengeSystem: DailyChallengeSystem | null = null;
 
   /** State version counter for change detection */
   private stateVersion: number = 0;
@@ -102,6 +119,35 @@ export class GameStateManager {
         effectResolver: this.effectResolver,
         eventBus: this.eventBus,
         customHandlers: options.randomEventCustomHandlers,
+      });
+    }
+
+    // Initialize achievement system
+    if (options.achievementDefinitions && options.achievementDefinitions.length > 0) {
+      this.achievementSystem = new AchievementSystem({
+        achievementDefinitions: options.achievementDefinitions,
+        cardDefinitions: this.cardDefinitions,
+        eventBus: this.eventBus,
+        customCheckers: options.achievementCustomCheckers,
+      });
+    }
+
+    // Initialize difficulty system
+    if (options.difficultyDefinitions && options.difficultyDefinitions.length > 0) {
+      this.difficultySystem = new DifficultySystem({
+        difficultyDefinitions: options.difficultyDefinitions,
+        eventBus: this.eventBus,
+        customRuleHandlers: options.difficultyCustomRuleHandlers,
+      });
+    }
+
+    // Initialize daily challenge system
+    if (options.dailyChallengeConfig && options.dailyChallengeConfig.challengePool.length > 0) {
+      this.dailyChallengeSystem = new DailyChallengeSystem({
+        challengeConfig: options.dailyChallengeConfig,
+        cardDefinitions: this.cardDefinitions,
+        eventBus: this.eventBus,
+        customCheckers: options.dailyChallengeCustomCheckers,
       });
     }
 
@@ -875,5 +921,40 @@ export class GameStateManager {
     const player = this.state.players[playerId];
     if (!player) return [];
     return [...player.statuses];
+  }
+
+  // ============================================================================
+  // Achievement, Difficulty, and Daily Challenge Systems Access
+  // ============================================================================
+
+  /**
+   * Get the achievement system
+   */
+  getAchievementSystem(): AchievementSystem | null {
+    return this.achievementSystem;
+  }
+
+  /**
+   * Get the difficulty system
+   */
+  getDifficultySystem(): DifficultySystem | null {
+    return this.difficultySystem;
+  }
+
+  /**
+   * Get the daily challenge system
+   */
+  getDailyChallengeSystem(): DailyChallengeSystem | null {
+    return this.dailyChallengeSystem;
+  }
+
+  /**
+   * Get modified game config based on current difficulty
+   */
+  getEffectiveConfig(): GameConfig {
+    if (this.difficultySystem) {
+      return this.difficultySystem.applyToGameConfig(this.state.config);
+    }
+    return this.state.config;
   }
 }

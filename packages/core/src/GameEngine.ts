@@ -8,6 +8,14 @@ import {
   CardUpgradeDefinition,
   RandomEventDefinition,
   RandomEventConfig,
+  AchievementDefinition,
+  DifficultyDefinition,
+  DifficultyLevel,
+  DailyChallengeConfig,
+  AchievementState,
+  DifficultyConfig,
+  DailyChallengeState,
+  GameSessionStats,
 } from './types';
 import { GameStateManager } from './state';
 import { TurnManager, TurnPhaseConfig } from './turn';
@@ -19,6 +27,12 @@ import {
   CardUpgradeSystem,
   RandomEventSystem,
   RandomEventCustomHandler,
+  AchievementSystem,
+  CustomAchievementChecker,
+  DifficultySystem,
+  CustomDifficultyRuleHandler,
+  DailyChallengeSystem,
+  CustomChallengeChecker,
 } from './systems';
 
 export interface GameEngineOptions {
@@ -26,6 +40,9 @@ export interface GameEngineOptions {
   customPhases?: TurnPhaseConfig[];
   customEffectHandlers?: Record<string, CustomEffectHandler>;
   randomEventCustomHandlers?: Record<string, RandomEventCustomHandler>;
+  achievementCustomCheckers?: Record<string, CustomAchievementChecker>;
+  difficultyCustomRuleHandlers?: Record<string, CustomDifficultyRuleHandler>;
+  dailyChallengeCustomCheckers?: Record<string, CustomChallengeChecker>;
 }
 
 /**
@@ -64,6 +81,15 @@ export class GameEngine {
       randomEventDefinitions: this.theme.randomEventDefinitions,
       randomEventConfig: this.theme.randomEventConfig,
       randomEventCustomHandlers: options.randomEventCustomHandlers,
+      achievementDefinitions: this.theme.achievementDefinitions,
+      achievementCustomCheckers:
+        options.achievementCustomCheckers ?? this.theme.customAchievementCheckers,
+      difficultyDefinitions: this.theme.difficultyDefinitions,
+      difficultyCustomRuleHandlers:
+        options.difficultyCustomRuleHandlers ?? this.theme.customDifficultyRuleHandlers,
+      dailyChallengeConfig: this.theme.dailyChallengeConfig,
+      dailyChallengeCustomCheckers:
+        options.dailyChallengeCustomCheckers ?? this.theme.customChallengeCheckers,
       eventBus: this.eventBus,
       effectResolver: this.effectResolver,
     });
@@ -412,5 +438,196 @@ export class GameEngine {
    */
   getRandomEventConfig(): RandomEventConfig | undefined {
     return this.theme.randomEventConfig;
+  }
+
+  // ============================================================================
+  // Achievement System
+  // ============================================================================
+
+  /**
+   * Get the achievement system
+   */
+  getAchievementSystem(): AchievementSystem | null {
+    return this.stateManager.getAchievementSystem();
+  }
+
+  /**
+   * Get all achievement definitions
+   */
+  getAchievementDefinitions(): AchievementDefinition[] {
+    return this.theme.achievementDefinitions ?? [];
+  }
+
+  /**
+   * Start tracking achievements for a new game session
+   */
+  startAchievementTracking(): void {
+    const system = this.getAchievementSystem();
+    if (system) {
+      const player = this.getAllPlayers()[0];
+      if (player) {
+        system.startSession(player.stats);
+      }
+    }
+  }
+
+  /**
+   * End achievement tracking and return newly unlocked achievements
+   */
+  endAchievementTracking(won: boolean): AchievementDefinition[] {
+    const system = this.getAchievementSystem();
+    if (system) {
+      return system.endSession(this.state, won);
+    }
+    return [];
+  }
+
+  /**
+   * Get current achievement state
+   */
+  getAchievementState(): AchievementState | null {
+    const system = this.getAchievementSystem();
+    return system?.getGlobalState() ?? null;
+  }
+
+  /**
+   * Load persisted achievement state
+   */
+  loadAchievementState(state: AchievementState): void {
+    const system = this.getAchievementSystem();
+    system?.loadState(state);
+  }
+
+  // ============================================================================
+  // Difficulty System
+  // ============================================================================
+
+  /**
+   * Get the difficulty system
+   */
+  getDifficultySystem(): DifficultySystem | null {
+    return this.stateManager.getDifficultySystem();
+  }
+
+  /**
+   * Get all difficulty definitions
+   */
+  getDifficultyDefinitions(): DifficultyDefinition[] {
+    return this.theme.difficultyDefinitions ?? [];
+  }
+
+  /**
+   * Get current difficulty level
+   */
+  getCurrentDifficulty(): DifficultyDefinition | undefined {
+    const system = this.getDifficultySystem();
+    return system?.getCurrentDifficulty();
+  }
+
+  /**
+   * Set difficulty level
+   */
+  setDifficulty(level: DifficultyLevel): boolean {
+    const system = this.getDifficultySystem();
+    return system?.setDifficulty(level) ?? false;
+  }
+
+  /**
+   * Get difficulty configuration
+   */
+  getDifficultyConfig(): DifficultyConfig | null {
+    const system = this.getDifficultySystem();
+    return system?.getConfig() ?? null;
+  }
+
+  /**
+   * Load persisted difficulty configuration
+   */
+  loadDifficultyConfig(config: DifficultyConfig): void {
+    const system = this.getDifficultySystem();
+    system?.loadConfig(config);
+  }
+
+  /**
+   * Unlock a difficulty level
+   */
+  unlockDifficulty(level: DifficultyLevel): boolean {
+    const system = this.getDifficultySystem();
+    return system?.unlockDifficulty(level) ?? false;
+  }
+
+  // ============================================================================
+  // Daily Challenge System
+  // ============================================================================
+
+  /**
+   * Get the daily challenge system
+   */
+  getDailyChallengeSystem(): DailyChallengeSystem | null {
+    return this.stateManager.getDailyChallengeSystem();
+  }
+
+  /**
+   * Get daily challenge configuration
+   */
+  getDailyChallengeConfig(): DailyChallengeConfig | undefined {
+    return this.theme.dailyChallengeConfig;
+  }
+
+  /**
+   * Generate today's daily challenge
+   */
+  generateTodayChallenge() {
+    const system = this.getDailyChallengeSystem();
+    return system?.generateTodayChallenge() ?? null;
+  }
+
+  /**
+   * Start a daily challenge attempt
+   */
+  startChallengeAttempt(): boolean {
+    const system = this.getDailyChallengeSystem();
+    if (system) {
+      const player = this.getAllPlayers()[0];
+      if (player) {
+        return system.startChallengeAttempt(player.stats);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * End the current challenge attempt
+   */
+  endChallengeAttempt(won: boolean) {
+    const system = this.getDailyChallengeSystem();
+    if (system) {
+      return system.endChallengeAttempt(this.state, won);
+    }
+    return null;
+  }
+
+  /**
+   * Get daily challenge state
+   */
+  getDailyChallengeState(): DailyChallengeState | null {
+    const system = this.getDailyChallengeSystem();
+    return system?.getState() ?? null;
+  }
+
+  /**
+   * Load persisted daily challenge state
+   */
+  loadDailyChallengeState(state: DailyChallengeState): void {
+    const system = this.getDailyChallengeSystem();
+    system?.loadState(state);
+  }
+
+  /**
+   * Check if currently in a daily challenge
+   */
+  isInDailyChallenge(): boolean {
+    const system = this.getDailyChallengeSystem();
+    return system?.isInChallenge() ?? false;
   }
 }

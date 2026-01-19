@@ -2,6 +2,16 @@
 
 echo "🔍 Running pre-commit checks..."
 
+# Auto-format all files first
+echo "🎨 Auto-formatting code..."
+pnpm format || {
+  echo "❌ Format failed."
+  exit 1
+}
+
+# Stage any formatting changes
+git add -u
+
 # Run lint-staged (ESLint + Prettier on staged files)
 echo "📝 Running lint-staged..."
 pnpm lint-staged || {
@@ -13,13 +23,6 @@ pnpm lint-staged || {
 echo "🔎 Running type check..."
 pnpm typecheck || {
   echo "❌ Type check failed. Please fix the type errors above."
-  exit 1
-}
-
-# Run format check on the entire project
-echo "🎨 Checking code formatting..."
-pnpm format:check || {
-  echo "❌ Format check failed. Run 'pnpm format' to fix formatting issues."
   exit 1
 }
 
