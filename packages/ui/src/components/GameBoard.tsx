@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback, memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { GameState, ThemeConfig, CardDefinition } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
@@ -14,7 +14,7 @@ interface GameBoardProps {
   style?: ViewStyle;
 }
 
-export function GameBoard({
+function GameBoardComponent({
   gameState,
   themeConfig,
   currentPlayerId,
@@ -22,26 +22,33 @@ export function GameBoard({
   onEndTurn,
   style,
 }: GameBoardProps) {
-  const { theme, t } = useTheme();
+  const { theme } = useTheme();
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
   const player = gameState.players[currentPlayerId];
   const isMyTurn = gameState.currentPlayerId === currentPlayerId;
 
-  // Create card definitions map
+  // Create card definitions map - memoized to prevent recreation
   const cardDefinitions = useMemo(() => {
     return new Map(themeConfig.cards.map((card) => [card.id, card]));
   }, [themeConfig.cards]);
 
-  const handleCardSelect = (cardId: string) => {
-    setSelectedCardId(cardId === selectedCardId ? null : cardId);
-  };
+  // Memoize handlers to prevent child re-renders
+  const handleCardSelect = useCallback(
+    (cardId: string) => {
+      setSelectedCardId((prev) => (cardId === prev ? null : cardId));
+    },
+    []
+  );
 
-  const handleCardPlay = (cardId: string) => {
-    if (!isMyTurn) return;
-    onCardPlay?.(cardId);
-    setSelectedCardId(null);
-  };
+  const handleCardPlay = useCallback(
+    (cardId: string) => {
+      if (!isMyTurn) return;
+      onCardPlay?.(cardId);
+      setSelectedCardId(null);
+    },
+    [isMyTurn, onCardPlay]
+  );
 
   const getPhaseText = (phase: string): string => {
     const phaseTexts: Record<string, string> = {
@@ -64,29 +71,18 @@ export function GameBoard({
     );
   }
 
+  // Memoize phase text
+  const phaseText = useMemo(() => getPhaseText(gameState.phase), [gameState.phase]);
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }, style]}>
       {/* Turn Info Bar */}
-      <View style={[styles.turnBar, { backgroundColor: theme.colors.surface }]}>
-        <View style={styles.turnInfo}>
-          <Text style={[styles.turnText, { color: theme.colors.textSecondary }]}>
-            回合 {gameState.turn}
-          </Text>
-          <Text style={[styles.phaseText, { color: theme.colors.primary }]}>
-            {getPhaseText(gameState.phase)}
-          </Text>
-        </View>
-        <View
-          style={[
-            styles.turnIndicator,
-            {
-              backgroundColor: isMyTurn ? theme.colors.success : theme.colors.warning,
-            },
-          ]}
-        >
-          <Text style={styles.turnIndicatorText}>{isMyTurn ? '你的回合' : '等待中'}</Text>
-        </View>
-      </View>
+      <TurnInfoBar
+        turn={gameState.turn}
+        phaseText={phaseText}
+        isMyTurn={isMyTurn}
+        colors={theme.colors}
+      />
 
       {/* Player Stats */}
       <View style={styles.statsSection}>
@@ -160,6 +156,49 @@ export function GameBoard({
     </View>
   );
 }
+
+/** Memoized turn info bar */
+const TurnInfoBar = memo(function TurnInfoBar({
+  turn,
+  phaseText,
+  isMyTurn,
+  colors,
+}: {
+  turn: number;
+  phaseText: string;
+  isMyTurn: boolean;
+  colors: {
+    surface: string;
+    textSecondary: string;
+    primary: string;
+    success: string;
+    warning: string;
+  };
+}) {
+  return (
+    <View style={[styles.turnBar, { backgroundColor: colors.surface }]}>
+      <View style={styles.turnInfo}>
+        <Text style={[styles.turnText, { color: colors.textSecondary }]}>回合 {turn}</Text>
+        <Text style={[styles.phaseText, { color: colors.primary }]}>{phaseText}</Text>
+      </View>
+      <View
+        style={[
+          styles.turnIndicator,
+          {
+            backgroundColor: isMyTurn ? colors.success : colors.warning,
+          },
+        ]}
+      >
+        <Text style={styles.turnIndicatorText}>{isMyTurn ? '你的回合' : '等待中'}</Text>
+      </View>
+    </View>
+  );
+});
+
+/**
+ * Memoized GameBoard component.
+ */
+export const GameBoard = memo(GameBoardComponent);
 
 const styles = StyleSheet.create({
   container: {
