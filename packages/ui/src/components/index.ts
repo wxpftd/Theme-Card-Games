@@ -6,3 +6,4 @@ export { GameOverScreen } from './GameOverScreen';
 export { AchievementList } from './AchievementList';
 export { DifficultySelector } from './DifficultySelector';
 export { DailyChallenge } from './DailyChallenge';
+export { LanguageSwitcher } from './LanguageSwitcher';

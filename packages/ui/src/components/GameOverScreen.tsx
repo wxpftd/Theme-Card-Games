@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { PlayerState, StatDefinition, ResourceDefinition } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
+import { useI18n } from '../i18n';
 
 interface GameOverScreenProps {
   winner: PlayerState | null;
@@ -24,7 +25,8 @@ export function GameOverScreen({
   onMainMenu,
   style,
 }: GameOverScreenProps) {
-  const { theme, t } = useTheme();
+  const { theme } = useTheme();
+  const { t } = useI18n();
 
   const isWinner = winner?.id === player.id;
 
@@ -41,7 +43,9 @@ export function GameOverScreen({
           ]}
         >
           <Text style={styles.emoji}>{isWinner ? '🎉' : '😢'}</Text>
-          <Text style={styles.resultText}>{isWinner ? '游戏胜利！' : '游戏结束'}</Text>
+          <Text style={styles.resultText}>
+            {isWinner ? t('gameOver.victory') : t('gameOver.defeat')}
+          </Text>
         </View>
 
         {/* Reason */}
@@ -51,7 +55,9 @@ export function GameOverScreen({
 
         {/* Final Stats */}
         <View style={styles.statsSection}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>最终数据</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            {t('gameOver.finalStats')}
+          </Text>
 
           <View style={styles.statsGrid}>
             {statDefinitions.map((stat) => {
@@ -91,7 +97,7 @@ export function GameOverScreen({
             style={[styles.button, styles.primaryButton, { backgroundColor: theme.colors.primary }]}
             onPress={onRestart}
           >
-            <Text style={styles.primaryButtonText}>再来一局</Text>
+            <Text style={styles.primaryButtonText}>{t('gameOver.playAgain')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -99,7 +105,7 @@ export function GameOverScreen({
             onPress={onMainMenu}
           >
             <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>
-              返回主页
+              {t('gameOver.mainMenu')}
             </Text>
           </TouchableOpacity>
         </View>

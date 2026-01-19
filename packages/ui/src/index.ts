@@ -6,3 +6,6 @@ export * from './hooks';
 
 // Theme
 export * from './theme';
+
+// i18n
+export * from './i18n';

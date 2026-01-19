@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, ViewStyle } from 'react-native';
 import { CardDefinition, CardInstance } from '@theme-card-games/core';
 import { Card } from './Card';
 import { useTheme } from '../theme/ThemeContext';
+import { useI18n } from '../i18n';
 
 interface HandViewProps {
   cards: CardInstance[];
@@ -26,6 +27,7 @@ function HandViewComponent({
   style,
 }: HandViewProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
 
   const visibleCards = useMemo(() => cards.slice(0, maxVisible), [cards, maxVisible]);
   const hasMore = cards.length > maxVisible;
@@ -62,10 +64,12 @@ function HandViewComponent({
   return (
     <View style={[styles.container, style]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>手牌 ({cards.length})</Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>
+          {t('hand.title')} ({cards.length})
+        </Text>
         {hasMore && (
           <Text style={[styles.moreText, { color: theme.colors.textSecondary }]}>
-            +{cards.length - maxVisible} more
+            {t('hand.more', { count: cards.length - maxVisible })}
           </Text>
         )}
       </View>
@@ -106,7 +110,7 @@ function HandViewComponent({
       {selectedCardId && (
         <View style={[styles.hint, { backgroundColor: theme.colors.surface }]}>
           <Text style={[styles.hintText, { color: theme.colors.textSecondary }]}>
-            点击打出 | 长按查看详情
+            {t('hand.hint')}
           </Text>
         </View>
       )}

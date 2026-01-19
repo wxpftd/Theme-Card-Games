@@ -2,6 +2,7 @@ import React, { useMemo, useState, useCallback, memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { GameState, ThemeConfig, CardDefinition } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
+import { useI18n } from '../i18n';
 import { PlayerStats } from './PlayerStats';
 import { HandView } from './HandView';
 
@@ -23,6 +24,7 @@ function GameBoardComponent({
   style,
 }: GameBoardProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
   const player = gameState.players[currentPlayerId];
@@ -47,23 +49,26 @@ function GameBoardComponent({
     [isMyTurn, onCardPlay]
   );
 
-  const getPhaseText = (phase: string): string => {
-    const phaseTexts: Record<string, string> = {
-      setup: '准备中',
-      draw: '抽牌阶段',
-      main: '主要阶段',
-      action: '行动阶段',
-      resolve: '结算阶段',
-      end: '结束阶段',
-      game_over: '游戏结束',
-    };
-    return phaseTexts[phase] ?? phase;
-  };
+  const getPhaseText = useCallback(
+    (phase: string): string => {
+      const phaseKeys: Record<string, string> = {
+        setup: 'phase.setup',
+        draw: 'phase.draw',
+        main: 'phase.main',
+        action: 'phase.action',
+        resolve: 'phase.resolve',
+        end: 'phase.end',
+        game_over: 'phase.game_over',
+      };
+      return t(phaseKeys[phase] ?? phase);
+    },
+    [t]
+  );
 
   if (!player) {
     return (
       <View style={[styles.container, style]}>
-        <Text style={{ color: theme.colors.text }}>Loading...</Text>
+        <Text style={{ color: theme.colors.text }}>{t('common.loading')}</Text>
       </View>
     );
   }
@@ -79,6 +84,7 @@ function GameBoardComponent({
         phaseText={phaseText}
         isMyTurn={isMyTurn}
         colors={theme.colors}
+        t={t}
       />
 
       {/* Player Stats */}
@@ -92,10 +98,12 @@ function GameBoardComponent({
 
       {/* Play Area */}
       <View style={[styles.playArea, { backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.playAreaTitle, { color: theme.colors.textSecondary }]}>场上</Text>
+        <Text style={[styles.playAreaTitle, { color: theme.colors.textSecondary }]}>
+          {t('game.playArea')}
+        </Text>
         {player.playArea.length === 0 ? (
           <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
-            暂无打出的卡牌
+            {t('game.noCards')}
           </Text>
         ) : (
           <View style={styles.playAreaCards}>
@@ -146,7 +154,7 @@ function GameBoardComponent({
               { color: isMyTurn ? '#fff' : theme.colors.textSecondary },
             ]}
           >
-            结束回合
+            {t('game.endTurn')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -160,6 +168,7 @@ const TurnInfoBar = memo(function TurnInfoBar({
   phaseText,
   isMyTurn,
   colors,
+  t,
 }: {
   turn: number;
   phaseText: string;
@@ -171,11 +180,14 @@ const TurnInfoBar = memo(function TurnInfoBar({
     success: string;
     warning: string;
   };
+  t: (key: string, params?: Record<string, string | number>) => string;
 }) {
   return (
     <View style={[styles.turnBar, { backgroundColor: colors.surface }]}>
       <View style={styles.turnInfo}>
-        <Text style={[styles.turnText, { color: colors.textSecondary }]}>回合 {turn}</Text>
+        <Text style={[styles.turnText, { color: colors.textSecondary }]}>
+          {t('game.turn', { turn })}
+        </Text>
         <Text style={[styles.phaseText, { color: colors.primary }]}>{phaseText}</Text>
       </View>
       <View
@@ -186,7 +198,9 @@ const TurnInfoBar = memo(function TurnInfoBar({
           },
         ]}
       >
-        <Text style={styles.turnIndicatorText}>{isMyTurn ? '你的回合' : '等待中'}</Text>
+        <Text style={styles.turnIndicatorText}>
+          {isMyTurn ? t('game.yourTurn') : t('game.waiting')}
+        </Text>
       </View>
     </View>
   );

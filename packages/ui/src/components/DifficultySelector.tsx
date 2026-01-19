@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { DifficultyDefinition, DifficultyLevel } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
+import { useI18n } from '../i18n';
 
 interface DifficultySelectorProps {
   difficulties: DifficultyDefinition[];
@@ -26,6 +27,7 @@ export function DifficultySelector({
   style,
 }: DifficultySelectorProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
 
   const renderDifficultyCard = (difficulty: DifficultyDefinition) => {
     const isUnlocked = unlockedDifficulties.includes(difficulty.id);
@@ -61,7 +63,7 @@ export function DifficultySelector({
           style={[styles.description, { color: isSelected ? '#fff' : theme.colors.textSecondary }]}
           numberOfLines={2}
         >
-          {isUnlocked ? difficulty.description : '完成更低难度以解锁'}
+          {isUnlocked ? difficulty.description : t('difficulty.locked')}
         </Text>
 
         {/* Modifiers */}
@@ -75,7 +77,7 @@ export function DifficultySelector({
                     { color: isSelected ? '#fff' : theme.colors.textSecondary },
                   ]}
                 >
-                  初始数值:
+                  {t('difficulty.initialStats')}
                 </Text>
                 <View style={styles.modifierList}>
                   {Object.entries(difficulty.initialStats).map(([stat, value]) => (
@@ -101,7 +103,7 @@ export function DifficultySelector({
                     { color: isSelected ? '#fff' : theme.colors.textSecondary },
                   ]}
                 >
-                  每回合:
+                  {t('difficulty.perTurn')}
                 </Text>
                 <View style={styles.modifierList}>
                   {Object.entries(difficulty.perTurnStatChanges).map(([stat, delta]) => (
@@ -134,7 +136,7 @@ export function DifficultySelector({
                     { color: isSelected ? '#fff' : theme.colors.textSecondary },
                   ]}
                 >
-                  特殊规则:
+                  {t('difficulty.specialRules')}
                 </Text>
                 {difficulty.specialRules.map((rule, index) => (
                   <Text
@@ -176,7 +178,7 @@ export function DifficultySelector({
 
   return (
     <View style={[styles.container, style]}>
-      <Text style={[styles.title, { color: theme.colors.text }]}>选择难度</Text>
+      <Text style={[styles.title, { color: theme.colors.text }]}>{t('difficulty.title')}</Text>
       <View style={styles.difficultyList}>{difficulties.map(renderDifficultyCard)}</View>
     </View>
   );

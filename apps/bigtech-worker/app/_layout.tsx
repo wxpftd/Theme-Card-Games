@@ -1,11 +1,16 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ThemeProvider } from '@theme-card-games/ui';
+import { ThemeProvider, I18nProvider, useI18n } from '@theme-card-games/ui';
 import { bigtechWorkerTheme } from '@theme-card-games/theme-bigtech-worker';
 
-export default function RootLayout() {
+/**
+ * Inner layout component that uses the I18n context
+ */
+function InnerLayout() {
+  const { locale } = useI18n();
+
   return (
-    <ThemeProvider themeConfig={bigtechWorkerTheme} locale="zh-CN">
+    <ThemeProvider themeConfig={bigtechWorkerTheme} locale={locale}>
       <StatusBar style="auto" />
       <Stack
         screenOptions={{
@@ -14,5 +19,13 @@ export default function RootLayout() {
         }}
       />
     </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <I18nProvider initialLocale="zh-CN">
+      <InnerLayout />
+    </I18nProvider>
   );
 }

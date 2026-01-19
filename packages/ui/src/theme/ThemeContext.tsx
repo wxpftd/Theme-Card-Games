@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useMemo, useCallback } from 'react';
 import { UITheme, ThemeConfig } from '@theme-card-games/core';
 
 interface ThemeContextValue {
   theme: UITheme;
   config: ThemeConfig;
-  t: (key: string, locale?: string) => string;
+  locale: string;
+  /** Translate a theme-specific key (for game content like cards, achievements, etc.) */
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -16,16 +18,30 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ themeConfig, locale = 'zh-CN', children }: ThemeProviderProps) {
+  const t = useCallback(
+    (key: string, params?: Record<string, string | number>): string => {
+      let text = themeConfig.localization[locale]?.[key] ?? key;
+
+      // Interpolate parameters
+      if (params) {
+        Object.entries(params).forEach(([paramKey, paramValue]) => {
+          text = text.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(paramValue));
+        });
+      }
+
+      return text;
+    },
+    [themeConfig.localization, locale]
+  );
+
   const value = useMemo<ThemeContextValue>(
     () => ({
       theme: themeConfig.uiTheme,
       config: themeConfig,
-      t: (key: string, loc?: string) => {
-        const l = loc ?? locale;
-        return themeConfig.localization[l]?.[key] ?? key;
-      },
+      locale,
+      t,
     }),
-    [themeConfig, locale]
+    [themeConfig, locale, t]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

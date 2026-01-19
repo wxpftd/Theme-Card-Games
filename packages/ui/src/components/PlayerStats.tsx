@@ -2,6 +2,7 @@ import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { PlayerState, StatDefinition, ResourceDefinition } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
+import { useI18n } from '../i18n';
 
 interface PlayerStatsProps {
   player: PlayerState;
@@ -89,6 +90,7 @@ function PlayerStatsComponent({
   style,
 }: PlayerStatsProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
 
   // Memoize colors object to prevent child re-renders
   const statColors = useMemo(
@@ -119,7 +121,9 @@ function PlayerStatsComponent({
 
       {/* Stats */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>状态</Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>
+          {t('stats.title')}
+        </Text>
         <View style={styles.statsGrid}>
           {statDefinitions.map((stat) => (
             <StatItem
@@ -135,7 +139,9 @@ function PlayerStatsComponent({
 
       {/* Resources */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>资源</Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>
+          {t('stats.resources')}
+        </Text>
         <View style={styles.resourcesRow}>
           {resourceDefinitions.map((resource) => (
             <ResourceItem
@@ -152,7 +158,9 @@ function PlayerStatsComponent({
       {/* Active Statuses */}
       {player.statuses.length > 0 && (
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>状态效果</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>
+            {t('stats.statusEffects')}
+          </Text>
           <View style={styles.statusesRow}>
             {player.statuses.map((status, index) => (
               <View

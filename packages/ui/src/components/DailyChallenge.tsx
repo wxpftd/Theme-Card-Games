@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import {
   DailyChallengeDefinition,
@@ -6,6 +6,7 @@ import {
   AchievementReward,
 } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
+import { useI18n } from '../i18n';
 
 interface DailyChallengeProps {
   challenge: DailyChallengeDefinition | null;
@@ -29,12 +30,38 @@ export function DailyChallenge({
   style,
 }: DailyChallengeProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
+
+  const getConditionText = useCallback(
+    (condition: any): string => {
+      switch (condition.type) {
+        case 'no_card_tag':
+          return t('condition.noCardTag', { tag: condition.tag });
+        case 'max_resource_usage':
+          return t('condition.maxResourceUsage', {
+            resource: condition.resource,
+            max: condition.max,
+          });
+        case 'min_stat_at_win':
+          return t('condition.minStatAtWin', { stat: condition.stat, min: condition.min });
+        case 'max_turns':
+          return t('condition.maxTurns', { turns: condition.turns });
+        case 'no_card_type':
+          return t('condition.noCardType', { cardType: condition.cardType });
+        case 'min_card_usage':
+          return t('condition.minCardUsage', { count: condition.count, cardTag: condition.cardTag });
+        default:
+          return t('condition.special');
+      }
+    },
+    [t]
+  );
 
   if (!challenge || !instance) {
     return (
       <View style={[styles.container, { backgroundColor: theme.colors.surface }, style]}>
         <Text style={[styles.loadingText, { color: theme.colors.textSecondary }]}>
-          加载每日挑战中...
+          {t('dailyChallenge.loading')}
         </Text>
       </View>
     );
@@ -49,7 +76,7 @@ export function DailyChallenge({
       <View style={[styles.header, { backgroundColor: theme.colors.primary }]}>
         <Text style={styles.headerIcon}>{challenge.icon}</Text>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>每日挑战</Text>
+          <Text style={styles.headerTitle}>{t('dailyChallenge.title')}</Text>
           <Text style={styles.headerDate}>{instance.date}</Text>
         </View>
         {isCompleted && (
@@ -68,7 +95,9 @@ export function DailyChallenge({
 
         {/* Difficulty */}
         <View style={styles.difficultyRow}>
-          <Text style={[styles.difficultyLabel, { color: theme.colors.textSecondary }]}>难度:</Text>
+          <Text style={[styles.difficultyLabel, { color: theme.colors.textSecondary }]}>
+            {t('dailyChallenge.difficulty')}
+          </Text>
           <Text style={[styles.difficultyStars, { color: theme.colors.warning }]}>
             {difficultyStars}
           </Text>
@@ -76,7 +105,9 @@ export function DailyChallenge({
 
         {/* Conditions */}
         <View style={styles.conditionsSection}>
-          <Text style={[styles.conditionsLabel, { color: theme.colors.text }]}>挑战条件:</Text>
+          <Text style={[styles.conditionsLabel, { color: theme.colors.text }]}>
+            {t('dailyChallenge.conditions')}
+          </Text>
           {challenge.conditions.map((condition, index) => (
             <View
               key={index}
@@ -105,7 +136,9 @@ export function DailyChallenge({
 
         {/* Rewards */}
         <View style={styles.rewardsSection}>
-          <Text style={[styles.rewardsLabel, { color: theme.colors.text }]}>奖励:</Text>
+          <Text style={[styles.rewardsLabel, { color: theme.colors.text }]}>
+            {t('dailyChallenge.rewards')}
+          </Text>
           <View style={styles.rewardsList}>
             {challenge.rewards.map((reward, index) => (
               <View
@@ -126,19 +159,25 @@ export function DailyChallenge({
       <View style={[styles.streakSection, { backgroundColor: theme.colors.background }]}>
         <View style={styles.streakItem}>
           <Text style={[styles.streakValue, { color: theme.colors.primary }]}>{currentStreak}</Text>
-          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>当前连胜</Text>
+          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>
+            {t('dailyChallenge.currentStreak')}
+          </Text>
         </View>
         <View style={styles.streakDivider} />
         <View style={styles.streakItem}>
           <Text style={[styles.streakValue, { color: theme.colors.accent }]}>{bestStreak}</Text>
-          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>最佳连胜</Text>
+          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>
+            {t('dailyChallenge.bestStreak')}
+          </Text>
         </View>
         <View style={styles.streakDivider} />
         <View style={styles.streakItem}>
           <Text style={[styles.streakValue, { color: theme.colors.text }]}>
             {instance.attemptCount}
           </Text>
-          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>今日尝试</Text>
+          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>
+            {t('dailyChallenge.todayAttempts')}
+          </Text>
         </View>
       </View>
 
@@ -147,7 +186,7 @@ export function DailyChallenge({
         <View style={[styles.streakBonus, { backgroundColor: `${theme.colors.success}20` }]}>
           <Text style={styles.streakBonusIcon}>🎁</Text>
           <Text style={[styles.streakBonusText, { color: theme.colors.success }]}>
-            连胜奖励: {streakBonus.description || `${streakBonus.value}`}
+            {t('dailyChallenge.streakBonus')} {streakBonus.description || `${streakBonus.value}`}
           </Text>
         </View>
       )}
@@ -160,7 +199,7 @@ export function DailyChallenge({
             onPress={onStartChallenge}
           >
             <Text style={styles.startButtonText}>
-              {instance.attemptCount > 0 ? '再次挑战' : '开始挑战'}
+              {instance.attemptCount > 0 ? t('dailyChallenge.retry') : t('dailyChallenge.start')}
             </Text>
           </TouchableOpacity>
         ) : (
@@ -168,31 +207,12 @@ export function DailyChallenge({
             style={[styles.completedButton, { backgroundColor: theme.colors.success }]}
             onPress={onViewRewards}
           >
-            <Text style={styles.completedButtonText}>查看奖励</Text>
+            <Text style={styles.completedButtonText}>{t('dailyChallenge.viewRewards')}</Text>
           </TouchableOpacity>
         )}
       </View>
     </View>
   );
-}
-
-function getConditionText(condition: any): string {
-  switch (condition.type) {
-    case 'no_card_tag':
-      return `不使用 "${condition.tag}" 类卡牌`;
-    case 'max_resource_usage':
-      return `${condition.resource} 消耗不超过 ${condition.max}`;
-    case 'min_stat_at_win':
-      return `通关时 ${condition.stat} 至少 ${condition.min}`;
-    case 'max_turns':
-      return `${condition.turns} 回合内完成`;
-    case 'no_card_type':
-      return `不使用 ${condition.cardType} 类型卡牌`;
-    case 'min_card_usage':
-      return `使用至少 ${condition.count} 张 "${condition.cardTag}" 卡牌`;
-    default:
-      return '特殊条件';
-  }
 }
 
 function getRewardIcon(type: string): string {
