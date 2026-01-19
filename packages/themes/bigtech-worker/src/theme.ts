@@ -571,7 +571,12 @@ const cards: CardDefinition[] = [
     effects: [
       { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: 15 },
       { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: -8 },
-      { type: 'apply_status', target: 'self', metadata: { statusId: 'sick_leave_debuff' }, value: 1 },
+      {
+        type: 'apply_status',
+        target: 'self',
+        metadata: { statusId: 'sick_leave_debuff' },
+        value: 1,
+      },
     ],
     cost: 0,
     rarity: 'common',

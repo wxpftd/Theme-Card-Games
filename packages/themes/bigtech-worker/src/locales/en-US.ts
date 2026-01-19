@@ -124,21 +124,26 @@ export const enUS = {
 
   // Cards - Reversal
   'card.slacking_caught': 'Caught Slacking',
-  'card.slacking_caught.desc': 'Boss caught you slacking! Performance -15, but draw 2 cards in panic',
+  'card.slacking_caught.desc':
+    'Boss caught you slacking! Performance -15, but draw 2 cards in panic',
   'card.manage_up': 'Manage Up',
-  'card.manage_up.desc': 'Use connections for upward management, spend 3 Connections, Performance +15',
+  'card.manage_up.desc':
+    'Use connections for upward management, spend 3 Connections, Performance +15',
   'card.paid_training': 'Paid Training',
   'card.paid_training.desc': 'Attend company training, Skill Points +3, no Energy cost',
 
   // Cards - High Risk High Reward
   'card.startup_dream': 'Startup Dream',
-  'card.startup_dream.desc': 'A startup idea pops up! 50% chance to double salary, 50% chance to lose it all',
+  'card.startup_dream.desc':
+    'A startup idea pops up! 50% chance to double salary, 50% chance to lose it all',
   'card.tech_speech': 'Tech Speech',
-  'card.tech_speech.desc': 'Give a tech speech, Influence +15, but 20% chance to fail and lose 10 Influence',
+  'card.tech_speech.desc':
+    'Give a tech speech, Influence +15, but 20% chance to fail and lose 10 Influence',
 
   // Cards - Survival
   'card.sick_leave': 'Sick Leave',
-  'card.sick_leave.desc': 'Take a sick day, Health +15, Performance -8, cannot use work cards next turn',
+  'card.sick_leave.desc':
+    'Take a sick day, Health +15, Performance -8, cannot use work cards next turn',
   'card.therapy': 'Therapy Session',
   'card.therapy.desc': 'Book a therapy session, Happiness +20, spend 2 Salary',
 
@@ -164,7 +169,8 @@ export const enUS = {
   'status.inspiration': 'Inspiration Burst',
   'status.inspiration.desc': 'Creative inspiration: Skills +2/turn',
   'status.sick_leave_debuff': 'On Sick Leave',
-  'status.sick_leave_debuff.desc': 'Currently on sick leave, cannot perform work-related activities',
+  'status.sick_leave_debuff.desc':
+    'Currently on sick leave, cannot perform work-related activities',
 
   // Random Events
   'event.performance_review': 'Performance Review',
