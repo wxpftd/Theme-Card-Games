@@ -117,6 +117,26 @@ export const zhCN = {
   'card.work_from_home': '居家办公',
   'card.work_from_home.desc': '今天远程办公，幸福感+8，健康+5，绩效-2',
 
+  // Cards - Reversal (反转类)
+  'card.slacking_caught': '摸鱼被抓',
+  'card.slacking_caught.desc': '摸鱼被领导发现了！绩效-15，但慌乱中抽2张卡',
+  'card.manage_up': '向上管理',
+  'card.manage_up.desc': '运用人脉关系进行向上管理，消耗3人脉，绩效+15',
+  'card.paid_training': '带薪学习',
+  'card.paid_training.desc': '参加公司内部培训，技能+3，不消耗精力',
+
+  // Cards - High Risk High Reward (高风险高收益)
+  'card.startup_dream': '创业念头',
+  'card.startup_dream.desc': '脑海中冒出创业想法！50%概率薪资翻倍，50%概率薪资归零',
+  'card.tech_speech': '演讲分享',
+  'card.tech_speech.desc': '进行技术演讲分享，影响力+15，但有20%概率失败导致影响力-10',
+
+  // Cards - Survival (生存类)
+  'card.sick_leave': '请病假',
+  'card.sick_leave.desc': '请一天病假休息，健康+15，绩效-8，下回合不能使用工作卡',
+  'card.therapy': '心理咨询',
+  'card.therapy.desc': '预约心理咨询师，幸福感+20，消耗薪资2',
+
   // Combos
   'combo.night_warrior': '熬夜战士',
   'combo.night_warrior.desc': '一回合打出3张以上加班卡，获得额外绩效加成',
@@ -136,6 +156,8 @@ export const zhCN = {
   'status.burnout.desc': '严重倦怠：所有卡牌消耗精力+1',
   'status.inspiration': '灵感爆发',
   'status.inspiration.desc': '创意灵感：每回合技能+2',
+  'status.sick_leave_debuff': '病假中',
+  'status.sick_leave_debuff.desc': '正在休病假，不能进行工作相关活动',
 
   // Random Events
   'event.performance_review': '绩效评估',

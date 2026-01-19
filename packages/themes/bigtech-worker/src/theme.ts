@@ -473,6 +473,128 @@ const cards: CardDefinition[] = [
     rarity: 'uncommon',
     tags: ['rest', 'social', 'upgraded'],
   },
+
+  // ==================== 反转类卡牌 ====================
+  {
+    id: 'slacking_caught',
+    type: 'event',
+    name: '摸鱼被抓',
+    description: '摸鱼被领导发现了！绩效-15，但慌乱中抽2张卡',
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: -15 },
+      { type: 'draw_cards', target: 'self', value: 2 },
+    ],
+    cost: 0,
+    rarity: 'uncommon',
+    tags: ['rest', 'risk', 'reversal'],
+  },
+  {
+    id: 'manage_up',
+    type: 'action',
+    name: '向上管理',
+    description: '运用人脉关系进行向上管理，消耗3人脉，绩效+15',
+    effects: [
+      { type: 'lose_resource', target: 'self', metadata: { resource: 'connections' }, value: 3 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: 15 },
+    ],
+    cost: 1,
+    rarity: 'rare',
+    tags: ['work', 'social', 'reversal'],
+  },
+  {
+    id: 'paid_training',
+    type: 'action',
+    name: '带薪学习',
+    description: '参加公司内部培训，技能+3，不消耗精力',
+    effects: [
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'skills' }, value: 3 },
+    ],
+    cost: 0,
+    rarity: 'uncommon',
+    tags: ['growth', 'reversal'],
+  },
+
+  // ==================== 高风险高收益卡牌 ====================
+  {
+    id: 'startup_dream',
+    type: 'event',
+    name: '创业念头',
+    description: '脑海中冒出创业想法！50%概率薪资翻倍，50%概率薪资归零',
+    effects: [
+      {
+        type: 'custom',
+        target: 'self',
+        metadata: {
+          handler: 'random_resource_gamble',
+          resource: 'money',
+          successMultiplier: 2,
+          failMultiplier: 0,
+          successChance: 0.5,
+        },
+        value: 0,
+      },
+    ],
+    cost: 0,
+    rarity: 'rare',
+    tags: ['strategy', 'high_risk'],
+  },
+  {
+    id: 'tech_speech',
+    type: 'action',
+    name: '演讲分享',
+    description: '进行技术演讲分享，影响力+15，但有20%概率失败导致影响力-10',
+    effects: [
+      {
+        type: 'custom',
+        target: 'self',
+        metadata: {
+          handler: 'random_stat_gamble',
+          stat: 'influence',
+          successValue: 15,
+          failValue: -10,
+          failChance: 0.2,
+        },
+        value: 0,
+      },
+    ],
+    cost: 2,
+    rarity: 'uncommon',
+    tags: ['work', 'social', 'high_risk'],
+  },
+
+  // ==================== 生存类卡牌 ====================
+  {
+    id: 'sick_leave',
+    type: 'action',
+    name: '请病假',
+    description: '请一天病假休息，健康+15，绩效-8，下回合不能使用工作卡',
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: 15 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: -8 },
+      {
+        type: 'apply_status',
+        target: 'self',
+        metadata: { statusId: 'sick_leave_debuff' },
+        value: 1,
+      },
+    ],
+    cost: 0,
+    rarity: 'common',
+    tags: ['life', 'rest', 'survival'],
+  },
+  {
+    id: 'therapy',
+    type: 'action',
+    name: '心理咨询',
+    description: '预约心理咨询师，幸福感+20，消耗薪资2',
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 20 },
+      { type: 'lose_resource', target: 'self', metadata: { resource: 'money' }, value: 2 },
+    ],
+    cost: 1,
+    rarity: 'uncommon',
+    tags: ['life', 'survival'],
+  },
 ];
 
 // ============================================================================
@@ -733,6 +855,23 @@ const statusDefinitions: StatusDefinition[] = [
       operator: '<',
       value: 30,
     },
+  },
+  // 病假状态：请病假后触发，下回合不能使用工作卡
+  {
+    id: 'sick_leave_debuff',
+    name: '病假中',
+    description: '正在休病假，不能进行工作相关活动',
+    icon: '🏥',
+    duration: 1,
+    stackable: false,
+    effects: [
+      {
+        type: 'custom',
+        target: 'self',
+        metadata: { modifierType: 'block_tag', tag: 'work' },
+        value: 1,
+      },
+    ],
   },
 ];
 
