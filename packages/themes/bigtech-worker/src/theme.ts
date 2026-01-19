@@ -891,7 +891,12 @@ const randomEventDefinitions: RandomEventDefinition[] = [
         weight: 50,
         description: '面试顺利，成功跳槽！消耗2人脉，薪资+8',
         effects: [
-          { type: 'lose_resource', target: 'self', metadata: { resource: 'connections' }, value: 2 },
+          {
+            type: 'lose_resource',
+            target: 'self',
+            metadata: { resource: 'connections' },
+            value: 2,
+          },
           { type: 'gain_resource', target: 'self', metadata: { resource: 'money' }, value: 8 },
           { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 10 },
           { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: -20 },
@@ -901,7 +906,12 @@ const randomEventDefinitions: RandomEventDefinition[] = [
         weight: 50,
         description: '面试失败了，但积累了经验。消耗2人脉，获得2技能点',
         effects: [
-          { type: 'lose_resource', target: 'self', metadata: { resource: 'connections' }, value: 2 },
+          {
+            type: 'lose_resource',
+            target: 'self',
+            metadata: { resource: 'connections' },
+            value: 2,
+          },
           { type: 'gain_resource', target: 'self', metadata: { resource: 'skills' }, value: 2 },
           { type: 'modify_stat', target: 'self', metadata: { stat: 'influence' }, value: 1 },
         ],

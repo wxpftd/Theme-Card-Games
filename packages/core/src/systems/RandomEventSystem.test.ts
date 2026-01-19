@@ -2,12 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { RandomEventSystem } from './RandomEventSystem';
 import { EffectResolver } from '../card/EffectResolver';
 import { EventBus } from '../event/EventBus';
-import {
-  RandomEventDefinition,
-  RandomEventConfig,
-  PlayerState,
-  GameState,
-} from '../types';
+import { RandomEventDefinition, RandomEventConfig, PlayerState, GameState } from '../types';
 
 describe('RandomEventSystem', () => {
   let randomEventSystem: RandomEventSystem;
@@ -272,9 +267,9 @@ describe('RandomEventSystem', () => {
     });
 
     it('should use custom handler when specified', () => {
-      const customHandler = vi.fn().mockReturnValue([
-        { type: 'modify_stat', target: 'player1', before: 50, after: 75 },
-      ]);
+      const customHandler = vi
+        .fn()
+        .mockReturnValue([{ type: 'modify_stat', target: 'player1', before: 50, after: 75 }]);
 
       const customSystem = new RandomEventSystem({
         eventDefinitions: [mockEventDefinitions[3]], // custom_event
@@ -349,10 +344,7 @@ describe('RandomEventSystem', () => {
     it('should process events for all players when trigger condition is met', () => {
       vi.spyOn(Math, 'random').mockReturnValue(0.1); // Always trigger
 
-      const players = [
-        player,
-        { ...player, id: 'player2', name: 'Player 2' },
-      ];
+      const players = [player, { ...player, id: 'player2', name: 'Player 2' }];
 
       const results = randomEventSystem.processTurnEnd(3, players, gameState);
 
