@@ -1,4 +1,10 @@
-import { ThemeConfig, CardDefinition, StatDefinition, ResourceDefinition, UITheme } from '@theme-card-games/core';
+import {
+  ThemeConfig,
+  CardDefinition,
+  StatDefinition,
+  ResourceDefinition,
+  UITheme,
+} from '@theme-card-games/core';
 
 /**
  * 大厂打工主题配置
@@ -392,16 +398,16 @@ const cards: CardDefinition[] = [
 // ============================================================================
 const uiTheme: UITheme = {
   colors: {
-    primary: '#1E88E5',      // 科技蓝
-    secondary: '#43A047',    // 成长绿
-    background: '#F5F5F5',   // 浅灰背景
-    surface: '#FFFFFF',      // 白色卡片
-    text: '#212121',         // 深灰文字
+    primary: '#1E88E5', // 科技蓝
+    secondary: '#43A047', // 成长绿
+    background: '#F5F5F5', // 浅灰背景
+    surface: '#FFFFFF', // 白色卡片
+    text: '#212121', // 深灰文字
     textSecondary: '#757575', // 次要文字
-    accent: '#FF6B35',       // 强调橙
-    error: '#D32F2F',        // 错误红
-    success: '#388E3C',      // 成功绿
-    warning: '#F57C00',      // 警告橙
+    accent: '#FF6B35', // 强调橙
+    error: '#D32F2F', // 错误红
+    success: '#388E3C', // 成功绿
+    warning: '#F57C00', // 警告橙
   },
   fonts: {
     regular: 'System',

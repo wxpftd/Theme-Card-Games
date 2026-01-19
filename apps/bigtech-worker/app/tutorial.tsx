@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '@theme-card-games/ui';
 import { bigtechWorkerTheme } from '@theme-card-games/theme-bigtech-worker';
@@ -20,8 +13,7 @@ interface TutorialStep {
 const tutorialSteps: TutorialStep[] = [
   {
     title: '欢迎来到大厂',
-    content:
-      '你是一名刚入职的大厂员工，你的目标是在保持身心健康的同时，努力提升绩效获得晋升！',
+    content: '你是一名刚入职的大厂员工，你的目标是在保持身心健康的同时，努力提升绩效获得晋升！',
     emoji: '🏢',
   },
   {
@@ -44,8 +36,7 @@ const tutorialSteps: TutorialStep[] = [
   },
   {
     title: '策略是关键',
-    content:
-      '过度加班会损害健康，过度摸鱼会影响绩效。找到适合自己的节奏，成为最会生存的打工人！',
+    content: '过度加班会损害健康，过度摸鱼会影响绩效。找到适合自己的节奏，成为最会生存的打工人！',
     emoji: '🎯',
   },
   {
@@ -81,15 +72,11 @@ export default function TutorialScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleSkip}>
-          <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>
-            跳过
-          </Text>
+          <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>跳过</Text>
         </TouchableOpacity>
         <View style={styles.dots}>
           {tutorialSteps.map((_, index) => (
@@ -99,9 +86,7 @@ export default function TutorialScreen() {
                 styles.dot,
                 {
                   backgroundColor:
-                    index === currentStep
-                      ? theme.colors.primary
-                      : theme.colors.background,
+                    index === currentStep ? theme.colors.primary : theme.colors.background,
                   borderColor: theme.colors.primary,
                 },
               ]}
@@ -114,9 +99,7 @@ export default function TutorialScreen() {
       {/* Content */}
       <View style={styles.content}>
         <Text style={styles.emoji}>{step.emoji}</Text>
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          {step.title}
-        </Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>{step.title}</Text>
         <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
           {step.content}
         </Text>
@@ -133,17 +116,11 @@ export default function TutorialScreen() {
           {bigtechWorkerTheme.cards.slice(0, 5).map((card) => (
             <View
               key={card.id}
-              style={[
-                styles.cardPreview,
-                { backgroundColor: theme.colors.surface },
-              ]}
+              style={[styles.cardPreview, { backgroundColor: theme.colors.surface }]}
             >
               <Text style={styles.cardName}>{card.name}</Text>
               <Text
-                style={[
-                  styles.cardDesc,
-                  { color: theme.colors.textSecondary },
-                ]}
+                style={[styles.cardDesc, { color: theme.colors.textSecondary }]}
                 numberOfLines={3}
               >
                 {card.description}
@@ -159,8 +136,7 @@ export default function TutorialScreen() {
           style={[
             styles.navButton,
             {
-              backgroundColor:
-                currentStep > 0 ? theme.colors.surface : 'transparent',
+              backgroundColor: currentStep > 0 ? theme.colors.surface : 'transparent',
             },
           ]}
           onPress={handlePrev}
@@ -170,10 +146,7 @@ export default function TutorialScreen() {
             style={[
               styles.navButtonText,
               {
-                color:
-                  currentStep > 0
-                    ? theme.colors.text
-                    : theme.colors.background,
+                color: currentStep > 0 ? theme.colors.text : theme.colors.background,
               },
             ]}
           >

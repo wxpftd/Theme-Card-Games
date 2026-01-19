@@ -156,7 +156,7 @@ export class EffectResolver {
       case 'self':
         return [gameState.players[sourcePlayerId]].filter(Boolean);
       case 'opponent':
-        return players.filter(p => p.id !== sourcePlayerId);
+        return players.filter((p) => p.id !== sourcePlayerId);
       case 'all_players':
         return players;
       case 'random_player':
@@ -300,7 +300,7 @@ export class EffectResolver {
     if (!statusId) return null;
 
     for (const player of targets) {
-      const index = player.statuses.findIndex(s => s.id === statusId);
+      const index = player.statuses.findIndex((s) => s.id === statusId);
       if (index !== -1) {
         const removed = player.statuses.splice(index, 1)[0];
         return {

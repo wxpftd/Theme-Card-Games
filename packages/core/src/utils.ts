@@ -16,7 +16,7 @@ export function deepClone<T>(obj: T): T {
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(item => deepClone(item)) as unknown as T;
+    return obj.map((item) => deepClone(item)) as unknown as T;
   }
 
   const cloned = {} as T;
@@ -76,7 +76,7 @@ export function weightedRandom<T>(items: T[], weights: number[]): T {
  * Delay execution
  */
 export function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**

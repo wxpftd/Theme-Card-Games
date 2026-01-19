@@ -17,11 +17,7 @@ export class EventBus {
   /**
    * Subscribe to an event type
    */
-  on(
-    eventType: GameEventType | '*',
-    handler: GameEventHandler,
-    priority: number = 0
-  ): () => void {
+  on(eventType: GameEventType | '*', handler: GameEventHandler, priority: number = 0): () => void {
     return this.addListener(eventType, handler, false, priority);
   }
 
@@ -43,7 +39,7 @@ export class EventBus {
     const listeners = this.listeners.get(eventType);
     if (!listeners) return;
 
-    const index = listeners.findIndex(l => l.handler === handler);
+    const index = listeners.findIndex((l) => l.handler === handler);
     if (index !== -1) {
       listeners.splice(index, 1);
     }
@@ -97,11 +93,7 @@ export class EventBus {
   /**
    * Emit a simple event
    */
-  emitSimple(
-    type: GameEventType,
-    data: Record<string, unknown>,
-    state: GameState
-  ): void {
+  emitSimple(type: GameEventType, data: Record<string, unknown>, state: GameState): void {
     this.emit(
       {
         type,
@@ -123,7 +115,7 @@ export class EventBus {
    * Get events of a specific type from history
    */
   getEventsOfType(type: GameEventType): GameEvent[] {
-    return this.eventHistory.filter(e => e.type === type);
+    return this.eventHistory.filter((e) => e.type === type);
   }
 
   /**

@@ -117,7 +117,7 @@ export class TurnManager {
    * Skip to a specific phase
    */
   skipToPhase(phaseName: GamePhase): boolean {
-    const phaseIndex = this.phases.findIndex(p => p.name === phaseName);
+    const phaseIndex = this.phases.findIndex((p) => p.name === phaseName);
     if (phaseIndex === -1) return false;
 
     this.clearPhaseTimer();
@@ -181,7 +181,7 @@ export class TurnManager {
    * Handle phase change
    */
   private onPhaseChanged(phase: GamePhase): void {
-    const config = this.phases.find(p => p.name === phase);
+    const config = this.phases.find((p) => p.name === phase);
     if (!config) return;
 
     // Execute onEnter
@@ -259,7 +259,7 @@ export class TurnManager {
    * Remove a phase
    */
   removePhase(phaseName: GamePhase): boolean {
-    const index = this.phases.findIndex(p => p.name === phaseName);
+    const index = this.phases.findIndex((p) => p.name === phaseName);
     if (index === -1) return false;
 
     this.phases.splice(index, 1);

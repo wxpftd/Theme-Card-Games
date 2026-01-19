@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { PlayerState, StatDefinition, ResourceDefinition } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -35,13 +29,7 @@ export function GameOverScreen({
   const isWinner = winner?.id === player.id;
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.background },
-        style,
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: theme.colors.background }, style]}>
       <View style={[styles.card, { backgroundColor: theme.colors.surface }]}>
         {/* Result Header */}
         <View
@@ -53,23 +41,17 @@ export function GameOverScreen({
           ]}
         >
           <Text style={styles.emoji}>{isWinner ? '🎉' : '😢'}</Text>
-          <Text style={styles.resultText}>
-            {isWinner ? '游戏胜利！' : '游戏结束'}
-          </Text>
+          <Text style={styles.resultText}>{isWinner ? '游戏胜利！' : '游戏结束'}</Text>
         </View>
 
         {/* Reason */}
         {reason && (
-          <Text style={[styles.reason, { color: theme.colors.textSecondary }]}>
-            {reason}
-          </Text>
+          <Text style={[styles.reason, { color: theme.colors.textSecondary }]}>{reason}</Text>
         )}
 
         {/* Final Stats */}
         <View style={styles.statsSection}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-            最终数据
-          </Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>最终数据</Text>
 
           <View style={styles.statsGrid}>
             {statDefinitions.map((stat) => {
@@ -77,14 +59,8 @@ export function GameOverScreen({
               return (
                 <View key={stat.id} style={styles.statRow}>
                   <Text style={styles.statIcon}>{stat.icon}</Text>
-                  <Text style={[styles.statName, { color: theme.colors.text }]}>
-                    {stat.name}
-                  </Text>
-                  <Text
-                    style={[styles.statValue, { color: theme.colors.primary }]}
-                  >
-                    {value}
-                  </Text>
+                  <Text style={[styles.statName, { color: theme.colors.text }]}>{stat.name}</Text>
+                  <Text style={[styles.statValue, { color: theme.colors.primary }]}>{value}</Text>
                 </View>
               );
             })}
@@ -96,23 +72,11 @@ export function GameOverScreen({
               return (
                 <View
                   key={resource.id}
-                  style={[
-                    styles.resourceItem,
-                    { backgroundColor: theme.colors.background },
-                  ]}
+                  style={[styles.resourceItem, { backgroundColor: theme.colors.background }]}
                 >
                   <Text style={styles.resourceIcon}>{resource.icon}</Text>
-                  <Text
-                    style={[styles.resourceValue, { color: theme.colors.text }]}
-                  >
-                    {value}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.resourceName,
-                      { color: theme.colors.textSecondary },
-                    ]}
-                  >
+                  <Text style={[styles.resourceValue, { color: theme.colors.text }]}>{value}</Text>
+                  <Text style={[styles.resourceName, { color: theme.colors.textSecondary }]}>
                     {resource.name}
                   </Text>
                 </View>
@@ -124,27 +88,17 @@ export function GameOverScreen({
         {/* Actions */}
         <View style={styles.actions}>
           <TouchableOpacity
-            style={[
-              styles.button,
-              styles.primaryButton,
-              { backgroundColor: theme.colors.primary },
-            ]}
+            style={[styles.button, styles.primaryButton, { backgroundColor: theme.colors.primary }]}
             onPress={onRestart}
           >
             <Text style={styles.primaryButtonText}>再来一局</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              styles.button,
-              styles.secondaryButton,
-              { borderColor: theme.colors.primary },
-            ]}
+            style={[styles.button, styles.secondaryButton, { borderColor: theme.colors.primary }]}
             onPress={onMainMenu}
           >
-            <Text
-              style={[styles.secondaryButtonText, { color: theme.colors.primary }]}
-            >
+            <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>
               返回主页
             </Text>
           </TouchableOpacity>

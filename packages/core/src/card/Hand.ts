@@ -59,7 +59,7 @@ export class Hand {
    * Remove a specific card from the hand
    */
   removeCard(cardId: string): Card | null {
-    const index = this.cards.findIndex(c => c.id === cardId);
+    const index = this.cards.findIndex((c) => c.id === cardId);
     if (index === -1) return null;
 
     const [card] = this.cards.splice(index, 1);
@@ -105,7 +105,7 @@ export class Hand {
    */
   discardAll(): Card[] {
     const discarded = [...this.cards];
-    discarded.forEach(c => c.setState('discarded'));
+    discarded.forEach((c) => c.setState('discarded'));
     this.cards = [];
     return discarded;
   }
@@ -114,7 +114,7 @@ export class Hand {
    * Get a card by ID without removing it
    */
   getCard(cardId: string): Card | null {
-    return this.cards.find(c => c.id === cardId) ?? null;
+    return this.cards.find((c) => c.id === cardId) ?? null;
   }
 
   /**
@@ -135,14 +135,14 @@ export class Hand {
    * Find cards matching a filter
    */
   findCards(filter: CardFilter): Card[] {
-    return this.cards.filter(card => card.matches(filter));
+    return this.cards.filter((card) => card.matches(filter));
   }
 
   /**
    * Check if hand contains a card matching filter
    */
   hasCard(filter: CardFilter): boolean {
-    return this.cards.some(card => card.matches(filter));
+    return this.cards.some((card) => card.matches(filter));
   }
 
   /**
@@ -198,7 +198,7 @@ export class Hand {
       return [];
     }
     const overflow = this.cards.splice(this.maxSize);
-    overflow.forEach(c => c.setState('discarded'));
+    overflow.forEach((c) => c.setState('discarded'));
     return overflow;
   }
 
