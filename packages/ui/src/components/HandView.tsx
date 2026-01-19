@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, ViewStyle } from 'react-native';
 import { CardDefinition, CardInstance } from '@theme-card-games/core';
 import { Card } from './Card';
@@ -15,7 +15,7 @@ interface HandViewProps {
   style?: ViewStyle;
 }
 
-export function HandView({
+function HandViewComponent({
   cards,
   cardDefinitions,
   onCardSelect,
@@ -25,26 +25,39 @@ export function HandView({
   maxVisible = 10,
   style,
 }: HandViewProps) {
-  const { theme, t } = useTheme();
-  const [expandedView, setExpandedView] = useState(false);
+  const { theme } = useTheme();
 
-  const visibleCards = cards.slice(0, maxVisible);
+  const visibleCards = useMemo(() => cards.slice(0, maxVisible), [cards, maxVisible]);
   const hasMore = cards.length > maxVisible;
 
-  const getCardDefinition = (card: CardInstance): CardDefinition | null => {
-    return cardDefinitions.get(card.definitionId) ?? null;
-  };
+  const getCardDefinition = useCallback(
+    (card: CardInstance): CardDefinition | null => {
+      return cardDefinitions.get(card.definitionId) ?? null;
+    },
+    [cardDefinitions]
+  );
 
-  const handleCardPress = (cardId: string) => {
-    if (disabled) return;
+  // Use useCallback to prevent creating new function references
+  const handleCardPress = useCallback(
+    (cardId: string) => {
+      if (disabled) return;
 
-    if (selectedCardId === cardId) {
-      // Double tap to play
+      if (selectedCardId === cardId) {
+        // Double tap to play
+        onCardPlay?.(cardId);
+      } else {
+        onCardSelect?.(cardId);
+      }
+    },
+    [disabled, selectedCardId, onCardPlay, onCardSelect]
+  );
+
+  const handleCardLongPress = useCallback(
+    (cardId: string) => {
       onCardPlay?.(cardId);
-    } else {
-      onCardSelect?.(cardId);
-    }
-  };
+    },
+    [onCardPlay]
+  );
 
   return (
     <View style={[styles.container, style]}>
@@ -77,13 +90,13 @@ export function HandView({
                 },
               ]}
             >
-              <Card
+              <CardWithHandlers
                 card={definition}
-                onPress={() => handleCardPress(card.instanceId)}
-                onLongPress={() => onCardPlay?.(card.instanceId)}
+                cardId={card.instanceId}
+                onCardPress={handleCardPress}
+                onCardLongPress={handleCardLongPress}
                 selected={selectedCardId === card.instanceId}
                 disabled={disabled}
-                size="medium"
               />
             </View>
           );
@@ -100,6 +113,42 @@ export function HandView({
     </View>
   );
 }
+
+/** Wrapper component to memoize card press handlers */
+const CardWithHandlers = memo(function CardWithHandlers({
+  card,
+  cardId,
+  onCardPress,
+  onCardLongPress,
+  selected,
+  disabled,
+}: {
+  card: CardDefinition;
+  cardId: string;
+  onCardPress: (cardId: string) => void;
+  onCardLongPress: (cardId: string) => void;
+  selected: boolean;
+  disabled: boolean;
+}) {
+  const handlePress = useCallback(() => onCardPress(cardId), [onCardPress, cardId]);
+  const handleLongPress = useCallback(() => onCardLongPress(cardId), [onCardLongPress, cardId]);
+
+  return (
+    <Card
+      card={card}
+      onPress={handlePress}
+      onLongPress={handleLongPress}
+      selected={selected}
+      disabled={disabled}
+      size="medium"
+    />
+  );
+});
+
+/**
+ * Memoized HandView component to prevent unnecessary re-renders.
+ */
+export const HandView = memo(HandViewComponent);
 
 const styles = StyleSheet.create({
   container: {

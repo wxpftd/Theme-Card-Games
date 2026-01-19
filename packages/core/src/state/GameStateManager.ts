@@ -28,6 +28,12 @@ export class GameStateManager {
   private playerDecks: Map<string, Deck> = new Map();
   private playerHands: Map<string, Hand> = new Map();
 
+  /** State version counter for change detection */
+  private stateVersion: number = 0;
+  /** Cached shallow snapshot */
+  private cachedSnapshot: GameState | null = null;
+  private cachedSnapshotVersion: number = -1;
+
   constructor(options: GameStateManagerOptions) {
     this.cardDefinitions = new Map(options.cardDefinitions.map((def) => [def.id, def]));
     this.eventBus = options.eventBus ?? new EventBus();
@@ -36,9 +42,51 @@ export class GameStateManager {
     this.state = this.createInitialState(options.config);
   }
 
+  /**
+   * Increment state version to invalidate caches
+   */
+  private invalidateCache(): void {
+    this.stateVersion++;
+  }
+
+  /**
+   * Get current state version for change detection
+   */
+  get version(): number {
+    return this.stateVersion;
+  }
+
   // Getters
+  /**
+   * Returns a deep clone of the current state.
+   * Use getStateSnapshot() for better performance when you only need to read the state.
+   * @deprecated Consider using getStateSnapshot() for read-only access
+   */
   get currentState(): GameState {
     return deepClone(this.state);
+  }
+
+  /**
+   * Returns a shallow snapshot of the current state.
+   * This is more performant than currentState but modifications to nested objects
+   * will affect the original state. Use for read-only access.
+   */
+  getStateSnapshot(): Readonly<GameState> {
+    // Return cached snapshot if state hasn't changed
+    if (this.cachedSnapshot && this.cachedSnapshotVersion === this.stateVersion) {
+      return this.cachedSnapshot;
+    }
+
+    // Create shallow snapshot with shallow-cloned players
+    this.cachedSnapshot = {
+      ...this.state,
+      players: { ...this.state.players },
+      sharedState: { ...this.state.sharedState },
+      history: [...this.state.history],
+    };
+    this.cachedSnapshotVersion = this.stateVersion;
+
+    return this.cachedSnapshot;
   }
 
   get phase(): GamePhase {
@@ -100,6 +148,7 @@ export class GameStateManager {
     };
 
     this.state.players[id] = playerState;
+    this.invalidateCache();
 
     // Create deck and hand for player
     const deck = Deck.fromDefinitions(Array.from(this.cardDefinitions.values()));
@@ -134,6 +183,7 @@ export class GameStateManager {
     delete this.state.players[playerId];
     this.playerDecks.delete(playerId);
     this.playerHands.delete(playerId);
+    this.invalidateCache();
 
     return true;
   }
@@ -184,6 +234,7 @@ export class GameStateManager {
 
     this.state.phase = 'draw';
     this.state.turn = 1;
+    this.invalidateCache();
 
     this.eventBus.emitSimple('game_started', {}, this.state);
     this.eventBus.emitSimple(
@@ -201,6 +252,7 @@ export class GameStateManager {
   setPhase(phase: GamePhase): void {
     const previousPhase = this.state.phase;
     this.state.phase = phase;
+    this.invalidateCache();
 
     this.eventBus.emitSimple('phase_changed', { from: previousPhase, to: phase }, this.state);
   }
@@ -255,6 +307,7 @@ export class GameStateManager {
 
     // Sync deck state
     player.deck = deck.getCards().map((c) => c.getInstance());
+    this.invalidateCache();
 
     return drawn;
   }
@@ -304,6 +357,7 @@ export class GameStateManager {
 
     // Sync hand state
     player.hand = hand.getCards().map((c) => c.getInstance());
+    this.invalidateCache();
 
     this.eventBus.emitSimple(
       'card_played',
@@ -340,6 +394,7 @@ export class GameStateManager {
     // Sync states
     player.hand = hand.getCards().map((c) => c.getInstance());
     player.discardPile = deck.getDiscardPile().map((c) => c.getInstance());
+    this.invalidateCache();
 
     this.eventBus.emitSimple('card_discarded', { playerId, cardId }, this.state);
 
@@ -355,6 +410,7 @@ export class GameStateManager {
 
     const before = player.stats[stat] ?? 0;
     player.stats[stat] = before + delta;
+    this.invalidateCache();
 
     this.eventBus.emitSimple(
       'stat_changed',
@@ -379,6 +435,7 @@ export class GameStateManager {
 
     const before = player.stats[stat] ?? 0;
     player.stats[stat] = value;
+    this.invalidateCache();
 
     this.eventBus.emitSimple(
       'stat_changed',
@@ -403,6 +460,7 @@ export class GameStateManager {
 
     const before = player.resources[resource] ?? 0;
     player.resources[resource] = Math.max(0, before + delta);
+    this.invalidateCache();
 
     this.eventBus.emitSimple(
       'resource_changed',
@@ -444,6 +502,7 @@ export class GameStateManager {
     if (nextIndex === 0) {
       this.state.turn++;
     }
+    this.invalidateCache();
 
     // Tick modifiers
     const hand = this.playerHands.get(this.state.currentPlayerId);
@@ -534,6 +593,7 @@ export class GameStateManager {
    */
   endGame(winnerId: string | null, reason: string): void {
     this.state.phase = 'game_over';
+    this.invalidateCache();
 
     this.eventBus.emitSimple(
       'game_ended',
@@ -575,5 +635,6 @@ export class GameStateManager {
     this.playerDecks.clear();
     this.playerHands.clear();
     this.eventBus.clearHistory();
+    this.invalidateCache();
   }
 }

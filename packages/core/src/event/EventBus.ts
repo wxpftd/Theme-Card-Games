@@ -55,15 +55,13 @@ export class EventBus {
       this.eventHistory.shift();
     }
 
-    // Get specific listeners
+    // Get specific listeners (already sorted by priority)
     const specificListeners = this.listeners.get(event.type) ?? [];
-    // Get wildcard listeners
+    // Get wildcard listeners (already sorted by priority)
     const wildcardListeners = this.listeners.get('*') ?? [];
 
-    // Combine and sort by priority (higher first)
-    const allListeners = [...specificListeners, ...wildcardListeners].sort(
-      (a, b) => b.priority - a.priority
-    );
+    // Merge two sorted arrays maintaining priority order (higher first)
+    const allListeners = this.mergeSortedListeners(specificListeners, wildcardListeners);
 
     // Track listeners to remove after execution
     const toRemove: { type: GameEventType | '*'; handler: GameEventHandler }[] = [];
@@ -149,6 +147,40 @@ export class EventBus {
     return this.listeners.get(eventType)?.length ?? 0;
   }
 
+  /**
+   * Merge two sorted listener arrays into one, maintaining priority order (higher first)
+   */
+  private mergeSortedListeners(a: EventListener[], b: EventListener[]): EventListener[] {
+    if (a.length === 0) return b;
+    if (b.length === 0) return a;
+
+    const result: EventListener[] = [];
+    let i = 0;
+    let j = 0;
+
+    while (i < a.length && j < b.length) {
+      if (a[i].priority >= b[j].priority) {
+        result.push(a[i]);
+        i++;
+      } else {
+        result.push(b[j]);
+        j++;
+      }
+    }
+
+    // Add remaining elements
+    while (i < a.length) {
+      result.push(a[i]);
+      i++;
+    }
+    while (j < b.length) {
+      result.push(b[j]);
+      j++;
+    }
+
+    return result;
+  }
+
   private addListener(
     eventType: GameEventType | '*',
     handler: GameEventHandler,
@@ -160,7 +192,15 @@ export class EventBus {
     }
 
     const listener: EventListener = { handler, once, priority };
-    this.listeners.get(eventType)!.push(listener);
+    const listeners = this.listeners.get(eventType)!;
+
+    // Insert in sorted order (higher priority first) to avoid sorting on emit
+    const insertIndex = listeners.findIndex((l) => l.priority < priority);
+    if (insertIndex === -1) {
+      listeners.push(listener);
+    } else {
+      listeners.splice(insertIndex, 0, listener);
+    }
 
     // Return unsubscribe function
     return () => this.off(eventType, handler);

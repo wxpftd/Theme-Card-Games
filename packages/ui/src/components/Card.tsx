@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
 import { CardDefinition, CardRarity } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
@@ -29,7 +29,7 @@ const typeIcons: Record<string, string> = {
   modifier: '🔧',
 };
 
-export function Card({
+function CardComponent({
   card,
   onPress,
   onLongPress,
@@ -41,7 +41,8 @@ export function Card({
 }: CardProps) {
   const { theme } = useTheme();
 
-  const sizeStyles = getSizeStyles(size, theme.cardStyles);
+  // Memoize computed values
+  const sizeStyles = useMemo(() => getSizeStyles(size, theme.cardStyles), [size, theme.cardStyles]);
   const rarityColor = rarityColors[card.rarity ?? 'common'];
   const typeIcon = typeIcons[card.type] ?? '📄';
 
@@ -118,6 +119,23 @@ export function Card({
     </TouchableOpacity>
   );
 }
+
+/**
+ * Memoized Card component to prevent unnecessary re-renders.
+ * Only re-renders when card data, selection state, or handlers change.
+ */
+export const Card = memo(CardComponent, (prevProps, nextProps) => {
+  // Custom comparison for better performance
+  return (
+    prevProps.card.id === nextProps.card.id &&
+    prevProps.selected === nextProps.selected &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.faceDown === nextProps.faceDown &&
+    prevProps.size === nextProps.size &&
+    prevProps.onPress === nextProps.onPress &&
+    prevProps.onLongPress === nextProps.onLongPress
+  );
+});
 
 function getSizeStyles(
   size: 'small' | 'medium' | 'large',

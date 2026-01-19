@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { PlayerState, StatDefinition, ResourceDefinition } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
@@ -11,7 +11,77 @@ interface PlayerStatsProps {
   style?: ViewStyle;
 }
 
-export function PlayerStats({
+/** Memoized stat item to prevent re-renders */
+const StatItem = memo(function StatItem({
+  stat,
+  value,
+  colors,
+  compact,
+}: {
+  stat: StatDefinition;
+  value: number;
+  colors: {
+    text: string;
+    background: string;
+    error: string;
+    warning: string;
+    success: string;
+    primary: string;
+  };
+  compact: boolean;
+}) {
+  const max = stat.max ?? 100;
+  const percentage = Math.min((value / max) * 100, 100);
+  const statColor = getStatColor(stat.id, percentage, colors);
+
+  return (
+    <View style={styles.statItem}>
+      <View style={styles.statHeader}>
+        <Text style={styles.statIcon}>{stat.icon}</Text>
+        <Text style={[styles.statName, { color: colors.text }]} numberOfLines={1}>
+          {compact ? '' : stat.name}
+        </Text>
+        <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
+      </View>
+      <View style={[styles.progressBar, { backgroundColor: colors.background }]}>
+        <View
+          style={[
+            styles.progressFill,
+            {
+              width: `${percentage}%`,
+              backgroundColor: statColor,
+            },
+          ]}
+        />
+      </View>
+    </View>
+  );
+});
+
+/** Memoized resource item to prevent re-renders */
+const ResourceItem = memo(function ResourceItem({
+  resource,
+  value,
+  colors,
+  compact,
+}: {
+  resource: ResourceDefinition;
+  value: number;
+  colors: { text: string; textSecondary: string; background: string };
+  compact: boolean;
+}) {
+  return (
+    <View style={[styles.resourceItem, { backgroundColor: colors.background }]}>
+      <Text style={styles.resourceIcon}>{resource.icon}</Text>
+      <Text style={[styles.resourceValue, { color: colors.text }]}>{value}</Text>
+      {!compact && (
+        <Text style={[styles.resourceName, { color: colors.textSecondary }]}>{resource.name}</Text>
+      )}
+    </View>
+  );
+});
+
+function PlayerStatsComponent({
   player,
   statDefinitions,
   resourceDefinitions,
@@ -19,6 +89,28 @@ export function PlayerStats({
   style,
 }: PlayerStatsProps) {
   const { theme } = useTheme();
+
+  // Memoize colors object to prevent child re-renders
+  const statColors = useMemo(
+    () => ({
+      text: theme.colors.text,
+      background: theme.colors.background,
+      error: theme.colors.error,
+      warning: theme.colors.warning,
+      success: theme.colors.success,
+      primary: theme.colors.primary,
+    }),
+    [theme.colors]
+  );
+
+  const resourceColors = useMemo(
+    () => ({
+      text: theme.colors.text,
+      textSecondary: theme.colors.textSecondary,
+      background: theme.colors.background,
+    }),
+    [theme.colors]
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.surface }, style]}>
@@ -29,34 +121,15 @@ export function PlayerStats({
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>状态</Text>
         <View style={styles.statsGrid}>
-          {statDefinitions.map((stat) => {
-            const value = player.stats[stat.id] ?? 0;
-            const max = stat.max ?? 100;
-            const percentage = Math.min((value / max) * 100, 100);
-
-            return (
-              <View key={stat.id} style={styles.statItem}>
-                <View style={styles.statHeader}>
-                  <Text style={styles.statIcon}>{stat.icon}</Text>
-                  <Text style={[styles.statName, { color: theme.colors.text }]} numberOfLines={1}>
-                    {compact ? '' : stat.name}
-                  </Text>
-                  <Text style={[styles.statValue, { color: theme.colors.text }]}>{value}</Text>
-                </View>
-                <View style={[styles.progressBar, { backgroundColor: theme.colors.background }]}>
-                  <View
-                    style={[
-                      styles.progressFill,
-                      {
-                        width: `${percentage}%`,
-                        backgroundColor: getStatColor(stat.id, percentage, theme.colors),
-                      },
-                    ]}
-                  />
-                </View>
-              </View>
-            );
-          })}
+          {statDefinitions.map((stat) => (
+            <StatItem
+              key={stat.id}
+              stat={stat}
+              value={player.stats[stat.id] ?? 0}
+              colors={statColors}
+              compact={compact}
+            />
+          ))}
         </View>
       </View>
 
@@ -64,24 +137,15 @@ export function PlayerStats({
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>资源</Text>
         <View style={styles.resourcesRow}>
-          {resourceDefinitions.map((resource) => {
-            const value = player.resources[resource.id] ?? 0;
-
-            return (
-              <View
-                key={resource.id}
-                style={[styles.resourceItem, { backgroundColor: theme.colors.background }]}
-              >
-                <Text style={styles.resourceIcon}>{resource.icon}</Text>
-                <Text style={[styles.resourceValue, { color: theme.colors.text }]}>{value}</Text>
-                {!compact && (
-                  <Text style={[styles.resourceName, { color: theme.colors.textSecondary }]}>
-                    {resource.name}
-                  </Text>
-                )}
-              </View>
-            );
-          })}
+          {resourceDefinitions.map((resource) => (
+            <ResourceItem
+              key={resource.id}
+              resource={resource}
+              value={player.resources[resource.id] ?? 0}
+              colors={resourceColors}
+              compact={compact}
+            />
+          ))}
         </View>
       </View>
 
@@ -107,6 +171,36 @@ export function PlayerStats({
     </View>
   );
 }
+
+/**
+ * Memoized PlayerStats component to prevent unnecessary re-renders.
+ */
+export const PlayerStats = memo(PlayerStatsComponent, (prevProps, nextProps) => {
+  // Compare player stats and resources
+  const prevStats = prevProps.player.stats;
+  const nextStats = nextProps.player.stats;
+  const prevResources = prevProps.player.resources;
+  const nextResources = nextProps.player.resources;
+
+  // Check if stats changed
+  const statsEqual =
+    Object.keys(prevStats).length === Object.keys(nextStats).length &&
+    Object.keys(prevStats).every((key) => prevStats[key] === nextStats[key]);
+
+  // Check if resources changed
+  const resourcesEqual =
+    Object.keys(prevResources).length === Object.keys(nextResources).length &&
+    Object.keys(prevResources).every((key) => prevResources[key] === nextResources[key]);
+
+  return (
+    prevProps.player.id === nextProps.player.id &&
+    prevProps.player.name === nextProps.player.name &&
+    prevProps.compact === nextProps.compact &&
+    statsEqual &&
+    resourcesEqual &&
+    prevProps.player.statuses.length === nextProps.player.statuses.length
+  );
+});
 
 function getStatColor(
   statId: string,
