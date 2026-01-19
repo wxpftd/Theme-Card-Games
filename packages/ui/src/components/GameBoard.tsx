@@ -34,12 +34,9 @@ function GameBoardComponent({
   }, [themeConfig.cards]);
 
   // Memoize handlers to prevent child re-renders
-  const handleCardSelect = useCallback(
-    (cardId: string) => {
-      setSelectedCardId((prev) => (cardId === prev ? null : cardId));
-    },
-    []
-  );
+  const handleCardSelect = useCallback((cardId: string) => {
+    setSelectedCardId((prev) => (cardId === prev ? null : cardId));
+  }, []);
 
   const handleCardPlay = useCallback(
     (cardId: string) => {

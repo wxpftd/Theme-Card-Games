@@ -371,7 +371,11 @@ describe('EffectResolver', () => {
     });
 
     it('should support all comparison operators', () => {
-      const testCases: Array<{ operator: '>' | '<' | '==' | '>=' | '<=' | '!='; value: number; expected: boolean }> = [
+      const testCases: Array<{
+        operator: '>' | '<' | '==' | '>=' | '<=' | '!=';
+        value: number;
+        expected: boolean;
+      }> = [
         { operator: '>', value: 40, expected: true },
         { operator: '>', value: 50, expected: false },
         { operator: '<', value: 60, expected: true },
@@ -402,7 +406,9 @@ describe('EffectResolver', () => {
           condition: { type: 'stat_check', target: 'value', operator, value },
         };
         const result = resolver.resolve(effect, context);
-        expect(result !== null, `Failed for operator ${operator} with value ${value}`).toBe(expected);
+        expect(result !== null, `Failed for operator ${operator} with value ${value}`).toBe(
+          expected
+        );
       }
     });
   });

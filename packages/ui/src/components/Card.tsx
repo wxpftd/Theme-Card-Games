@@ -42,10 +42,7 @@ function CardComponent({
   const { theme } = useTheme();
 
   // Memoize computed values
-  const sizeStyles = useMemo(
-    () => getSizeStyles(size, theme.cardStyles),
-    [size, theme.cardStyles]
-  );
+  const sizeStyles = useMemo(() => getSizeStyles(size, theme.cardStyles), [size, theme.cardStyles]);
   const rarityColor = rarityColors[card.rarity ?? 'common'];
   const typeIcon = typeIcons[card.type] ?? '📄';
 

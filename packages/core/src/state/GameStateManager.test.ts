@@ -23,7 +23,9 @@ const createTestCards = (): CardDefinition[] => [
     type: 'action',
     name: 'Work Hard',
     description: 'Increase performance',
-    effects: [{ type: 'modify_stat', target: 'self', value: 10, metadata: { stat: 'performance' } }],
+    effects: [
+      { type: 'modify_stat', target: 'self', value: 10, metadata: { stat: 'performance' } },
+    ],
     cost: 1,
     rarity: 'common',
     tags: ['work'],

@@ -8,9 +8,7 @@ const createTestConfig = (): GameConfig => ({
   minPlayers: 1,
   initialHandSize: 3,
   maxHandSize: 7,
-  winConditions: [
-    { type: 'stat_threshold', stat: 'score', operator: '>=', value: 100 },
-  ],
+  winConditions: [{ type: 'stat_threshold', stat: 'score', operator: '>=', value: 100 }],
   initialStats: { score: 0, health: 100 },
   initialResources: { energy: 5 },
 });

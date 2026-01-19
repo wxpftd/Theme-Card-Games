@@ -20,7 +20,14 @@ const StatItem = memo(function StatItem({
 }: {
   stat: StatDefinition;
   value: number;
-  colors: { text: string; background: string; error: string; warning: string; success: string; primary: string };
+  colors: {
+    text: string;
+    background: string;
+    error: string;
+    warning: string;
+    success: string;
+    primary: string;
+  };
   compact: boolean;
 }) {
   const max = stat.max ?? 100;
@@ -68,9 +75,7 @@ const ResourceItem = memo(function ResourceItem({
       <Text style={styles.resourceIcon}>{resource.icon}</Text>
       <Text style={[styles.resourceValue, { color: colors.text }]}>{value}</Text>
       {!compact && (
-        <Text style={[styles.resourceName, { color: colors.textSecondary }]}>
-          {resource.name}
-        </Text>
+        <Text style={[styles.resourceName, { color: colors.textSecondary }]}>{resource.name}</Text>
       )}
     </View>
   );
