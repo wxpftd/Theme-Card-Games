@@ -433,7 +433,7 @@ export class GameStateManager {
     const results = this.effectResolver.resolveAll(card.effects, context);
 
     // Check for combos
-    let comboResults: ResolvedEffect[] = [];
+    const comboResults: ResolvedEffect[] = [];
     if (this.comboSystem) {
       const triggered = this.comboSystem.onCardPlayed(playerId, card.definitionId, this.state);
       for (const { effects } of triggered) {

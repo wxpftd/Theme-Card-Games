@@ -1,9 +1,7 @@
 import {
   ComboDefinition,
   ComboState,
-  ComboTrigger,
   CardDefinition,
-  CardEffect,
   GameState,
   ResolvedEffect,
 } from '../types';

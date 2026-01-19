@@ -2,7 +2,6 @@ import {
   CardUpgradeDefinition,
   CardUsageTracker,
   CardDefinition,
-  CardInstance,
   PlayerState,
   GameState,
   UpgradeCondition,
@@ -120,7 +119,7 @@ export class CardUpgradeSystem {
     condition: UpgradeCondition,
     playerId: string,
     player: PlayerState,
-    gameState: GameState
+    _gameState: GameState
   ): boolean {
     switch (condition.type) {
       case 'use_count': {

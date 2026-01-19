@@ -3,7 +3,6 @@ import {
   PlayerStatus,
   PlayerState,
   GameState,
-  CardEffect,
   ResolvedEffect,
   StatusTriggerCondition,
 } from '../types';
@@ -382,7 +381,7 @@ export class StatusEffectSystem {
             if (targetResource && metadata.resource !== targetResource) continue;
           }
 
-          modifier += (Number(effect.value) ?? 0) * stacks;
+          modifier += (Number(effect.value) || 0) * stacks;
         }
       }
     }
