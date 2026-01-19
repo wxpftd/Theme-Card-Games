@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "pnpm format && pnpm lint && pnpm precommit"
+            "command": "pnpm ci:local"
           }
         ]
       },

@@ -24,6 +24,7 @@
     "prepare": "husky",
     "precommit": "pnpm lint && pnpm format:check && pnpm typecheck",
     "precommit:full": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
+    "ci:local": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "app:bigtech": "cd apps/bigtech-worker && pnpm start",
     "app:startup": "cd apps/startup && pnpm start",
     "app:travel": "cd apps/travel && pnpm start",
