@@ -1,0 +1,11 @@
+{
+  "name": "@theme-card-games/theme-parenting",
+  "version": "0.1.0",
+  "description": "Parenting theme for themed card games - 育儿主题",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {},
+  "dependencies": {
+    "@theme-card-games/core": "workspace:*"
+  }
+}

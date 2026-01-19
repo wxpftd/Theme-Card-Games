@@ -1,0 +1,28 @@
+{
+  "name": "theme-card-games",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A multi-theme card game framework for iOS",
+  "workspaces": [
+    "packages/*",
+    "packages/themes/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "clean": "pnpm -r clean",
+    "typecheck": "pnpm -r typecheck",
+    "app:bigtech": "cd apps/bigtech-worker && pnpm start",
+    "app:startup": "cd apps/startup && pnpm start",
+    "app:travel": "cd apps/travel && pnpm start",
+    "app:parenting": "cd apps/parenting && pnpm start"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

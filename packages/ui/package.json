@@ -1,0 +1,41 @@
+{
+  "name": "@theme-card-games/ui",
+  "version": "1.0.0",
+  "description": "UI components for themed card games (React Native / Expo)",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --external react --external react-native",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --external react --external react-native --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "card-game",
+    "ui",
+    "react-native",
+    "expo"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@theme-card-games/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-native": ">=0.72.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-native": "^0.72.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

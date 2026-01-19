@@ -1,0 +1,11 @@
+{
+  "name": "@theme-card-games/theme-startup",
+  "version": "0.1.0",
+  "description": "Startup theme for themed card games - 创业主题",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {},
+  "dependencies": {
+    "@theme-card-games/core": "workspace:*"
+  }
+}
