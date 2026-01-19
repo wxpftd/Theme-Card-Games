@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ViewStyle } from 'react-native';
 import { AchievementDefinition, AchievementProgress } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
+import { useI18n } from '../i18n';
 
 interface AchievementListProps {
   achievements: AchievementDefinition[];
@@ -29,6 +30,7 @@ export function AchievementList({
   style,
 }: AchievementListProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
 
   const unlockedCount = Object.values(progress).filter((p) => p.unlocked).length;
 
@@ -95,7 +97,7 @@ export function AchievementList({
           {/* Points */}
           <View style={styles.pointsRow}>
             <Text style={[styles.points, { color: theme.colors.primary }]}>
-              {achievement.points ?? 0} pts
+              {t('achievements.points', { points: achievement.points ?? 0 })}
             </Text>
 
             {/* Claim button */}
@@ -104,12 +106,14 @@ export function AchievementList({
                 style={[styles.claimButton, { backgroundColor: theme.colors.success }]}
                 onPress={() => onClaimReward(achievement.id)}
               >
-                <Text style={styles.claimButtonText}>Claim</Text>
+                <Text style={styles.claimButtonText}>{t('achievements.claim')}</Text>
               </TouchableOpacity>
             )}
 
             {isClaimed && (
-              <Text style={[styles.claimedText, { color: theme.colors.success }]}>Claimed</Text>
+              <Text style={[styles.claimedText, { color: theme.colors.success }]}>
+                {t('achievements.claimed')}
+              </Text>
             )}
           </View>
         </View>
@@ -126,21 +130,21 @@ export function AchievementList({
 
   // Group achievements by category
   const categories = ['gameplay', 'challenge', 'milestone', 'hidden'];
-  const categoryNames: Record<string, string> = {
-    gameplay: '游戏成就',
-    challenge: '挑战成就',
-    milestone: '里程碑',
-    hidden: '隐藏成就',
+  const categoryKeys: Record<string, string> = {
+    gameplay: 'achievements.category.gameplay',
+    challenge: 'achievements.category.challenge',
+    milestone: 'achievements.category.milestone',
+    hidden: 'achievements.category.hidden',
   };
 
   return (
     <ScrollView style={[styles.container, style]} contentContainerStyle={styles.contentContainer}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.primary }]}>
-        <Text style={styles.headerTitle}>成就</Text>
+        <Text style={styles.headerTitle}>{t('achievements.title')}</Text>
         <View style={styles.headerStats}>
           <Text style={styles.headerStatText}>
-            {unlockedCount}/{achievements.length} 解锁
+            {unlockedCount}/{achievements.length} {t('achievements.unlocked')}
           </Text>
           <Text style={styles.headerStatText}>{totalPoints} pts</Text>
         </View>
@@ -154,7 +158,7 @@ export function AchievementList({
         return (
           <View key={category} style={styles.categorySection}>
             <Text style={[styles.categoryTitle, { color: theme.colors.text }]}>
-              {categoryNames[category]}
+              {t(categoryKeys[category])}
             </Text>
             {categoryAchievements.map(renderAchievement)}
           </View>

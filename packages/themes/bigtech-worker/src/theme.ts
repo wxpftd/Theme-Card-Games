@@ -15,6 +15,7 @@ import {
   GameSessionStats,
   GameState,
 } from '@theme-card-games/core';
+import { zhCN, enUS } from './locales';
 
 /**
  * 大厂打工主题配置
@@ -1390,40 +1391,8 @@ const uiTheme: UITheme = {
 // 本地化 (Localization)
 // ============================================================================
 const localization: Record<string, Record<string, string>> = {
-  'zh-CN': {
-    'game.title': '大厂生存指南',
-    'game.subtitle': '打工人的卡牌人生',
-    'game.start': '开始游戏',
-    'game.restart': '重新开始',
-    'game.pause': '暂停',
-    'game.resume': '继续',
-    'turn.draw': '抽牌阶段',
-    'turn.main': '主要阶段',
-    'turn.end': '结束阶段',
-    'action.play': '打出',
-    'action.discard': '弃牌',
-    'action.endTurn': '结束回合',
-    'win.promotion': '恭喜晋升！你成功在大厂站稳脚跟！',
-    'lose.health': '身体垮了...你选择了离职休养',
-    'lose.happiness': '太累了...你选择了躺平',
-  },
-  'en-US': {
-    'game.title': 'Big Tech Survival Guide',
-    'game.subtitle': 'Card Game of a Tech Worker',
-    'game.start': 'Start Game',
-    'game.restart': 'Restart',
-    'game.pause': 'Pause',
-    'game.resume': 'Resume',
-    'turn.draw': 'Draw Phase',
-    'turn.main': 'Main Phase',
-    'turn.end': 'End Phase',
-    'action.play': 'Play',
-    'action.discard': 'Discard',
-    'action.endTurn': 'End Turn',
-    'win.promotion': 'Congratulations! You got promoted!',
-    'lose.health': 'Burned out... You decided to take a break',
-    'lose.happiness': 'Too exhausted... You chose to lie flat',
-  },
+  'zh-CN': zhCN,
+  'en-US': enUS,
 };
 
 // ============================================================================

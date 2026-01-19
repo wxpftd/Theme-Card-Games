@@ -1,13 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
-import { useTheme } from '@theme-card-games/ui';
+import { useTheme, LanguageSwitcher, useI18n } from '@theme-card-games/ui';
 
 export default function HomeScreen() {
   const { theme, config, t } = useTheme();
+  const { t: uiT } = useI18n();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {/* Language Switcher */}
+      <View style={styles.languageSwitcher}>
+        <LanguageSwitcher mode="compact" />
+      </View>
+
       {/* Logo / Title Area */}
       <View style={styles.header}>
         <Text style={styles.emoji}>🏢</Text>
@@ -26,7 +32,9 @@ export default function HomeScreen() {
 
       {/* Stats Preview */}
       <View style={[styles.previewCard, { backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.previewTitle, { color: theme.colors.text }]}>游戏元素</Text>
+        <Text style={[styles.previewTitle, { color: theme.colors.text }]}>
+          {t('theme.description')}
+        </Text>
         <View style={styles.statsRow}>
           {config.stats.map((stat) => (
             <View key={stat.id} style={styles.statPreview}>
@@ -63,7 +71,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/tutorial')}
         >
           <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>
-            游戏教程
+            {uiT('common.next')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -79,6 +87,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
+  },
+  languageSwitcher: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
   },
   header: {
     alignItems: 'center',
