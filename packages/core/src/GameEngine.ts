@@ -1,8 +1,17 @@
-import { ThemeConfig, GameState, CardDefinition, GameEventHandler } from './types';
+import {
+  ThemeConfig,
+  GameState,
+  CardDefinition,
+  GameEventHandler,
+  ComboDefinition,
+  StatusDefinition,
+  CardUpgradeDefinition,
+} from './types';
 import { GameStateManager } from './state';
 import { TurnManager, TurnPhaseConfig } from './turn';
 import { EventBus } from './event';
 import { EffectResolver, CustomEffectHandler } from './card';
+import { ComboSystem, StatusEffectSystem, CardUpgradeSystem } from './systems';
 
 export interface GameEngineOptions {
   theme: ThemeConfig;
@@ -36,10 +45,13 @@ export class GameEngine {
       }
     }
 
-    // Create state manager
+    // Create state manager with new game systems
     this.stateManager = new GameStateManager({
       config: this.theme.gameConfig,
       cardDefinitions: this.theme.cards,
+      comboDefinitions: this.theme.comboDefinitions,
+      statusDefinitions: this.theme.statusDefinitions,
+      cardUpgrades: this.theme.cardUpgrades,
       eventBus: this.eventBus,
       effectResolver: this.effectResolver,
     });
@@ -293,5 +305,79 @@ export class GameEngine {
    */
   getHistory() {
     return this.stateManager.getHistory();
+  }
+
+  // ============================================================================
+  // Game Systems
+  // ============================================================================
+
+  /**
+   * Get the combo system
+   */
+  getComboSystem(): ComboSystem | null {
+    return this.stateManager.getComboSystem();
+  }
+
+  /**
+   * Get the status effect system
+   */
+  getStatusEffectSystem(): StatusEffectSystem | null {
+    return this.stateManager.getStatusEffectSystem();
+  }
+
+  /**
+   * Get the card upgrade system
+   */
+  getCardUpgradeSystem(): CardUpgradeSystem | null {
+    return this.stateManager.getCardUpgradeSystem();
+  }
+
+  /**
+   * Apply a status effect to a player
+   */
+  applyStatus(playerId: string, statusId: string): boolean {
+    return this.stateManager.applyStatus(playerId, statusId);
+  }
+
+  /**
+   * Remove a status effect from a player
+   */
+  removeStatus(playerId: string, statusId: string): boolean {
+    return this.stateManager.removeStatus(playerId, statusId);
+  }
+
+  /**
+   * Check if a player has a specific status
+   */
+  hasStatus(playerId: string, statusId: string): boolean {
+    return this.stateManager.hasStatus(playerId, statusId);
+  }
+
+  /**
+   * Get all active statuses for a player
+   */
+  getPlayerStatuses(playerId: string) {
+    return this.stateManager.getPlayerStatuses(playerId);
+  }
+
+  /**
+   * Get combo definitions
+   */
+  getComboDefinitions(): ComboDefinition[] {
+    return this.theme.comboDefinitions ?? [];
+  }
+
+  /**
+   * Get status definitions
+   */
+  getStatusDefinitions(): StatusDefinition[] {
+    return this.theme.statusDefinitions ?? [];
+  }
+
+  /**
+   * Get card upgrade definitions
+   */
+  getCardUpgradeDefinitions(): CardUpgradeDefinition[] {
+    return this.theme.cardUpgrades ?? [];
   }
 }

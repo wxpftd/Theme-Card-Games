@@ -5,14 +5,24 @@ import {
   GameConfig,
   GameAction,
   CardDefinition,
+  ComboDefinition,
+  StatusDefinition,
+  CardUpgradeDefinition,
+  ResolvedEffect,
 } from '../types';
 import { EventBus } from '../event';
 import { Card, Deck, Hand, EffectResolver } from '../card';
+import { ComboSystem } from '../systems/ComboSystem';
+import { StatusEffectSystem } from '../systems/StatusEffectSystem';
+import { CardUpgradeSystem } from '../systems/CardUpgradeSystem';
 import { generateId, deepClone } from '../utils';
 
 export interface GameStateManagerOptions {
   config: GameConfig;
   cardDefinitions: CardDefinition[];
+  comboDefinitions?: ComboDefinition[];
+  statusDefinitions?: StatusDefinition[];
+  cardUpgrades?: CardUpgradeDefinition[];
   eventBus?: EventBus;
   effectResolver?: EffectResolver;
 }
@@ -28,6 +38,11 @@ export class GameStateManager {
   private playerDecks: Map<string, Deck> = new Map();
   private playerHands: Map<string, Hand> = new Map();
 
+  // Game systems
+  private comboSystem: ComboSystem | null = null;
+  private statusEffectSystem: StatusEffectSystem | null = null;
+  private cardUpgradeSystem: CardUpgradeSystem | null = null;
+
   /** State version counter for change detection */
   private stateVersion: number = 0;
   /** Cached shallow snapshot */
@@ -40,6 +55,80 @@ export class GameStateManager {
     this.effectResolver = options.effectResolver ?? new EffectResolver();
 
     this.state = this.createInitialState(options.config);
+
+    // Initialize game systems
+    if (options.comboDefinitions && options.comboDefinitions.length > 0) {
+      this.comboSystem = new ComboSystem({
+        comboDefinitions: options.comboDefinitions,
+        cardDefinitions: this.cardDefinitions,
+        effectResolver: this.effectResolver,
+        eventBus: this.eventBus,
+      });
+    }
+
+    if (options.statusDefinitions && options.statusDefinitions.length > 0) {
+      this.statusEffectSystem = new StatusEffectSystem({
+        statusDefinitions: options.statusDefinitions,
+        effectResolver: this.effectResolver,
+        eventBus: this.eventBus,
+      });
+    }
+
+    if (options.cardUpgrades && options.cardUpgrades.length > 0) {
+      this.cardUpgradeSystem = new CardUpgradeSystem({
+        upgradeDefinitions: options.cardUpgrades,
+        cardDefinitions: this.cardDefinitions,
+        eventBus: this.eventBus,
+      });
+    }
+
+    this.setupSystemEventListeners();
+  }
+
+  /**
+   * Setup event listeners for system integration
+   */
+  private setupSystemEventListeners(): void {
+    // Process status effects at turn boundaries
+    this.eventBus.on('turn_started', (event) => {
+      const playerId = event.data.playerId as string;
+      this.processStatusTurnStart(playerId);
+    });
+
+    this.eventBus.on('turn_ended', (event) => {
+      const playerId = event.data.playerId as string;
+      this.processStatusTurnEnd(playerId);
+    });
+  }
+
+  /**
+   * Process status effects at turn start
+   */
+  private processStatusTurnStart(playerId: string): void {
+    if (!this.statusEffectSystem) return;
+
+    const player = this.state.players[playerId];
+    if (!player) return;
+
+    const effects = this.statusEffectSystem.processTurnStart(playerId, player, this.state);
+    if (effects.length > 0) {
+      this.invalidateCache();
+    }
+  }
+
+  /**
+   * Process status effects at turn end
+   */
+  private processStatusTurnEnd(playerId: string): void {
+    if (!this.statusEffectSystem) return;
+
+    const player = this.state.players[playerId];
+    if (!player) return;
+
+    const effects = this.statusEffectSystem.processTurnEnd(playerId, player, this.state);
+    if (effects.length > 0) {
+      this.invalidateCache();
+    }
   }
 
   /**
@@ -162,6 +251,10 @@ export class GameStateManager {
     if (!this.state.currentPlayerId) {
       this.state.currentPlayerId = id;
     }
+
+    // Initialize player in game systems
+    this.comboSystem?.initializePlayer(id);
+    this.cardUpgradeSystem?.initializePlayer(id);
 
     this.eventBus.emitSimple(
       'custom',
@@ -317,9 +410,10 @@ export class GameStateManager {
    */
   playCard(playerId: string, cardId: string, targets?: Record<string, string>): boolean {
     const hand = this.playerHands.get(playerId);
+    const deck = this.playerDecks.get(playerId);
     const player = this.state.players[playerId];
 
-    if (!hand || !player) {
+    if (!hand || !player || !deck) {
       return false;
     }
 
@@ -338,6 +432,20 @@ export class GameStateManager {
 
     const results = this.effectResolver.resolveAll(card.effects, context);
 
+    // Check for combos
+    const comboResults: ResolvedEffect[] = [];
+    if (this.comboSystem) {
+      const triggered = this.comboSystem.onCardPlayed(playerId, card.definitionId, this.state);
+      for (const { effects } of triggered) {
+        comboResults.push(...effects);
+      }
+    }
+
+    // Check for card upgrades
+    if (this.cardUpgradeSystem) {
+      this.cardUpgradeSystem.onCardPlayed(playerId, card.definitionId, player, this.state, deck);
+    }
+
     // Record action
     const action: GameAction = {
       id: generateId('action'),
@@ -347,7 +455,7 @@ export class GameStateManager {
       payload: { cardId, targets },
       result: {
         success: true,
-        effects: results,
+        effects: [...results, ...comboResults],
       },
     };
     this.state.history.push(action);
@@ -365,6 +473,7 @@ export class GameStateManager {
         playerId,
         cardId,
         effects: results,
+        comboEffects: comboResults,
       },
       this.state
     );
@@ -635,6 +744,89 @@ export class GameStateManager {
     this.playerDecks.clear();
     this.playerHands.clear();
     this.eventBus.clearHistory();
+    this.comboSystem?.reset();
+    this.cardUpgradeSystem?.reset();
     this.invalidateCache();
+  }
+
+  // ============================================================================
+  // Game Systems Access
+  // ============================================================================
+
+  /**
+   * Get the combo system
+   */
+  getComboSystem(): ComboSystem | null {
+    return this.comboSystem;
+  }
+
+  /**
+   * Get the status effect system
+   */
+  getStatusEffectSystem(): StatusEffectSystem | null {
+    return this.statusEffectSystem;
+  }
+
+  /**
+   * Get the card upgrade system
+   */
+  getCardUpgradeSystem(): CardUpgradeSystem | null {
+    return this.cardUpgradeSystem;
+  }
+
+  // ============================================================================
+  // Status Effect Management
+  // ============================================================================
+
+  /**
+   * Apply a status effect to a player
+   */
+  applyStatus(playerId: string, statusId: string): boolean {
+    if (!this.statusEffectSystem) {
+      console.warn('Status effect system not initialized');
+      return false;
+    }
+
+    const player = this.state.players[playerId];
+    if (!player) return false;
+
+    this.statusEffectSystem.applyStatus(playerId, statusId, player, this.state);
+    this.invalidateCache();
+    return true;
+  }
+
+  /**
+   * Remove a status effect from a player
+   */
+  removeStatus(playerId: string, statusId: string): boolean {
+    if (!this.statusEffectSystem) {
+      console.warn('Status effect system not initialized');
+      return false;
+    }
+
+    const player = this.state.players[playerId];
+    if (!player) return false;
+
+    this.statusEffectSystem.removeStatus(playerId, statusId, player, this.state);
+    this.invalidateCache();
+    return true;
+  }
+
+  /**
+   * Check if a player has a specific status
+   */
+  hasStatus(playerId: string, statusId: string): boolean {
+    const player = this.state.players[playerId];
+    if (!player) return false;
+    return player.statuses.some((s) => s.id === statusId);
+  }
+
+  /**
+   * Get all active statuses for a player
+   */
+  getPlayerStatuses(playerId: string): PlayerState['statuses'] {
+    const player = this.state.players[playerId];
+    if (!player) return [];
+    return [...player.statuses];
   }
 }
