@@ -1,12 +1,14 @@
-export { zhCN } from './zh-CN';
-export { enUS } from './en-US';
+import { zhCN } from './zh-CN';
+import { enUS } from './en-US';
+
+export { zhCN, enUS };
 
 /**
  * Get all theme translations merged with base localization
  */
 export function getThemeLocalization() {
   return {
-    'zh-CN': require('./zh-CN').zhCN,
-    'en-US': require('./en-US').enUS,
+    'zh-CN': zhCN,
+    'en-US': enUS,
   };
 }
