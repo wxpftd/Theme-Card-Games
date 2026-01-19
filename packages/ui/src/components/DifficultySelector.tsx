@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { DifficultyDefinition, DifficultyLevel } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -57,22 +51,14 @@ export function DifficultySelector({
           <Text style={[styles.icon, !isUnlocked && styles.lockedIcon]}>
             {isUnlocked ? difficulty.icon : '🔒'}
           </Text>
-          <Text
-            style={[
-              styles.difficultyName,
-              { color: isSelected ? '#fff' : theme.colors.text },
-            ]}
-          >
+          <Text style={[styles.difficultyName, { color: isSelected ? '#fff' : theme.colors.text }]}>
             {difficulty.name}
           </Text>
         </View>
 
         {/* Description */}
         <Text
-          style={[
-            styles.description,
-            { color: isSelected ? '#fff' : theme.colors.textSecondary },
-          ]}
+          style={[styles.description, { color: isSelected ? '#fff' : theme.colors.textSecondary }]}
           numberOfLines={2}
         >
           {isUnlocked ? difficulty.description : '完成更低难度以解锁'}
@@ -132,7 +118,8 @@ export function DifficultySelector({
                         },
                       ]}
                     >
-                      {stat}: {delta > 0 ? '+' : ''}{delta}
+                      {stat}: {delta > 0 ? '+' : ''}
+                      {delta}
                     </Text>
                   ))}
                 </View>
@@ -152,10 +139,7 @@ export function DifficultySelector({
                 {difficulty.specialRules.map((rule, index) => (
                   <Text
                     key={index}
-                    style={[
-                      styles.ruleText,
-                      { color: isSelected ? '#fff' : theme.colors.text },
-                    ]}
+                    style={[styles.ruleText, { color: isSelected ? '#fff' : theme.colors.text }]}
                     numberOfLines={1}
                   >
                     {rule.description}
@@ -174,12 +158,7 @@ export function DifficultySelector({
               { backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : color },
             ]}
           >
-            <Text
-              style={[
-                styles.multiplierText,
-                { color: isSelected ? '#fff' : '#fff' },
-              ]}
-            >
+            <Text style={[styles.multiplierText, { color: isSelected ? '#fff' : '#fff' }]}>
               {difficulty.scoreMultiplier}x
             </Text>
           </View>
@@ -198,9 +177,7 @@ export function DifficultySelector({
   return (
     <View style={[styles.container, style]}>
       <Text style={[styles.title, { color: theme.colors.text }]}>选择难度</Text>
-      <View style={styles.difficultyList}>
-        {difficulties.map(renderDifficultyCard)}
-      </View>
+      <View style={styles.difficultyList}>{difficulties.map(renderDifficultyCard)}</View>
     </View>
   );
 }

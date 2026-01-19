@@ -212,11 +212,15 @@ export class DifficultySystem {
     }
 
     if (changes.length > 0) {
-      this.eventBus.emitSimple('difficulty_per_turn_effects', {
-        difficulty: this.config.currentDifficulty,
-        changes,
-        turn: state.turn,
-      }, state);
+      this.eventBus.emitSimple(
+        'difficulty_per_turn_effects',
+        {
+          difficulty: this.config.currentDifficulty,
+          changes,
+          turn: state.turn,
+        },
+        state
+      );
     }
   }
 
@@ -226,24 +230,36 @@ export class DifficultySystem {
   private executeRule(rule: DifficultyRule, state: GameState): void {
     switch (rule.type) {
       case 'layoff_check':
-        this.eventBus.emitSimple('difficulty_layoff_check', {
-          turn: this.currentTurn,
-          rule,
-        }, state);
+        this.eventBus.emitSimple(
+          'difficulty_layoff_check',
+          {
+            turn: this.currentTurn,
+            rule,
+          },
+          state
+        );
         break;
 
       case 'energy_recovery':
-        this.eventBus.emitSimple('difficulty_energy_recovery', {
-          value: rule.value ?? 0,
-          turn: this.currentTurn,
-        }, state);
+        this.eventBus.emitSimple(
+          'difficulty_energy_recovery',
+          {
+            value: rule.value ?? 0,
+            turn: this.currentTurn,
+          },
+          state
+        );
         break;
 
       case 'card_cost_modifier':
-        this.eventBus.emitSimple('difficulty_card_cost_modifier', {
-          modifier: rule.value ?? 0,
-          turn: this.currentTurn,
-        }, state);
+        this.eventBus.emitSimple(
+          'difficulty_card_cost_modifier',
+          {
+            modifier: rule.value ?? 0,
+            turn: this.currentTurn,
+          },
+          state
+        );
         break;
 
       case 'custom':

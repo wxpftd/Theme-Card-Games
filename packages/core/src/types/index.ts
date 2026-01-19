@@ -435,7 +435,10 @@ export interface ThemeConfig {
   customWinCheckers?: Record<string, (state: GameState) => boolean>;
 
   // Custom achievement checkers
-  customAchievementCheckers?: Record<string, (stats: GameSessionStats, state: GameState) => boolean>;
+  customAchievementCheckers?: Record<
+    string,
+    (stats: GameSessionStats, state: GameState) => boolean
+  >;
 
   // Custom challenge checkers
   customChallengeCheckers?: Record<string, (stats: GameSessionStats, state: GameState) => boolean>;
@@ -525,7 +528,13 @@ export interface AchievementDefinition {
 
 export type AchievementCondition =
   | { type: 'card_usage'; cardTag: string; count: number; inSingleGame?: boolean }
-  | { type: 'stat_maintained'; stat: string; operator: '>=' | '<=' | '>' | '<'; value: number; forEntireGame: boolean }
+  | {
+      type: 'stat_maintained';
+      stat: string;
+      operator: '>=' | '<=' | '>' | '<';
+      value: number;
+      forEntireGame: boolean;
+    }
   | { type: 'stat_reached'; stat: string; operator: '>=' | '<=' | '>' | '<' | '=='; value: number }
   | { type: 'stat_recovered'; stat: string; fromBelow: number; toAbove: number }
   | { type: 'win_within_turns'; maxTurns: number }

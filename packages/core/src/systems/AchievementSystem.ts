@@ -197,9 +197,15 @@ export class AchievementSystem {
         const minValue = stats.minStats[condition.stat];
 
         if (condition.operator === '<' || condition.operator === '<=') {
-          return minValue !== undefined && this.compareValues(minValue, condition.operator, condition.value);
+          return (
+            minValue !== undefined &&
+            this.compareValues(minValue, condition.operator, condition.value)
+          );
         }
-        return maxValue !== undefined && this.compareValues(maxValue, condition.operator, condition.value);
+        return (
+          maxValue !== undefined &&
+          this.compareValues(maxValue, condition.operator, condition.value)
+        );
       }
 
       case 'stat_recovered': {

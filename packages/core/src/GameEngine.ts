@@ -82,11 +82,14 @@ export class GameEngine {
       randomEventConfig: this.theme.randomEventConfig,
       randomEventCustomHandlers: options.randomEventCustomHandlers,
       achievementDefinitions: this.theme.achievementDefinitions,
-      achievementCustomCheckers: options.achievementCustomCheckers ?? this.theme.customAchievementCheckers,
+      achievementCustomCheckers:
+        options.achievementCustomCheckers ?? this.theme.customAchievementCheckers,
       difficultyDefinitions: this.theme.difficultyDefinitions,
-      difficultyCustomRuleHandlers: options.difficultyCustomRuleHandlers ?? this.theme.customDifficultyRuleHandlers,
+      difficultyCustomRuleHandlers:
+        options.difficultyCustomRuleHandlers ?? this.theme.customDifficultyRuleHandlers,
       dailyChallengeConfig: this.theme.dailyChallengeConfig,
-      dailyChallengeCustomCheckers: options.dailyChallengeCustomCheckers ?? this.theme.customChallengeCheckers,
+      dailyChallengeCustomCheckers:
+        options.dailyChallengeCustomCheckers ?? this.theme.customChallengeCheckers,
       eventBus: this.eventBus,
       effectResolver: this.effectResolver,
     });

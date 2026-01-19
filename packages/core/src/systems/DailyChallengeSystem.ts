@@ -81,7 +81,8 @@ export class DailyChallengeSystem {
         if (delta < 0) {
           // Track resource consumption
           const key = `${resource}_used`;
-          this.sessionStats.cardUsage[key] = (this.sessionStats.cardUsage[key] || 0) + Math.abs(delta);
+          this.sessionStats.cardUsage[key] =
+            (this.sessionStats.cardUsage[key] || 0) + Math.abs(delta);
         }
       }
     });
@@ -251,11 +252,15 @@ export class DailyChallengeSystem {
       this.completeChallenge();
     }
 
-    this.eventBus.emitSimple('daily_challenge_attempt_ended', {
-      challengeId: this.state.currentChallenge.definitionId,
-      attempt,
-      success,
-    }, gameState);
+    this.eventBus.emitSimple(
+      'daily_challenge_attempt_ended',
+      {
+        challengeId: this.state.currentChallenge.definitionId,
+        attempt,
+        success,
+      },
+      gameState
+    );
 
     this.isInChallengeMode = false;
     this.sessionStats = null;
@@ -391,9 +396,7 @@ export class DailyChallengeSystem {
 
     const lastDate = new Date(this.state.lastCompletionDate);
     const todayDate = new Date(today);
-    const diffDays = Math.floor(
-      (todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays > 1) {
       // Streak broken

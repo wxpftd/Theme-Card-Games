@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ViewStyle } from 'react-native';
 import { AchievementDefinition, AchievementProgress } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -86,14 +79,9 @@ export function AchievementList({
               {isHidden ? '???' : achievement.name}
             </Text>
             <View
-              style={[
-                styles.rarityBadge,
-                { backgroundColor: rarityColors[achievement.rarity] },
-              ]}
+              style={[styles.rarityBadge, { backgroundColor: rarityColors[achievement.rarity] }]}
             >
-              <Text style={styles.rarityText}>
-                {achievement.rarity.charAt(0).toUpperCase()}
-              </Text>
+              <Text style={styles.rarityText}>{achievement.rarity.charAt(0).toUpperCase()}</Text>
             </View>
           </View>
 
@@ -121,9 +109,7 @@ export function AchievementList({
             )}
 
             {isClaimed && (
-              <Text style={[styles.claimedText, { color: theme.colors.success }]}>
-                Claimed
-              </Text>
+              <Text style={[styles.claimedText, { color: theme.colors.success }]}>Claimed</Text>
             )}
           </View>
         </View>

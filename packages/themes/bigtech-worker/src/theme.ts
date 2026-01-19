@@ -1231,9 +1231,7 @@ const dailyChallengeConfig: DailyChallengeConfig = {
       name: '今日挑战：勤劳打工人',
       description: '不使用任何摸鱼类卡牌通关',
       icon: '💪',
-      conditions: [
-        { type: 'no_card_tag', tag: 'rest' },
-      ],
+      conditions: [{ type: 'no_card_tag', tag: 'rest' }],
       rewards: [
         { type: 'points', value: 50 },
         { type: 'card_skin', value: 'daily_diligent', description: '勤劳徽章' },
@@ -1247,9 +1245,7 @@ const dailyChallengeConfig: DailyChallengeConfig = {
       name: '今日挑战：精力管理大师',
       description: '精力消耗不超过20通关',
       icon: '🔋',
-      conditions: [
-        { type: 'max_resource_usage', resource: 'energy', max: 20 },
-      ],
+      conditions: [{ type: 'max_resource_usage', resource: 'energy', max: 20 }],
       rewards: [
         { type: 'points', value: 60 },
         { type: 'buff', value: 'energy_efficient', description: '下局游戏初始精力+2' },
@@ -1263,9 +1259,7 @@ const dailyChallengeConfig: DailyChallengeConfig = {
       name: '今日挑战：影响力冲刺',
       description: '影响力达到80后晋升',
       icon: '🎯',
-      conditions: [
-        { type: 'min_stat_at_win', stat: 'influence', min: 80 },
-      ],
+      conditions: [{ type: 'min_stat_at_win', stat: 'influence', min: 80 }],
       rewards: [
         { type: 'points', value: 80 },
         { type: 'card_skin', value: 'daily_influencer', description: '影响者徽章' },
@@ -1279,9 +1273,7 @@ const dailyChallengeConfig: DailyChallengeConfig = {
       name: '今日挑战：极速晋升',
       description: '20回合内完成晋升',
       icon: '⚡',
-      conditions: [
-        { type: 'max_turns', turns: 20 },
-      ],
+      conditions: [{ type: 'max_turns', turns: 20 }],
       rewards: [
         { type: 'points', value: 70 },
         { type: 'buff', value: 'quick_draw', description: '下局游戏首回合多抽1张牌' },
@@ -1295,9 +1287,7 @@ const dailyChallengeConfig: DailyChallengeConfig = {
       name: '今日挑战：社交达人',
       description: '使用至少8次社交类卡牌通关',
       icon: '🤝',
-      conditions: [
-        { type: 'min_card_usage', cardTag: 'social', count: 8 },
-      ],
+      conditions: [{ type: 'min_card_usage', cardTag: 'social', count: 8 }],
       rewards: [
         { type: 'points', value: 55 },
         { type: 'card_skin', value: 'daily_social', description: '社交达人徽章' },
@@ -1311,9 +1301,7 @@ const dailyChallengeConfig: DailyChallengeConfig = {
       name: '今日挑战：健康第一',
       description: '保持健康值70以上完成晋升',
       icon: '❤️',
-      conditions: [
-        { type: 'min_stat_at_win', stat: 'health', min: 70 },
-      ],
+      conditions: [{ type: 'min_stat_at_win', stat: 'health', min: 70 }],
       rewards: [
         { type: 'points', value: 65 },
         { type: 'buff', value: 'healthy_start', description: '下局游戏初始健康+5' },
@@ -1342,8 +1330,18 @@ const dailyChallengeConfig: DailyChallengeConfig = {
   streakBonuses: [
     { streakLength: 3, bonus: { type: 'points', value: 30, description: '3天连续挑战奖励' } },
     { streakLength: 7, bonus: { type: 'points', value: 100, description: '7天连续挑战奖励' } },
-    { streakLength: 14, bonus: { type: 'card_skin', value: 'streak_master', description: '连胜大师皮肤' } },
-    { streakLength: 30, bonus: { type: 'unlock_card', value: 'challenge_champion', description: '解锁特殊卡牌：挑战冠军' } },
+    {
+      streakLength: 14,
+      bonus: { type: 'card_skin', value: 'streak_master', description: '连胜大师皮肤' },
+    },
+    {
+      streakLength: 30,
+      bonus: {
+        type: 'unlock_card',
+        value: 'challenge_champion',
+        description: '解锁特殊卡牌：挑战冠军',
+      },
+    },
   ],
 };
 

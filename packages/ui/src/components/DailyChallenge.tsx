@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import {
   DailyChallengeDefinition,
   DailyChallengeInstance,
@@ -67,18 +61,14 @@ export function DailyChallenge({
 
       {/* Challenge Info */}
       <View style={styles.challengeInfo}>
-        <Text style={[styles.challengeName, { color: theme.colors.text }]}>
-          {challenge.name}
-        </Text>
+        <Text style={[styles.challengeName, { color: theme.colors.text }]}>{challenge.name}</Text>
         <Text style={[styles.challengeDescription, { color: theme.colors.textSecondary }]}>
           {challenge.description}
         </Text>
 
         {/* Difficulty */}
         <View style={styles.difficultyRow}>
-          <Text style={[styles.difficultyLabel, { color: theme.colors.textSecondary }]}>
-            难度:
-          </Text>
+          <Text style={[styles.difficultyLabel, { color: theme.colors.textSecondary }]}>难度:</Text>
           <Text style={[styles.difficultyStars, { color: theme.colors.warning }]}>
             {difficultyStars}
           </Text>
@@ -86,9 +76,7 @@ export function DailyChallenge({
 
         {/* Conditions */}
         <View style={styles.conditionsSection}>
-          <Text style={[styles.conditionsLabel, { color: theme.colors.text }]}>
-            挑战条件:
-          </Text>
+          <Text style={[styles.conditionsLabel, { color: theme.colors.text }]}>挑战条件:</Text>
           {challenge.conditions.map((condition, index) => (
             <View
               key={index}
@@ -137,38 +125,26 @@ export function DailyChallenge({
       {/* Streak Info */}
       <View style={[styles.streakSection, { backgroundColor: theme.colors.background }]}>
         <View style={styles.streakItem}>
-          <Text style={[styles.streakValue, { color: theme.colors.primary }]}>
-            {currentStreak}
-          </Text>
-          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>
-            当前连胜
-          </Text>
+          <Text style={[styles.streakValue, { color: theme.colors.primary }]}>{currentStreak}</Text>
+          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>当前连胜</Text>
         </View>
         <View style={styles.streakDivider} />
         <View style={styles.streakItem}>
-          <Text style={[styles.streakValue, { color: theme.colors.accent }]}>
-            {bestStreak}
-          </Text>
-          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>
-            最佳连胜
-          </Text>
+          <Text style={[styles.streakValue, { color: theme.colors.accent }]}>{bestStreak}</Text>
+          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>最佳连胜</Text>
         </View>
         <View style={styles.streakDivider} />
         <View style={styles.streakItem}>
           <Text style={[styles.streakValue, { color: theme.colors.text }]}>
             {instance.attemptCount}
           </Text>
-          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>
-            今日尝试
-          </Text>
+          <Text style={[styles.streakLabel, { color: theme.colors.textSecondary }]}>今日尝试</Text>
         </View>
       </View>
 
       {/* Streak Bonus */}
       {streakBonus && (
-        <View
-          style={[styles.streakBonus, { backgroundColor: `${theme.colors.success}20` }]}
-        >
+        <View style={[styles.streakBonus, { backgroundColor: `${theme.colors.success}20` }]}>
           <Text style={styles.streakBonusIcon}>🎁</Text>
           <Text style={[styles.streakBonusText, { color: theme.colors.success }]}>
             连胜奖励: {streakBonus.description || `${streakBonus.value}`}
