@@ -5,3 +5,8 @@ export {
   type CardUpgradeSystemOptions,
   type UpgradeResult,
 } from './CardUpgradeSystem';
+export {
+  RandomEventSystem,
+  type RandomEventSystemOptions,
+  type RandomEventCustomHandler,
+} from './RandomEventSystem';

@@ -7,6 +7,8 @@ import {
   ComboDefinition,
   StatusDefinition,
   CardUpgradeDefinition,
+  RandomEventDefinition,
+  RandomEventConfig,
 } from '@theme-card-games/core';
 
 /**
@@ -775,6 +777,159 @@ const cardUpgrades: CardUpgradeDefinition[] = [
 ];
 
 // ============================================================================
+// 随机事件定义 (Random Event Definitions)
+// ============================================================================
+const randomEventDefinitions: RandomEventDefinition[] = [
+  // 绩效评估：随机+20或-10绩效
+  {
+    id: 'performance_review',
+    name: '绩效评估',
+    description: '季度绩效评估来了！你的表现会被如何评价？',
+    icon: '📋',
+    weight: 1,
+    effects: [], // 使用randomEffects
+    randomEffects: [
+      {
+        weight: 50,
+        description: '表现优秀！获得了主管的认可，绩效+20',
+        effects: [
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: 20 },
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 5 },
+        ],
+      },
+      {
+        weight: 50,
+        description: '评估结果不太理想，绩效-10，需要更加努力',
+        effects: [
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: -10 },
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: -5 },
+        ],
+      },
+    ],
+  },
+
+  // 股票波动：薪资随机×0.5~2
+  {
+    id: 'stock_fluctuation',
+    name: '股票波动',
+    description: '公司股票价格发生了变化，你的期权价值也随之波动...',
+    icon: '📈',
+    weight: 1,
+    effects: [],
+    randomEffects: [
+      {
+        weight: 20,
+        description: '股价暴涨！期权价值翻倍，薪资×2',
+        effects: [
+          {
+            type: 'custom',
+            target: 'self',
+            metadata: { handler: 'multiply_resource', resource: 'money', multiplier: 2 },
+            value: 2,
+          },
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 15 },
+        ],
+      },
+      {
+        weight: 30,
+        description: '股价上涨，期权增值，薪资×1.5',
+        effects: [
+          {
+            type: 'custom',
+            target: 'self',
+            metadata: { handler: 'multiply_resource', resource: 'money', multiplier: 1.5 },
+            value: 1.5,
+          },
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 8 },
+        ],
+      },
+      {
+        weight: 30,
+        description: '股价下跌，期权缩水，薪资×0.75',
+        effects: [
+          {
+            type: 'custom',
+            target: 'self',
+            metadata: { handler: 'multiply_resource', resource: 'money', multiplier: 0.75 },
+            value: 0.75,
+          },
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: -5 },
+        ],
+      },
+      {
+        weight: 20,
+        description: '股价暴跌！期权大幅缩水，薪资×0.5',
+        effects: [
+          {
+            type: 'custom',
+            target: 'self',
+            metadata: { handler: 'multiply_resource', resource: 'money', multiplier: 0.5 },
+            value: 0.5,
+          },
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: -10 },
+        ],
+      },
+    ],
+  },
+
+  // 猎头联系：消耗2人脉，50%概率跳槽成功（薪资+8）
+  {
+    id: 'headhunter_contact',
+    name: '猎头联系',
+    description: '有猎头联系你了！要不要考虑一下新机会？',
+    icon: '📞',
+    weight: 1,
+    effects: [],
+    condition: {
+      type: 'resource_check',
+      resource: 'connections',
+      operator: '>=',
+      value: 2,
+    },
+    randomEffects: [
+      {
+        weight: 50,
+        description: '面试顺利，成功跳槽！消耗2人脉，薪资+8',
+        effects: [
+          { type: 'lose_resource', target: 'self', metadata: { resource: 'connections' }, value: 2 },
+          { type: 'gain_resource', target: 'self', metadata: { resource: 'money' }, value: 8 },
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 10 },
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: -20 },
+        ],
+      },
+      {
+        weight: 50,
+        description: '面试失败了，但积累了经验。消耗2人脉，获得2技能点',
+        effects: [
+          { type: 'lose_resource', target: 'self', metadata: { resource: 'connections' }, value: 2 },
+          { type: 'gain_resource', target: 'self', metadata: { resource: 'skills' }, value: 2 },
+          { type: 'modify_stat', target: 'self', metadata: { stat: 'influence' }, value: 1 },
+        ],
+      },
+    ],
+  },
+
+  // 体检报告：根据当前健康值触发不同效果
+  {
+    id: 'health_report',
+    name: '体检报告',
+    description: '年度体检报告出来了...',
+    icon: '🏥',
+    weight: 1,
+    effects: [],
+    customHandler: 'health_report_handler',
+  },
+];
+
+// 随机事件配置
+const randomEventConfig: RandomEventConfig = {
+  triggerInterval: 3, // 每3回合
+  triggerProbability: 0.3, // 30%概率触发
+  maxEventsPerGame: 10, // 每局游戏最多10次随机事件
+  announceEvent: true,
+};
+
+// ============================================================================
 // UI主题 (UI Theme)
 // ============================================================================
 const uiTheme: UITheme = {
@@ -896,6 +1051,8 @@ export const bigtechWorkerTheme: ThemeConfig = {
   statusDefinitions,
   comboDefinitions,
   cardUpgrades,
+  randomEventDefinitions,
+  randomEventConfig,
   uiTheme,
   localization,
 };
