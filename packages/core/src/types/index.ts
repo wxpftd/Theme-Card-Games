@@ -292,6 +292,18 @@ export type GameEventType =
   | 'random_event_triggered'
   | 'random_event_skipped'
   | 'player_action'
+  | 'achievement_unlocked'
+  | 'achievement_rewards_claimed'
+  | 'difficulty_changed'
+  | 'difficulty_unlocked'
+  | 'difficulty_per_turn_effects'
+  | 'difficulty_layoff_check'
+  | 'difficulty_energy_recovery'
+  | 'difficulty_card_cost_modifier'
+  | 'daily_challenge_generated'
+  | 'daily_challenge_attempt_started'
+  | 'daily_challenge_attempt_ended'
+  | 'daily_challenge_completed'
   | 'custom';
 
 export interface GameEvent {
@@ -401,6 +413,15 @@ export interface ThemeConfig {
   // Random event configuration
   randomEventConfig?: RandomEventConfig;
 
+  // Achievement definitions
+  achievementDefinitions?: AchievementDefinition[];
+
+  // Difficulty definitions
+  difficultyDefinitions?: DifficultyDefinition[];
+
+  // Daily challenge configuration
+  dailyChallengeConfig?: DailyChallengeConfig;
+
   // UI theming
   uiTheme: UITheme;
 
@@ -412,6 +433,15 @@ export interface ThemeConfig {
 
   // Custom win condition checkers
   customWinCheckers?: Record<string, (state: GameState) => boolean>;
+
+  // Custom achievement checkers
+  customAchievementCheckers?: Record<string, (stats: GameSessionStats, state: GameState) => boolean>;
+
+  // Custom challenge checkers
+  customChallengeCheckers?: Record<string, (stats: GameSessionStats, state: GameState) => boolean>;
+
+  // Custom difficulty rule handlers
+  customDifficultyRuleHandlers?: Record<string, (state: GameState, rule: DifficultyRule) => void>;
 }
 
 export interface StatDefinition {
@@ -466,4 +496,188 @@ export interface UITheme {
     height: number;
     aspectRatio: number;
   };
+}
+
+// ============================================================================
+// Achievement System Types
+// ============================================================================
+
+export type AchievementCategory = 'gameplay' | 'challenge' | 'milestone' | 'hidden';
+
+export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+
+export interface AchievementDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  category: AchievementCategory;
+  rarity: AchievementRarity;
+  // Condition to unlock this achievement
+  condition: AchievementCondition;
+  // Rewards for unlocking
+  rewards?: AchievementReward[];
+  // Whether this is a hidden achievement (description hidden until unlocked)
+  hidden?: boolean;
+  // Points awarded for this achievement
+  points?: number;
+}
+
+export type AchievementCondition =
+  | { type: 'card_usage'; cardTag: string; count: number; inSingleGame?: boolean }
+  | { type: 'stat_maintained'; stat: string; operator: '>=' | '<=' | '>' | '<'; value: number; forEntireGame: boolean }
+  | { type: 'stat_reached'; stat: string; operator: '>=' | '<=' | '>' | '<' | '=='; value: number }
+  | { type: 'stat_recovered'; stat: string; fromBelow: number; toAbove: number }
+  | { type: 'win_within_turns'; maxTurns: number }
+  | { type: 'win_with_condition'; conditionId: string }
+  | { type: 'custom'; checkerId: string };
+
+export interface AchievementReward {
+  type: 'card_skin' | 'buff' | 'title' | 'points' | 'unlock_card' | 'custom';
+  value: string | number;
+  description?: string;
+}
+
+export interface AchievementProgress {
+  achievementId: string;
+  currentValue: number;
+  targetValue: number;
+  unlocked: boolean;
+  unlockedAt?: number;
+  claimed?: boolean;
+}
+
+export interface AchievementState {
+  // All unlocked achievements
+  unlockedAchievements: string[];
+  // Progress for in-progress achievements
+  progress: Record<string, AchievementProgress>;
+  // Total achievement points
+  totalPoints: number;
+  // Claimed rewards
+  claimedRewards: string[];
+}
+
+// Tracking data collected during a game session
+export interface GameSessionStats {
+  cardUsage: Record<string, number>; // cardTag -> count
+  statHistory: Record<string, number[]>; // stat -> history of values
+  minStats: Record<string, number>; // stat -> minimum value reached
+  maxStats: Record<string, number>; // stat -> maximum value reached
+  turnsPlayed: number;
+  cardsPlayed: string[]; // card IDs played in order
+  won: boolean;
+  startTime: number;
+  endTime?: number;
+}
+
+// ============================================================================
+// Difficulty System Types
+// ============================================================================
+
+export type DifficultyLevel = 'easy' | 'normal' | 'hard' | 'hell';
+
+export interface DifficultyDefinition {
+  id: DifficultyLevel;
+  name: string;
+  description: string;
+  icon?: string;
+  // Stat modifiers (override initial values)
+  initialStats?: Record<string, number>;
+  // Resource modifiers
+  initialResources?: Record<string, number>;
+  // Per-turn modifiers
+  perTurnStatChanges?: Record<string, number>;
+  perTurnResourceChanges?: Record<string, number>;
+  // Special rules
+  specialRules?: DifficultyRule[];
+  // Score multiplier for achievements
+  scoreMultiplier?: number;
+  // Whether this difficulty needs to be unlocked
+  unlockCondition?: AchievementCondition;
+}
+
+export interface DifficultyRule {
+  type: 'layoff_check' | 'energy_recovery' | 'card_cost_modifier' | 'custom';
+  // For layoff_check: check every N turns
+  interval?: number;
+  // Modifier value
+  value?: number;
+  // Custom rule ID
+  customRuleId?: string;
+  description?: string;
+}
+
+export interface DifficultyConfig {
+  currentDifficulty: DifficultyLevel;
+  unlockedDifficulties: DifficultyLevel[];
+}
+
+// ============================================================================
+// Daily Challenge System Types
+// ============================================================================
+
+export interface DailyChallengeDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  // Conditions that must be met to complete the challenge
+  conditions: ChallengeCondition[];
+  // Rewards for completing
+  rewards: AchievementReward[];
+  // Difficulty rating (1-5)
+  difficulty: number;
+  // Tags for categorization
+  tags?: string[];
+}
+
+export type ChallengeCondition =
+  | { type: 'no_card_tag'; tag: string } // Cannot use cards with this tag
+  | { type: 'max_resource_usage'; resource: string; max: number }
+  | { type: 'min_stat_at_win'; stat: string; min: number }
+  | { type: 'max_turns'; turns: number }
+  | { type: 'no_card_type'; cardType: CardType }
+  | { type: 'min_card_usage'; cardTag: string; count: number }
+  | { type: 'custom'; checkerId: string };
+
+export interface DailyChallengeState {
+  // Current daily challenge (generated from seed based on date)
+  currentChallenge: DailyChallengeInstance | null;
+  // History of completed challenges
+  completedChallenges: string[];
+  // Current streak of consecutive days completing challenges
+  currentStreak: number;
+  // Best streak ever achieved
+  bestStreak: number;
+  // Last completion date (YYYY-MM-DD format)
+  lastCompletionDate?: string;
+}
+
+export interface DailyChallengeInstance {
+  definitionId: string;
+  date: string; // YYYY-MM-DD
+  seed: number;
+  completed: boolean;
+  attemptCount: number;
+  bestAttempt?: DailyChallengeAttempt;
+}
+
+export interface DailyChallengeAttempt {
+  timestamp: number;
+  turnsPlayed: number;
+  conditionsMet: boolean[];
+  success: boolean;
+}
+
+export interface DailyChallengeConfig {
+  // Available challenge pool
+  challengePool: DailyChallengeDefinition[];
+  // Streak bonuses
+  streakBonuses?: StreakBonus[];
+}
+
+export interface StreakBonus {
+  streakLength: number;
+  bonus: AchievementReward;
 }

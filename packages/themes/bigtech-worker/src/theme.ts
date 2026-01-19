@@ -9,6 +9,11 @@ import {
   CardUpgradeDefinition,
   RandomEventDefinition,
   RandomEventConfig,
+  AchievementDefinition,
+  DifficultyDefinition,
+  DailyChallengeConfig,
+  GameSessionStats,
+  GameState,
 } from '@theme-card-games/core';
 
 /**
@@ -940,6 +945,409 @@ const randomEventConfig: RandomEventConfig = {
 };
 
 // ============================================================================
+// 成就定义 (Achievement Definitions)
+// ============================================================================
+const achievementDefinitions: AchievementDefinition[] = [
+  // 卷王之王：单局游戏使用10次工作类卡牌
+  {
+    id: 'workaholic_king',
+    name: '卷王之王',
+    description: '单局游戏使用10次工作类卡牌',
+    icon: '👑',
+    category: 'gameplay',
+    rarity: 'rare',
+    condition: {
+      type: 'card_usage',
+      cardTag: 'work',
+      count: 10,
+      inSingleGame: true,
+    },
+    rewards: [
+      { type: 'card_skin', value: 'golden_overtime', description: '金色加班卡皮肤' },
+      { type: 'points', value: 100 },
+    ],
+    points: 100,
+  },
+  // 养生达人：健康值始终保持60以上通关
+  {
+    id: 'health_master',
+    name: '养生达人',
+    description: '健康值始终保持60以上通关',
+    icon: '🧘',
+    category: 'challenge',
+    rarity: 'epic',
+    condition: {
+      type: 'stat_maintained',
+      stat: 'health',
+      operator: '>=',
+      value: 60,
+      forEntireGame: true,
+    },
+    rewards: [
+      { type: 'buff', value: 'start_health_bonus', description: '开局健康+10 buff' },
+      { type: 'points', value: 150 },
+    ],
+    points: 150,
+  },
+  // 社交蝴蝶：人脉达到15
+  {
+    id: 'social_butterfly',
+    name: '社交蝴蝶',
+    description: '人脉达到15',
+    icon: '🦋',
+    category: 'milestone',
+    rarity: 'uncommon',
+    condition: {
+      type: 'stat_reached',
+      stat: 'connections',
+      operator: '>=',
+      value: 15,
+    },
+    rewards: [
+      { type: 'card_skin', value: 'vip_networking', description: 'VIP人脉卡皮肤' },
+      { type: 'points', value: 80 },
+    ],
+    points: 80,
+  },
+  // 躺平先锋：使用5次摸鱼卡后仍然晋升成功
+  {
+    id: 'slacker_champion',
+    name: '躺平先锋',
+    description: '使用5次摸鱼类卡牌后仍然晋升成功',
+    icon: '🛋️',
+    category: 'challenge',
+    rarity: 'rare',
+    condition: {
+      type: 'custom',
+      checkerId: 'slacker_champion_checker',
+    },
+    rewards: [
+      { type: 'card_skin', value: 'zen_slacking', description: '禅意摸鱼卡皮肤' },
+      { type: 'points', value: 120 },
+    ],
+    points: 120,
+  },
+  // 速通大师：15回合内晋升
+  {
+    id: 'speedrunner',
+    name: '速通大师',
+    description: '15回合内晋升',
+    icon: '⚡',
+    category: 'challenge',
+    rarity: 'epic',
+    condition: {
+      type: 'win_within_turns',
+      maxTurns: 15,
+    },
+    rewards: [
+      { type: 'buff', value: 'fast_start', description: '开局抽牌+2 buff' },
+      { type: 'points', value: 200 },
+    ],
+    points: 200,
+  },
+  // 铁人：健康值曾降到10以下但最终晋升
+  {
+    id: 'iron_will',
+    name: '铁人',
+    description: '健康值曾降到10以下但最终晋升成功',
+    icon: '🦾',
+    category: 'challenge',
+    rarity: 'legendary',
+    condition: {
+      type: 'stat_recovered',
+      stat: 'health',
+      fromBelow: 10,
+      toAbove: 0,
+    },
+    rewards: [
+      { type: 'card_skin', value: 'legendary_survivor', description: '传奇幸存者皮肤' },
+      { type: 'unlock_card', value: 'second_wind', description: '解锁特殊卡牌：绝地反击' },
+      { type: 'points', value: 300 },
+    ],
+    points: 300,
+  },
+  // 影响力大师：影响力达到80
+  {
+    id: 'influence_master',
+    name: '影响力大师',
+    description: '影响力达到80',
+    icon: '🎯',
+    category: 'milestone',
+    rarity: 'rare',
+    condition: {
+      type: 'stat_reached',
+      stat: 'influence',
+      operator: '>=',
+      value: 80,
+    },
+    rewards: [
+      { type: 'card_skin', value: 'executive_style', description: '高管风格皮肤' },
+      { type: 'points', value: 100 },
+    ],
+    points: 100,
+  },
+  // 首次胜利（隐藏成就）
+  {
+    id: 'first_win',
+    name: '职场新星',
+    description: '首次成功晋升',
+    icon: '⭐',
+    category: 'hidden',
+    rarity: 'common',
+    hidden: true,
+    condition: {
+      type: 'win_with_condition',
+      conditionId: 'any_win',
+    },
+    rewards: [
+      { type: 'title', value: '职场新星', description: '解锁称号' },
+      { type: 'points', value: 50 },
+    ],
+    points: 50,
+  },
+];
+
+// ============================================================================
+// 难度定义 (Difficulty Definitions)
+// ============================================================================
+const difficultyDefinitions: DifficultyDefinition[] = [
+  // 简单模式
+  {
+    id: 'easy',
+    name: '实习生模式',
+    description: '初始绩效60，健康100，每回合精力恢复+1',
+    icon: '🌱',
+    initialStats: {
+      performance: 60,
+      health: 100,
+      happiness: 70,
+      influence: 15,
+    },
+    initialResources: {
+      money: 3,
+      energy: 6,
+      connections: 4,
+      skills: 3,
+    },
+    specialRules: [
+      {
+        type: 'energy_recovery',
+        value: 1,
+        description: '每回合额外恢复1点精力',
+      },
+    ],
+    scoreMultiplier: 0.5,
+  },
+  // 普通模式
+  {
+    id: 'normal',
+    name: '普通员工模式',
+    description: '标准难度，体验真实的打工生活',
+    icon: '💼',
+    // 使用默认配置
+    scoreMultiplier: 1.0,
+  },
+  // 困难模式
+  {
+    id: 'hard',
+    name: '高压模式',
+    description: '初始绩效40，每5回合触发一次裁员评估',
+    icon: '🔥',
+    initialStats: {
+      performance: 40,
+      health: 75,
+      happiness: 50,
+      influence: 5,
+    },
+    initialResources: {
+      money: 2,
+      energy: 4,
+      connections: 2,
+      skills: 1,
+    },
+    specialRules: [
+      {
+        type: 'layoff_check',
+        interval: 5,
+        description: '每5回合进行裁员评估，绩效最低者有风险',
+      },
+    ],
+    scoreMultiplier: 1.5,
+    unlockCondition: {
+      type: 'win_with_condition',
+      conditionId: 'normal_win',
+    },
+  },
+  // 地狱模式
+  {
+    id: 'hell',
+    name: '996地狱模式',
+    description: '初始绩效30，健康和幸福每回合自动-2，体验真正的996',
+    icon: '💀',
+    initialStats: {
+      performance: 30,
+      health: 60,
+      happiness: 40,
+      influence: 0,
+    },
+    initialResources: {
+      money: 1,
+      energy: 3,
+      connections: 1,
+      skills: 0,
+    },
+    perTurnStatChanges: {
+      health: -2,
+      happiness: -2,
+    },
+    specialRules: [
+      {
+        type: 'layoff_check',
+        interval: 3,
+        description: '每3回合进行裁员评估',
+      },
+      {
+        type: 'card_cost_modifier',
+        value: 1,
+        description: '所有卡牌精力消耗+1',
+      },
+    ],
+    scoreMultiplier: 3.0,
+    unlockCondition: {
+      type: 'win_with_condition',
+      conditionId: 'hard_win',
+    },
+  },
+];
+
+// ============================================================================
+// 每日挑战配置 (Daily Challenge Configuration)
+// ============================================================================
+const dailyChallengeConfig: DailyChallengeConfig = {
+  challengePool: [
+    // 无摸鱼挑战
+    {
+      id: 'no_slacking',
+      name: '今日挑战：勤劳打工人',
+      description: '不使用任何摸鱼类卡牌通关',
+      icon: '💪',
+      conditions: [
+        { type: 'no_card_tag', tag: 'rest' },
+      ],
+      rewards: [
+        { type: 'points', value: 50 },
+        { type: 'card_skin', value: 'daily_diligent', description: '勤劳徽章' },
+      ],
+      difficulty: 3,
+      tags: ['restriction'],
+    },
+    // 精力节约挑战
+    {
+      id: 'energy_saver',
+      name: '今日挑战：精力管理大师',
+      description: '精力消耗不超过20通关',
+      icon: '🔋',
+      conditions: [
+        { type: 'max_resource_usage', resource: 'energy', max: 20 },
+      ],
+      rewards: [
+        { type: 'points', value: 60 },
+        { type: 'buff', value: 'energy_efficient', description: '下局游戏初始精力+2' },
+      ],
+      difficulty: 4,
+      tags: ['resource'],
+    },
+    // 影响力挑战
+    {
+      id: 'influence_rush',
+      name: '今日挑战：影响力冲刺',
+      description: '影响力达到80后晋升',
+      icon: '🎯',
+      conditions: [
+        { type: 'min_stat_at_win', stat: 'influence', min: 80 },
+      ],
+      rewards: [
+        { type: 'points', value: 80 },
+        { type: 'card_skin', value: 'daily_influencer', description: '影响者徽章' },
+      ],
+      difficulty: 4,
+      tags: ['stat'],
+    },
+    // 速通挑战
+    {
+      id: 'speedrun_daily',
+      name: '今日挑战：极速晋升',
+      description: '20回合内完成晋升',
+      icon: '⚡',
+      conditions: [
+        { type: 'max_turns', turns: 20 },
+      ],
+      rewards: [
+        { type: 'points', value: 70 },
+        { type: 'buff', value: 'quick_draw', description: '下局游戏首回合多抽1张牌' },
+      ],
+      difficulty: 3,
+      tags: ['speed'],
+    },
+    // 社交达人挑战
+    {
+      id: 'social_master',
+      name: '今日挑战：社交达人',
+      description: '使用至少8次社交类卡牌通关',
+      icon: '🤝',
+      conditions: [
+        { type: 'min_card_usage', cardTag: 'social', count: 8 },
+      ],
+      rewards: [
+        { type: 'points', value: 55 },
+        { type: 'card_skin', value: 'daily_social', description: '社交达人徽章' },
+      ],
+      difficulty: 2,
+      tags: ['card_type'],
+    },
+    // 健康优先挑战
+    {
+      id: 'health_first',
+      name: '今日挑战：健康第一',
+      description: '保持健康值70以上完成晋升',
+      icon: '❤️',
+      conditions: [
+        { type: 'min_stat_at_win', stat: 'health', min: 70 },
+      ],
+      rewards: [
+        { type: 'points', value: 65 },
+        { type: 'buff', value: 'healthy_start', description: '下局游戏初始健康+5' },
+      ],
+      difficulty: 3,
+      tags: ['stat'],
+    },
+    // 纯工作挑战
+    {
+      id: 'pure_work',
+      name: '今日挑战：专注工作',
+      description: '只使用工作类卡牌通关（不使用社交和生活卡）',
+      icon: '📊',
+      conditions: [
+        { type: 'no_card_tag', tag: 'social' },
+        { type: 'no_card_tag', tag: 'life' },
+      ],
+      rewards: [
+        { type: 'points', value: 100 },
+        { type: 'card_skin', value: 'daily_focused', description: '专注徽章' },
+      ],
+      difficulty: 5,
+      tags: ['restriction', 'hardcore'],
+    },
+  ],
+  streakBonuses: [
+    { streakLength: 3, bonus: { type: 'points', value: 30, description: '3天连续挑战奖励' } },
+    { streakLength: 7, bonus: { type: 'points', value: 100, description: '7天连续挑战奖励' } },
+    { streakLength: 14, bonus: { type: 'card_skin', value: 'streak_master', description: '连胜大师皮肤' } },
+    { streakLength: 30, bonus: { type: 'unlock_card', value: 'challenge_champion', description: '解锁特殊卡牌：挑战冠军' } },
+  ],
+};
+
+// ============================================================================
 // UI主题 (UI Theme)
 // ============================================================================
 const uiTheme: UITheme = {
@@ -1063,8 +1471,19 @@ export const bigtechWorkerTheme: ThemeConfig = {
   cardUpgrades,
   randomEventDefinitions,
   randomEventConfig,
+  achievementDefinitions,
+  difficultyDefinitions,
+  dailyChallengeConfig,
   uiTheme,
   localization,
+
+  // Custom achievement checker for "躺平先锋" achievement
+  customAchievementCheckers: {
+    slacker_champion_checker: (stats: GameSessionStats, _state: GameState) => {
+      const restCardCount = stats.cardUsage['rest'] || 0;
+      return stats.won && restCardCount >= 5;
+    },
+  },
 };
 
 export default bigtechWorkerTheme;
