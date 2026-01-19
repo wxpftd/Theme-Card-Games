@@ -49,7 +49,10 @@ export function DailyChallenge({
         case 'no_card_type':
           return t('condition.noCardType', { cardType: condition.cardType });
         case 'min_card_usage':
-          return t('condition.minCardUsage', { count: condition.count, cardTag: condition.cardTag });
+          return t('condition.minCardUsage', {
+            count: condition.count,
+            cardTag: condition.cardTag,
+          });
         default:
           return t('condition.special');
       }

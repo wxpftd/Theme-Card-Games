@@ -65,9 +65,7 @@ export function LanguageSwitcher({ mode = 'full', style }: LanguageSwitcherProps
               onPress={() => setLocale(loc)}
             >
               <Text style={styles.flag}>{flag}</Text>
-              <Text
-                style={[styles.languageText, { color: isActive ? '#fff' : theme.colors.text }]}
-              >
+              <Text style={[styles.languageText, { color: isActive ? '#fff' : theme.colors.text }]}>
                 {native}
               </Text>
               {isActive && <Text style={styles.checkmark}>✓</Text>}

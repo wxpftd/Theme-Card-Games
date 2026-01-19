@@ -50,7 +50,8 @@ export const enUS = {
   'card.bug_fix': 'Fix Production Bug',
   'card.bug_fix.desc': 'Emergency fix for production issue, Performance +15, Health -10',
   'card.project_delivery': 'Project Delivery',
-  'card.project_delivery.desc': 'Successfully deliver important project, Performance +20, Influence +5',
+  'card.project_delivery.desc':
+    'Successfully deliver important project, Performance +20, Influence +5',
   'card.code_review': 'Code Review',
   'card.code_review.desc': 'Help colleagues with code review, Influence +3, Connections +1',
   'card.ppt_presentation': 'PPT Presentation',
@@ -76,7 +77,8 @@ export const enUS = {
   'card.side_project': 'Side Project',
   'card.side_project.desc': 'Work on personal project, Skill Points +5, Health -5, Happiness +3',
   'card.certification': 'Get Certified',
-  'card.certification.desc': 'Obtain professional certification, Performance +10, Influence +5, Energy -3',
+  'card.certification.desc':
+    'Obtain professional certification, Performance +10, Influence +5, Energy -3',
 
   // Cards - Events
   'card.layoff_rumor': 'Layoff Rumors',
@@ -90,7 +92,8 @@ export const enUS = {
   'card.gym': 'Gym Session',
   'card.gym.desc': 'Exercise after work, Health +8, Happiness +3',
   'card.external_interview': 'External Interview',
-  'card.external_interview.desc': 'Interview at another company, Salary +3 (if successful), Energy -2',
+  'card.external_interview.desc':
+    'Interview at another company, Salary +3 (if successful), Energy -2',
   'card.startup_idea': 'Startup Idea',
   'card.startup_idea.desc': 'Conceive a startup idea, Happiness +10, Performance -5',
   'card.team_conflict': 'Team Conflict',
@@ -100,7 +103,8 @@ export const enUS = {
   'card.hire_review': 'Interview Candidate',
   'card.hire_review.desc': 'Interview potential new hire, Influence +5, Energy -1',
   'card.promotion_apply': 'Apply for Promotion',
-  'card.promotion_apply.desc': 'Submit promotion application, Performance +25, Energy -3, Salary +2',
+  'card.promotion_apply.desc':
+    'Submit promotion application, Performance +25, Energy -3, Salary +2',
   'card.stock_vesting': 'Stock Vesting',
   'card.stock_vesting.desc': 'Company stock vests, Salary +10, Happiness +10',
   'card.burnout': 'Burnout',
@@ -110,7 +114,7 @@ export const enUS = {
   'card.lucky_day': 'Lucky Day',
   'card.lucky_day.desc': 'Everything goes well today! All stats +5',
   'card.bad_day': 'Bad Day',
-  'card.bad_day.desc': 'Murphy\'s law in action. All stats -3',
+  'card.bad_day.desc': "Murphy's law in action. All stats -3",
   'card.mentorship': 'Be a Mentor',
   'card.mentorship.desc': 'Mentor junior colleagues, Influence +10, Happiness +5, Energy -2',
   'card.hackathon': 'Hackathon',
@@ -126,13 +130,15 @@ export const enUS = {
   'combo.efficient_learner': 'Efficient Learner',
   'combo.efficient_learner.desc': 'Online course + Certification, skill points +10',
   'combo.involution_king': 'Involution King',
-  'combo.involution_king.desc': 'Overtime + Bug fix + Project delivery in one turn, performance +50',
+  'combo.involution_king.desc':
+    'Overtime + Bug fix + Project delivery in one turn, performance +50',
 
   // Status Effects
   'status.996_mode': '996 Mode',
   'status.996_mode.desc': 'Work overtime mode: Performance +5/turn, Health -3/turn',
   'status.involution': 'Involution State',
-  'status.involution.desc': 'Super involution: Performance +10/turn, Health -5/turn, Happiness -5/turn',
+  'status.involution.desc':
+    'Super involution: Performance +10/turn, Health -5/turn, Happiness -5/turn',
   'status.burnout': 'Burnout',
   'status.burnout.desc': 'Severe burnout: All cards cost +1 energy',
   'status.inspiration': 'Inspiration Burst',
