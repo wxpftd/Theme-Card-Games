@@ -6,7 +6,16 @@
         "hooks": [
           {
             "type": "command",
-            "command": "pnpm precommit"
+            "command": "pnpm format && pnpm precommit"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(git add*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm format"
           }
         ]
       }

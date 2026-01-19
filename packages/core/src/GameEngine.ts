@@ -6,17 +6,26 @@ import {
   ComboDefinition,
   StatusDefinition,
   CardUpgradeDefinition,
+  RandomEventDefinition,
+  RandomEventConfig,
 } from './types';
 import { GameStateManager } from './state';
 import { TurnManager, TurnPhaseConfig } from './turn';
 import { EventBus } from './event';
 import { EffectResolver, CustomEffectHandler } from './card';
-import { ComboSystem, StatusEffectSystem, CardUpgradeSystem } from './systems';
+import {
+  ComboSystem,
+  StatusEffectSystem,
+  CardUpgradeSystem,
+  RandomEventSystem,
+  RandomEventCustomHandler,
+} from './systems';
 
 export interface GameEngineOptions {
   theme: ThemeConfig;
   customPhases?: TurnPhaseConfig[];
   customEffectHandlers?: Record<string, CustomEffectHandler>;
+  randomEventCustomHandlers?: Record<string, RandomEventCustomHandler>;
 }
 
 /**
@@ -52,6 +61,9 @@ export class GameEngine {
       comboDefinitions: this.theme.comboDefinitions,
       statusDefinitions: this.theme.statusDefinitions,
       cardUpgrades: this.theme.cardUpgrades,
+      randomEventDefinitions: this.theme.randomEventDefinitions,
+      randomEventConfig: this.theme.randomEventConfig,
+      randomEventCustomHandlers: options.randomEventCustomHandlers,
       eventBus: this.eventBus,
       effectResolver: this.effectResolver,
     });
@@ -333,6 +345,13 @@ export class GameEngine {
   }
 
   /**
+   * Get the random event system
+   */
+  getRandomEventSystem(): RandomEventSystem | null {
+    return this.stateManager.getRandomEventSystem();
+  }
+
+  /**
    * Apply a status effect to a player
    */
   applyStatus(playerId: string, statusId: string): boolean {
@@ -379,5 +398,19 @@ export class GameEngine {
    */
   getCardUpgradeDefinitions(): CardUpgradeDefinition[] {
     return this.theme.cardUpgrades ?? [];
+  }
+
+  /**
+   * Get random event definitions
+   */
+  getRandomEventDefinitions(): RandomEventDefinition[] {
+    return this.theme.randomEventDefinitions ?? [];
+  }
+
+  /**
+   * Get random event configuration
+   */
+  getRandomEventConfig(): RandomEventConfig | undefined {
+    return this.theme.randomEventConfig;
   }
 }

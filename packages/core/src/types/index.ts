@@ -289,6 +289,8 @@ export type GameEventType =
   | 'status_tick'
   | 'combo_triggered'
   | 'card_upgraded'
+  | 'random_event_triggered'
+  | 'random_event_skipped'
   | 'player_action'
   | 'custom';
 
@@ -299,6 +301,68 @@ export interface GameEvent {
 }
 
 export type GameEventHandler = (event: GameEvent, state: GameState) => void;
+
+// ============================================================================
+// Random Event System Types
+// ============================================================================
+
+export interface RandomEventDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  // Weight for random selection (higher = more likely)
+  weight?: number;
+  // Effects to resolve - can be random
+  effects: CardEffect[];
+  // Random effect options - system will pick one
+  randomEffects?: RandomEffectOption[];
+  // Condition to check before applying effects
+  condition?: RandomEventCondition;
+  // Custom handler for complex logic
+  customHandler?: string;
+}
+
+export interface RandomEffectOption {
+  // Probability weight for this option
+  weight: number;
+  // Description of this outcome
+  description: string;
+  // Effects if this option is selected
+  effects: CardEffect[];
+}
+
+export interface RandomEventCondition {
+  type: 'stat_check' | 'resource_check' | 'has_status' | 'turn_check' | 'random_chance';
+  stat?: string;
+  resource?: string;
+  status?: string;
+  operator?: '>' | '<' | '==' | '>=' | '<=' | '!=';
+  value?: number;
+  // For random_chance: probability between 0-1
+  probability?: number;
+}
+
+export interface RandomEventConfig {
+  // Trigger every N turns
+  triggerInterval: number;
+  // Probability of triggering (0-1)
+  triggerProbability: number;
+  // Maximum events per game (optional)
+  maxEventsPerGame?: number;
+  // Whether to announce the event before applying
+  announceEvent?: boolean;
+}
+
+export interface RandomEventResult {
+  eventId: string;
+  eventName: string;
+  description: string;
+  selectedOption?: string;
+  effects: ResolvedEffect[];
+  skipped: boolean;
+  skipReason?: string;
+}
 
 // ============================================================================
 // Theme Types
@@ -330,6 +394,12 @@ export interface ThemeConfig {
 
   // Card upgrade definitions
   cardUpgrades?: CardUpgradeDefinition[];
+
+  // Random event definitions
+  randomEventDefinitions?: RandomEventDefinition[];
+
+  // Random event configuration
+  randomEventConfig?: RandomEventConfig;
 
   // UI theming
   uiTheme: UITheme;

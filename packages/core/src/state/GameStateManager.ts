@@ -8,6 +8,9 @@ import {
   ComboDefinition,
   StatusDefinition,
   CardUpgradeDefinition,
+  RandomEventDefinition,
+  RandomEventConfig,
+  RandomEventResult,
   ResolvedEffect,
 } from '../types';
 import { EventBus } from '../event';
@@ -15,6 +18,7 @@ import { Card, Deck, Hand, EffectResolver } from '../card';
 import { ComboSystem } from '../systems/ComboSystem';
 import { StatusEffectSystem } from '../systems/StatusEffectSystem';
 import { CardUpgradeSystem } from '../systems/CardUpgradeSystem';
+import { RandomEventSystem, RandomEventCustomHandler } from '../systems/RandomEventSystem';
 import { generateId, deepClone } from '../utils';
 
 export interface GameStateManagerOptions {
@@ -23,6 +27,9 @@ export interface GameStateManagerOptions {
   comboDefinitions?: ComboDefinition[];
   statusDefinitions?: StatusDefinition[];
   cardUpgrades?: CardUpgradeDefinition[];
+  randomEventDefinitions?: RandomEventDefinition[];
+  randomEventConfig?: RandomEventConfig;
+  randomEventCustomHandlers?: Record<string, RandomEventCustomHandler>;
   eventBus?: EventBus;
   effectResolver?: EffectResolver;
 }
@@ -42,6 +49,7 @@ export class GameStateManager {
   private comboSystem: ComboSystem | null = null;
   private statusEffectSystem: StatusEffectSystem | null = null;
   private cardUpgradeSystem: CardUpgradeSystem | null = null;
+  private randomEventSystem: RandomEventSystem | null = null;
 
   /** State version counter for change detection */
   private stateVersion: number = 0;
@@ -79,6 +87,21 @@ export class GameStateManager {
         upgradeDefinitions: options.cardUpgrades,
         cardDefinitions: this.cardDefinitions,
         eventBus: this.eventBus,
+      });
+    }
+
+    if (options.randomEventDefinitions && options.randomEventDefinitions.length > 0) {
+      const defaultConfig: RandomEventConfig = {
+        triggerInterval: 3,
+        triggerProbability: 0.3,
+        announceEvent: true,
+      };
+      this.randomEventSystem = new RandomEventSystem({
+        eventDefinitions: options.randomEventDefinitions,
+        config: options.randomEventConfig ?? defaultConfig,
+        effectResolver: this.effectResolver,
+        eventBus: this.eventBus,
+        customHandlers: options.randomEventCustomHandlers,
       });
     }
 
@@ -607,9 +630,12 @@ export class GameStateManager {
 
     this.state.currentPlayerId = playerIds[nextIndex];
 
-    // Increment turn if we've gone around
+    // Increment turn if we've gone around (complete round)
     if (nextIndex === 0) {
       this.state.turn++;
+
+      // Process random events at end of each complete round
+      this.processRandomEvents();
     }
     this.invalidateCache();
 
@@ -627,6 +653,19 @@ export class GameStateManager {
       },
       this.state
     );
+  }
+
+  /**
+   * Process random events for all players
+   * Called at the end of each complete round
+   */
+  private processRandomEvents(): RandomEventResult[] {
+    if (!this.randomEventSystem) {
+      return [];
+    }
+
+    const players = Object.values(this.state.players);
+    return this.randomEventSystem.processTurnEnd(this.state.turn, players, this.state);
   }
 
   /**
@@ -746,6 +785,7 @@ export class GameStateManager {
     this.eventBus.clearHistory();
     this.comboSystem?.reset();
     this.cardUpgradeSystem?.reset();
+    this.randomEventSystem?.reset();
     this.invalidateCache();
   }
 
@@ -772,6 +812,13 @@ export class GameStateManager {
    */
   getCardUpgradeSystem(): CardUpgradeSystem | null {
     return this.cardUpgradeSystem;
+  }
+
+  /**
+   * Get the random event system
+   */
+  getRandomEventSystem(): RandomEventSystem | null {
+    return this.randomEventSystem;
   }
 
   // ============================================================================

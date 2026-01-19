@@ -30,6 +30,9 @@ export {
   CardUpgradeSystem,
   CardUpgradeSystemOptions,
   UpgradeResult,
+  RandomEventSystem,
+  RandomEventSystemOptions,
+  RandomEventCustomHandler,
 } from './systems';
 
 // Types
