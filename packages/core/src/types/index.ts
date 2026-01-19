@@ -99,6 +99,100 @@ export interface PlayerStatus {
   name: string;
   duration: number; // -1 for permanent
   effects: CardEffect[];
+  description?: string;
+  icon?: string;
+  stackable?: boolean; // Whether multiple instances can stack
+  maxStacks?: number;
+  currentStacks?: number;
+  onApply?: CardEffect[]; // Effects triggered when status is applied
+  onRemove?: CardEffect[]; // Effects triggered when status is removed
+  onTurnStart?: CardEffect[]; // Effects triggered at turn start
+  onTurnEnd?: CardEffect[]; // Effects triggered at turn end
+}
+
+// ============================================================================
+// Status Effect Definition (for theme configuration)
+// ============================================================================
+
+export interface StatusDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  duration: number; // -1 for permanent, 0 for until condition, positive for turns
+  stackable?: boolean;
+  maxStacks?: number;
+  effects: CardEffect[]; // Passive effects while active
+  onApply?: CardEffect[]; // Effects when first applied
+  onRemove?: CardEffect[]; // Effects when removed
+  onTurnStart?: CardEffect[]; // Effects at start of each turn
+  onTurnEnd?: CardEffect[]; // Effects at end of each turn
+  triggerCondition?: StatusTriggerCondition; // Auto-trigger condition
+}
+
+export interface StatusTriggerCondition {
+  type: 'stat_threshold' | 'resource_threshold' | 'card_played' | 'turn_count';
+  stat?: string;
+  resource?: string;
+  operator: '>' | '<' | '==' | '>=' | '<=' | '!=';
+  value: number;
+  cardTag?: string;
+}
+
+// ============================================================================
+// Combo System Types
+// ============================================================================
+
+export interface ComboDefinition {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  // Cards that trigger this combo (by ID or tag)
+  trigger: ComboTrigger;
+  // Effects to apply when combo is triggered
+  effects: CardEffect[];
+  // Optional: Status to apply
+  applyStatus?: string;
+  // Cooldown in turns (0 = can trigger every time)
+  cooldown?: number;
+}
+
+export type ComboTrigger =
+  | { type: 'sequence'; cards: string[] } // Play cards in exact sequence
+  | { type: 'combination'; cards: string[] } // Play all cards (any order) in same turn
+  | { type: 'tag_sequence'; tags: string[]; count?: number } // Sequence of tags
+  | { type: 'tag_count'; tag: string; count: number }; // Play N cards with same tag in one turn
+
+export interface ComboState {
+  playedCardsThisTurn: string[]; // Card IDs played this turn
+  playedTagsThisTurn: string[]; // Tags of cards played this turn
+  recentCards: string[]; // Last N cards played (across turns)
+  triggeredCombos: Map<string, number>; // Combo ID -> last triggered turn
+}
+
+// ============================================================================
+// Card Upgrade System Types
+// ============================================================================
+
+export interface CardUpgradeDefinition {
+  id: string;
+  sourceCardId: string;
+  targetCardId: string;
+  upgradeCondition: UpgradeCondition;
+  description?: string;
+}
+
+export type UpgradeCondition =
+  | { type: 'use_count'; count: number } // Use card N times
+  | { type: 'stat_threshold'; stat: string; operator: string; value: number }
+  | { type: 'resource_threshold'; resource: string; operator: string; value: number }
+  | { type: 'combo_triggered'; comboId: string; count?: number };
+
+export interface CardUsageTracker {
+  cardId: string;
+  useCount: number;
+  upgraded: boolean;
 }
 
 // ============================================================================
@@ -192,6 +286,9 @@ export type GameEventType =
   | 'resource_changed'
   | 'status_applied'
   | 'status_removed'
+  | 'status_tick'
+  | 'combo_triggered'
+  | 'card_upgraded'
   | 'player_action'
   | 'custom';
 
@@ -224,6 +321,15 @@ export interface ThemeConfig {
 
   // Resource definitions
   resources: ResourceDefinition[];
+
+  // Status effect definitions
+  statusDefinitions?: StatusDefinition[];
+
+  // Combo definitions
+  comboDefinitions?: ComboDefinition[];
+
+  // Card upgrade definitions
+  cardUpgrades?: CardUpgradeDefinition[];
 
   // UI theming
   uiTheme: UITheme;

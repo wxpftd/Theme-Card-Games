@@ -4,6 +4,9 @@ import {
   StatDefinition,
   ResourceDefinition,
   UITheme,
+  ComboDefinition,
+  StatusDefinition,
+  CardUpgradeDefinition,
 } from '@theme-card-games/core';
 
 /**
@@ -391,6 +394,384 @@ const cards: CardDefinition[] = [
     rarity: 'uncommon',
     tags: ['strategy'],
   },
+
+  // ==================== 升级版卡牌 ====================
+  {
+    id: 'overtime_efficient',
+    type: 'event',
+    name: '高效加班',
+    description: '学会了高效加班，绩效+10，健康-3（减少消耗），精力-2',
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: 10 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: -3 },
+      { type: 'lose_resource', target: 'self', metadata: { resource: 'energy' }, value: 2 },
+    ],
+    cost: 0,
+    rarity: 'uncommon',
+    tags: ['work', 'overtime', 'upgraded'],
+  },
+  {
+    id: 'slacking_pro',
+    type: 'action',
+    name: '花式摸鱼',
+    description: '摸鱼技术登峰造极，健康+8，幸福感+8，绩效-2',
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: 8 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 8 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: -2 },
+    ],
+    cost: 0,
+    rarity: 'uncommon',
+    tags: ['rest', 'risk', 'upgraded'],
+  },
+  {
+    id: 'project_delivery_star',
+    type: 'action',
+    name: '明星项目',
+    description: '交付了明星项目！绩效+30，影响力+10，解锁晋升快车道',
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: 30 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'influence' }, value: 10 },
+    ],
+    cost: 3,
+    rarity: 'legendary',
+    tags: ['work', 'project', 'upgraded'],
+  },
+  {
+    id: 'online_course_advanced',
+    type: 'action',
+    name: '深度学习',
+    description: '系统性学习高级课程，技能点+5，影响力+2，精力-1',
+    effects: [
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'skills' }, value: 5 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'influence' }, value: 2 },
+      { type: 'lose_resource', target: 'self', metadata: { resource: 'energy' }, value: 1 },
+    ],
+    cost: 1,
+    rarity: 'uncommon',
+    tags: ['growth', 'upgraded'],
+  },
+  {
+    id: 'coffee_break_social',
+    type: 'action',
+    name: '咖啡社交',
+    description: '咖啡时间变成社交时间，健康+3，精力+1，人脉+1',
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: 3 },
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'energy' }, value: 1 },
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'connections' }, value: 1 },
+    ],
+    cost: 0,
+    rarity: 'uncommon',
+    tags: ['rest', 'social', 'upgraded'],
+  },
+];
+
+// ============================================================================
+// 组合定义 (Combo Definitions)
+// ============================================================================
+const comboDefinitions: ComboDefinition[] = [
+  // 加班 + 咖啡时间 = 熬夜战士
+  {
+    id: 'night_warrior',
+    name: '熬夜战士',
+    description: '加班配咖啡，战斗力爆表！额外绩效+5',
+    icon: '🦉',
+    trigger: {
+      type: 'combination',
+      cards: ['overtime', 'coffee_break'],
+    },
+    effects: [{ type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: 5 }],
+    cooldown: 0,
+  },
+  // 代码评审 + 导师1对1 = 职场导师
+  {
+    id: 'workplace_mentor',
+    name: '职场导师',
+    description: '指导他人，提升自我！额外影响力+5',
+    icon: '👨‍🏫',
+    trigger: {
+      type: 'combination',
+      cards: ['code_review', 'mentor_meeting'],
+    },
+    effects: [{ type: 'modify_stat', target: 'self', metadata: { stat: 'influence' }, value: 5 }],
+    cooldown: 0,
+  },
+  // 在线学习 + 考取证书 = 高效学习
+  {
+    id: 'efficient_learning',
+    name: '高效学习',
+    description: '学以致用，事半功倍！获得额外技能点+3',
+    icon: '📖',
+    trigger: {
+      type: 'combination',
+      cards: ['online_course', 'certification'],
+    },
+    effects: [
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'skills' }, value: 3 },
+    ],
+    cooldown: 0,
+  },
+  // 连续3张工作类卡牌 = 卷王状态
+  {
+    id: 'workaholic_combo',
+    name: '卷王降临',
+    description: '连续工作触发卷王状态！绩效加成但健康持续下降',
+    icon: '💪',
+    trigger: {
+      type: 'tag_count',
+      tag: 'work',
+      count: 3,
+    },
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: 10 },
+    ],
+    applyStatus: 'workaholic_mode',
+    cooldown: 3, // 3回合冷却
+  },
+  // 健身 + 陪伴家人 = 生活平衡
+  {
+    id: 'life_balance',
+    name: '生活平衡',
+    description: '工作生活两不误！幸福感大幅提升',
+    icon: '⚖️',
+    trigger: {
+      type: 'combination',
+      cards: ['gym', 'family_time'],
+    },
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 10 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: 5 },
+    ],
+    cooldown: 0,
+  },
+  // 摸鱼 + 咖啡时间 = 带薪休息
+  {
+    id: 'paid_break',
+    name: '带薪休息',
+    description: '摸鱼的艺术！健康大幅恢复',
+    icon: '☕',
+    trigger: {
+      type: 'combination',
+      cards: ['slacking', 'coffee_break'],
+    },
+    effects: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: 8 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 3 },
+    ],
+    cooldown: 0,
+  },
+  // 团建聚餐 + 拓展人脉 = 社交达人
+  {
+    id: 'social_butterfly',
+    name: '社交达人',
+    description: '人脉广布，左右逢源！人脉+3，影响力+3',
+    icon: '🦋',
+    trigger: {
+      type: 'combination',
+      cards: ['team_dinner', 'networking'],
+    },
+    effects: [
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'connections' }, value: 3 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'influence' }, value: 3 },
+    ],
+    cooldown: 0,
+  },
+];
+
+// ============================================================================
+// 状态效果定义 (Status Effect Definitions)
+// ============================================================================
+const statusDefinitions: StatusDefinition[] = [
+  // 996模式：持续3回合，每回合绩效+5但健康-3
+  {
+    id: 'mode_996',
+    name: '996模式',
+    description: '工作到极致，但身体在透支',
+    icon: '⏰',
+    duration: 3,
+    stackable: false,
+    effects: [], // 被动效果（暂无）
+    onTurnStart: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: 5 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: -3 },
+    ],
+  },
+  // 卷王状态：由连击触发，持续2回合
+  {
+    id: 'workaholic_mode',
+    name: '卷王状态',
+    description: '疯狂内卷中，绩效飙升但健康告急',
+    icon: '🔥',
+    duration: 2,
+    stackable: false,
+    effects: [],
+    onTurnStart: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'performance' }, value: 5 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: -5 },
+    ],
+  },
+  // 职业倦怠：幸福感<30时自动触发，所有行动消耗精力+1
+  {
+    id: 'burnout',
+    name: '职业倦怠',
+    description: '身心俱疲，做什么都提不起劲',
+    icon: '😮‍💨',
+    duration: -1, // 永久，直到条件解除
+    stackable: false,
+    effects: [
+      // 标记效果，用于在卡牌消耗时检查
+      {
+        type: 'custom',
+        target: 'self',
+        metadata: { modifierType: 'energy_cost', value: 1 },
+        value: 1,
+      },
+    ],
+    onTurnStart: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: -2 },
+    ],
+    triggerCondition: {
+      type: 'stat_threshold',
+      stat: 'happiness',
+      operator: '<',
+      value: 30,
+    },
+  },
+  // 灵感爆发：技能点>8时触发，下2回合成长卡效果翻倍
+  {
+    id: 'inspiration_burst',
+    name: '灵感爆发',
+    description: '灵感如泉涌，学习效率翻倍！',
+    icon: '💡',
+    duration: 2,
+    stackable: false,
+    effects: [
+      {
+        type: 'custom',
+        target: 'self',
+        metadata: { modifierType: 'growth_bonus', value: 2 },
+        value: 2,
+      },
+    ],
+    onApply: [
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'skills' }, value: 2 },
+    ],
+    triggerCondition: {
+      type: 'resource_threshold',
+      resource: 'skills',
+      operator: '>',
+      value: 8,
+    },
+  },
+  // 人脉网络：人脉>5时，社交卡额外+2影响力
+  {
+    id: 'network_effect',
+    name: '人脉网络',
+    description: '人脉广泛，社交更有影响力',
+    icon: '🌐',
+    duration: -1, // 永久，条件状态
+    stackable: false,
+    effects: [
+      {
+        type: 'custom',
+        target: 'self',
+        metadata: { modifierType: 'social_bonus', value: 2 },
+        value: 2,
+      },
+    ],
+    triggerCondition: {
+      type: 'resource_threshold',
+      resource: 'connections',
+      operator: '>',
+      value: 5,
+    },
+  },
+  // 精力充沛：健康>80时触发
+  {
+    id: 'energized',
+    name: '精力充沛',
+    description: '身体健康，干劲十足！',
+    icon: '⚡',
+    duration: -1,
+    stackable: false,
+    effects: [],
+    onTurnStart: [
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'energy' }, value: 1 },
+    ],
+    triggerCondition: {
+      type: 'stat_threshold',
+      stat: 'health',
+      operator: '>',
+      value: 80,
+    },
+  },
+  // 压力山大：绩效<30时触发
+  {
+    id: 'stressed',
+    name: '压力山大',
+    description: '绩效压力让人喘不过气',
+    icon: '😰',
+    duration: -1,
+    stackable: false,
+    effects: [],
+    onTurnEnd: [
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: -3 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'health' }, value: -2 },
+    ],
+    triggerCondition: {
+      type: 'stat_threshold',
+      stat: 'performance',
+      operator: '<',
+      value: 30,
+    },
+  },
+];
+
+// ============================================================================
+// 卡牌升级定义 (Card Upgrade Definitions)
+// ============================================================================
+const cardUpgrades: CardUpgradeDefinition[] = [
+  // 加班 → 高效加班（使用3次后升级）
+  {
+    id: 'upgrade_overtime',
+    sourceCardId: 'overtime',
+    targetCardId: 'overtime_efficient',
+    upgradeCondition: { type: 'use_count', count: 3 },
+    description: '使用3次加班后升级为高效加班',
+  },
+  // 摸鱼 → 花式摸鱼（使用3次后升级）
+  {
+    id: 'upgrade_slacking',
+    sourceCardId: 'slacking',
+    targetCardId: 'slacking_pro',
+    upgradeCondition: { type: 'use_count', count: 3 },
+    description: '使用3次摸鱼后升级为花式摸鱼',
+  },
+  // 项目交付 → 明星项目（使用3次后升级）
+  {
+    id: 'upgrade_project_delivery',
+    sourceCardId: 'project_delivery',
+    targetCardId: 'project_delivery_star',
+    upgradeCondition: { type: 'use_count', count: 3 },
+    description: '使用3次项目交付后升级为明星项目',
+  },
+  // 在线学习 → 深度学习（使用3次后升级）
+  {
+    id: 'upgrade_online_course',
+    sourceCardId: 'online_course',
+    targetCardId: 'online_course_advanced',
+    upgradeCondition: { type: 'use_count', count: 3 },
+    description: '使用3次在线学习后升级为深度学习',
+  },
+  // 咖啡时间 → 咖啡社交（使用3次后升级）
+  {
+    id: 'upgrade_coffee_break',
+    sourceCardId: 'coffee_break',
+    targetCardId: 'coffee_break_social',
+    upgradeCondition: { type: 'use_count', count: 3 },
+    description: '使用3次咖啡时间后升级为咖啡社交',
+  },
 ];
 
 // ============================================================================
@@ -512,6 +893,9 @@ export const bigtechWorkerTheme: ThemeConfig = {
   cards,
   stats,
   resources,
+  statusDefinitions,
+  comboDefinitions,
+  cardUpgrades,
   uiTheme,
   localization,
 };

@@ -21,6 +21,17 @@ export { TurnManager, TurnPhaseConfig, TurnManagerOptions } from './turn';
 // Event system
 export { EventBus } from './event';
 
+// Game systems
+export {
+  ComboSystem,
+  ComboSystemOptions,
+  StatusEffectSystem,
+  StatusEffectSystemOptions,
+  CardUpgradeSystem,
+  CardUpgradeSystemOptions,
+  UpgradeResult,
+} from './systems';
+
 // Types
 export * from './types';
 
