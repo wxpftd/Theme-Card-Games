@@ -932,3 +932,222 @@ export interface TargetSelectionResponse {
   /** 选中的目标玩家 ID 列表 */
   selectedTargets: string[];
 }
+
+// ============================================================================
+// Share Card System Types (分享卡系统类型)
+// ============================================================================
+
+/** 名场面事件类型 */
+export type HighlightEventType =
+  | 'near_death_recovery' // 濒死逆袭
+  | 'massive_stat_change' // 属性巨变
+  | 'combo_triggered' // 连击触发
+  | 'perfect_defense' // 完美防守
+  | 'lucky_escape' // 幸运逃脱
+  | 'resource_windfall' // 资源横财
+  | 'blame_shifted' // 成功甩锅
+  | 'credit_stolen' // 抢功成功
+  | 'survived_attack' // 承受攻击
+  | 'final_comeback'; // 绝地反击
+
+/** 名场面事件 */
+export interface HighlightEvent {
+  /** 事件唯一标识 */
+  id: string;
+  /** 事件类型 */
+  type: HighlightEventType;
+  /** 发生回合 */
+  turn: number;
+  /** 事件描述 */
+  description: string;
+  /** 事件图标 */
+  icon: string;
+  /** 额外数据 */
+  data: Record<string, unknown>;
+  /** 精彩程度 (1-10) */
+  intensity: number;
+}
+
+/** 竞争模式统计 */
+export interface CompetitiveStats {
+  /** 甩锅次数 */
+  blameShiftCount: number;
+  /** 成功甩锅次数 */
+  blameShiftSuccessCount: number;
+  /** 抢功次数 */
+  creditStealCount: number;
+  /** 抢夺资源总量 */
+  resourcesStolenAmount: number;
+  /** 受到攻击次数 */
+  attacksReceived: number;
+  /** 发起攻击次数 */
+  attacksInitiated: number;
+  /** 共享资源抢夺次数 */
+  sharedResourceClaims: number;
+  /** 被甩锅次数 */
+  blamedCount: number;
+}
+
+/** 玩家对战报告 */
+export interface PlayerBattleReport {
+  /** 玩家 ID */
+  playerId: string;
+  /** 玩家名称 */
+  playerName: string;
+  /** 最终排名 */
+  rank: number;
+  /** 是否存活 */
+  survived: boolean;
+  /** 淘汰回合 (如被淘汰) */
+  eliminatedAtTurn?: number;
+  /** 最终属性 */
+  finalStats: Record<string, number>;
+  /** 竞争统计 */
+  competitiveStats: CompetitiveStats;
+  /** 名场面事件 */
+  highlights: HighlightEvent[];
+}
+
+/** 对战战报 */
+export interface BattleReport {
+  /** 游戏 ID */
+  gameId: string;
+  /** 总回合数 */
+  totalTurns: number;
+  /** 赢家 ID */
+  winnerId: string | null;
+  /** 赢家名称 */
+  winnerName?: string;
+  /** 各玩家报告 */
+  playerReports: PlayerBattleReport[];
+  /** 游戏开始时间 */
+  startTime: number;
+  /** 游戏结束时间 */
+  endTime: number;
+  /** 游戏模式 */
+  gameMode: GameModeType;
+  /** 特殊称号 (甩锅王、抢功王等) */
+  specialTitles: SpecialTitle[];
+}
+
+/** 特殊称号 */
+export interface SpecialTitle {
+  /** 称号 ID */
+  titleId: string;
+  /** 称号名称 */
+  titleName: string;
+  /** 获得者 ID */
+  playerId: string;
+  /** 获得者名称 */
+  playerName: string;
+  /** 称号图标 */
+  icon: string;
+  /** 描述 */
+  description: string;
+}
+
+/** 生存报告分享卡数据 */
+export interface SurvivalReportShareCard {
+  /** 卡片类型 */
+  type: 'survival_report';
+  /** 玩家名称 */
+  playerName: string;
+  /** 是否胜利 */
+  isVictory: boolean;
+  /** 存活回合数 */
+  turnsPlayed: number;
+  /** 最终属性 */
+  finalStats: Record<string, number>;
+  /** 最终资源 */
+  finalResources: Record<string, number>;
+  /** 名场面 (最多3个) */
+  highlights: HighlightEvent[];
+  /** 一句话总结 */
+  summary: string;
+  /** 成就徽章 (可选, 如果本局解锁) */
+  unlockedAchievements?: string[];
+  /** 游戏会话统计 */
+  sessionStats: GameSessionStats;
+  /** 生成时间 */
+  generatedAt: number;
+}
+
+/** 成就徽章分享卡数据 */
+export interface AchievementBadgeShareCard {
+  /** 卡片类型 */
+  type: 'achievement_badge';
+  /** 玩家名称 */
+  playerName: string;
+  /** 成就 ID */
+  achievementId: string;
+  /** 成就名称 */
+  achievementName: string;
+  /** 成就描述 */
+  achievementDescription: string;
+  /** 成就图标 */
+  achievementIcon?: string;
+  /** 成就稀有度 */
+  achievementRarity: AchievementRarity;
+  /** 成就故事 (根据解锁情况生成的个性化文字) */
+  achievementStory: string;
+  /** 成就点数 */
+  points: number;
+  /** 解锁时间 */
+  unlockedAt: number;
+  /** 生成时间 */
+  generatedAt: number;
+}
+
+/** 对战战报分享卡数据 */
+export interface BattleReportShareCard {
+  /** 卡片类型 */
+  type: 'battle_report';
+  /** 对战战报 */
+  battleReport: BattleReport;
+  /** 当前玩家 ID (分享视角) */
+  currentPlayerId: string;
+  /** 一句话总结 */
+  summary: string;
+  /** 生成时间 */
+  generatedAt: number;
+}
+
+/** 分享卡联合类型 */
+export type ShareCard = SurvivalReportShareCard | AchievementBadgeShareCard | BattleReportShareCard;
+
+/** 扩展的游戏会话统计 (用于分享功能) */
+export interface ExtendedGameSessionStats extends GameSessionStats {
+  /** 名场面事件列表 */
+  highlights: HighlightEvent[];
+  /** 竞争模式统计 (仅多人模式) */
+  competitiveStats?: CompetitiveStats;
+  /** 游戏模式 */
+  gameMode: GameModeType;
+  /** 玩家名称 */
+  playerName: string;
+  /** 玩家 ID */
+  playerId: string;
+}
+
+/** 一句话总结模板 */
+export interface SummaryTemplate {
+  /** 模板 ID */
+  id: string;
+  /** 模板类型 */
+  type: 'victory' | 'defeat' | 'competitive_win' | 'competitive_lose' | 'special';
+  /** 触发条件 */
+  condition: SummaryCondition;
+  /** 模板文本 (支持变量插值) */
+  template: string;
+  /** 优先级 (越高越优先匹配) */
+  priority: number;
+}
+
+/** 总结模板条件 */
+export type SummaryCondition =
+  | { type: 'victory' }
+  | { type: 'defeat'; reason: 'health_zero' | 'resource_depleted' | 'turn_limit' | 'any' }
+  | { type: 'highlight_exists'; highlightType: HighlightEventType }
+  | { type: 'stat_reached'; stat: string; operator: '>=' | '<=' | '>' | '<'; value: number }
+  | { type: 'competitive_title'; titleId: string }
+  | { type: 'always' };
