@@ -25,3 +25,7 @@ export {
   type DailyChallengeSystemOptions,
   type CustomChallengeChecker,
 } from './DailyChallengeSystem';
+
+// 竞争模式系统
+export { AIPlayerSystem, type AIPlayerSystemOptions } from './AIPlayerSystem';
+export { SharedResourceSystem, type SharedResourceSystemOptions } from './SharedResourceSystem';
