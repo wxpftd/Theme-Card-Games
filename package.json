@@ -44,7 +44,10 @@
   "pnpm": {
     "neverBuiltDependencies": [
       "react-native-screens"
-    ]
+    ],
+    "overrides": {
+      "@types/react": "~19.1.17"
+    }
   },
   "engines": {
     "node": ">=18.0.0"
