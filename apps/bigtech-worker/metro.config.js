@@ -6,16 +6,16 @@ const workspaceRoot = path.resolve(projectRoot, '../..');
 
 const config = getDefaultConfig(projectRoot);
 
-// Watch all files in the monorepo
+// 监听整个 monorepo
 config.watchFolders = [workspaceRoot];
 
-// Let Metro know where to resolve packages from
+// 依赖解析路径
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules'),
 ];
 
-// Force Metro to resolve (sub)dependencies only from the workspace root
-config.resolver.disableHierarchicalLookup = true;
+// 启用 symlinks 支持（pnpm hoisted 模式需要）
+config.resolver.unstable_enableSymlinks = true;
 
 module.exports = config;

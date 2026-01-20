@@ -38,6 +38,7 @@ Fix a GitHub issue and create a PR for it.
    - Commit with message: `fix: <description> (fixes #$ARGUMENTS)`
    - Push: `git push -u origin fix/issue-$ARGUMENTS`
    - Create PR linking to the issue:
+
      ```
      gh pr create --title "fix: <description>" --body "Fixes #$ARGUMENTS
 

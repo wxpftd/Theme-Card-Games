@@ -15,27 +15,28 @@ Update project dependencies one by one, running tests after each update.
    For each outdated package, in order of risk (patch -> minor -> major):
 
    a. **Update the package**
-      - `pnpm update <package>@<version>` for specific version
-      - Or edit package.json and run `pnpm install`
+   - `pnpm update <package>@<version>` for specific version
+   - Or edit package.json and run `pnpm install`
 
    b. **Run CI checks**
-      - `pnpm lint`
-      - `pnpm typecheck`
-      - `pnpm test`
-      - `pnpm build`
+   - `pnpm lint`
+   - `pnpm typecheck`
+   - `pnpm test`
+   - `pnpm build`
 
    c. **If tests pass**: Commit the update
-      - `git add .`
-      - `git commit -m "chore(deps): update <package> to <version>"`
+   - `git add .`
+   - `git commit -m "chore(deps): update <package> to <version>"`
 
    d. **If tests fail**:
-      - Investigate and fix compatibility issues
-      - Or revert: `git checkout -- .`
-      - Document the issue for manual review
+   - Investigate and fix compatibility issues
+   - Or revert: `git checkout -- .`
+   - Document the issue for manual review
 
 4. **Create summary PR**
    - Push all commits: `git push -u origin chore/update-deps`
    - Create PR with summary of all updates:
+
      ```
      gh pr create --title "chore(deps): update dependencies" --body "
      ## Updated packages
