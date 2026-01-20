@@ -1,6 +1,21 @@
 // Main exports
 export { GameEngine, GameEngineOptions } from './GameEngine';
 
+// Game mode management
+export { GameModeManager, GameModeManagerOptions } from './GameModeManager';
+export {
+  createSinglePlayerMode,
+  createCompetitiveMode,
+  createLocalMultiplayerMode,
+  createQuick1v1Mode,
+  createQuick1v3Mode,
+  createEliminationMode,
+  type AIPlayerConfig,
+  type HumanPlayerConfig,
+  type CompetitiveModeOptions,
+  type LocalMultiplayerOptions,
+} from './gameModes';
+
 // Card system
 export {
   Card,
@@ -33,7 +48,24 @@ export {
   RandomEventSystem,
   RandomEventSystemOptions,
   RandomEventCustomHandler,
+  // 竞争模式系统
+  AIPlayerSystem,
+  AIPlayerSystemOptions,
+  SharedResourceSystem,
+  SharedResourceSystemOptions,
 } from './systems';
+
+// AI presets
+export {
+  EASY_AI_STRATEGY,
+  MEDIUM_AI_STRATEGY,
+  HARD_AI_STRATEGY,
+  EXPERT_AI_STRATEGY,
+  AI_PERSONALITY_MODIFIERS,
+  getAIStrategyByDifficulty,
+  createCustomAIStrategy,
+  applyPersonalityModifier,
+} from './ai';
 
 // Types
 export * from './types';

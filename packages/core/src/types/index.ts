@@ -60,6 +60,10 @@ export type EffectType =
   | 'trigger_event'
   | 'apply_status'
   | 'remove_status'
+  | 'transfer_stat' // 竞争模式: 将自己的属性转移给对手 (甩锅)
+  | 'steal_resource' // 竞争模式: 从对手偷取资源
+  | 'claim_shared' // 竞争模式: 抢夺共享资源
+  | 'damage_stat' // 竞争模式: 直接减少对手属性
   | 'custom';
 
 export type EffectTarget =
@@ -69,7 +73,11 @@ export type EffectTarget =
   | 'random_player'
   | 'selected_card'
   | 'all_cards'
-  | 'game';
+  | 'game'
+  | 'selected_opponent' // 竞争模式: 需要玩家选择的对手
+  | 'all_opponents' // 竞争模式: 所有对手
+  | 'weakest_opponent' // 竞争模式: 属性最低的对手
+  | 'strongest_opponent'; // 竞争模式: 属性最高的对手
 
 export interface EffectCondition {
   type: 'stat_check' | 'card_count' | 'turn_count' | 'custom';
@@ -304,6 +312,19 @@ export type GameEventType =
   | 'daily_challenge_attempt_started'
   | 'daily_challenge_attempt_ended'
   | 'daily_challenge_completed'
+  // 竞争模式事件
+  | 'ai_turn_started'
+  | 'ai_turn_ended'
+  | 'ai_decision_made'
+  | 'target_selection_requested'
+  | 'target_selection_completed'
+  | 'shared_resource_claimed'
+  | 'shared_resource_renewed'
+  | 'shared_resource_depleted'
+  | 'stat_transferred'
+  | 'resource_stolen'
+  | 'player_eliminated'
+  | 'competitive_winner'
   | 'custom';
 
 export interface GameEvent {
@@ -445,6 +466,19 @@ export interface ThemeConfig {
 
   // Custom difficulty rule handlers
   customDifficultyRuleHandlers?: Record<string, (state: GameState, rule: DifficultyRule) => void>;
+
+  // ============================================================================
+  // Competitive Mode Additions
+  // ============================================================================
+
+  /** 共享资源定义 (竞争模式) */
+  sharedResourceDefinitions?: SharedResourceDefinition[];
+
+  /** 自定义共享资源抢夺规则处理器 */
+  customSharedResourceRules?: Record<string, SharedResourceClaimHandler>;
+
+  /** 竞争卡牌 ID 列表 (用于区分竞争卡牌和普通卡牌) */
+  competitiveCardIds?: string[];
 }
 
 export interface StatDefinition {
@@ -689,4 +723,212 @@ export interface DailyChallengeConfig {
 export interface StreakBonus {
   streakLength: number;
   bonus: AchievementReward;
+}
+
+// ============================================================================
+// AI Player System Types
+// ============================================================================
+
+export type AIDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
+
+export interface AIStrategyConfig {
+  /** AI 难度等级 */
+  difficulty: AIDifficulty;
+  /** 攻击性 (0-1): 越高越倾向于使用攻击性卡牌 */
+  aggressiveness: number;
+  /** 防御性 (0-1): 越高越倾向于保护自身属性 */
+  defensiveness: number;
+  /** 贪婪度 (0-1): 越高越倾向于抢夺共享资源 */
+  greed: number;
+  /** 风险偏好 (0-1): 越高越愿意使用高风险卡牌 */
+  riskTolerance: number;
+  /** 思考延迟 (ms): 模拟思考时间，提升用户体验 */
+  thinkingDelay: number;
+}
+
+export interface AIPlayerState {
+  /** 玩家 ID */
+  playerId: string;
+  /** AI 策略配置 */
+  strategyConfig: AIStrategyConfig;
+  /** AI 记忆: 记录对手行为模式 */
+  memory: AIMemory;
+}
+
+export interface AIMemory {
+  /** 每个对手打出的卡牌历史 */
+  opponentCardHistory: Record<string, string[]>;
+  /** 每个对手的威胁评分 */
+  threatScores: Record<string, number>;
+  /** 已被抢夺的共享资源 */
+  claimedResources: string[];
+}
+
+export interface AIDecision {
+  /** 决策类型 */
+  action: 'play_card' | 'end_turn' | 'claim_resource';
+  /** 卡牌 ID (如果是出牌动作) */
+  cardId?: string;
+  /** 目标玩家 ID (如果卡牌需要目标) */
+  targetPlayerId?: string;
+  /** 共享资源 ID (如果是抢夺资源动作) */
+  resourceId?: string;
+  /** 决策置信度 (0-1) */
+  confidence: number;
+  /** 决策原因 (用于调试) */
+  reason?: string;
+}
+
+// ============================================================================
+// Shared Resource System Types
+// ============================================================================
+
+export interface SharedResourceDefinition {
+  /** 资源唯一标识 */
+  id: string;
+  /** 资源名称 */
+  name: string;
+  /** 资源描述 */
+  description: string;
+  /** 资源图标 */
+  icon?: string;
+  /** 资源总量 */
+  totalAmount: number;
+  /** 是否可再生 */
+  renewable: boolean;
+  /** 再生间隔 (回合数) */
+  renewalInterval?: number;
+  /** 每次再生数量 */
+  renewalAmount?: number;
+  /** 资源抢夺规则 */
+  claimRules: SharedResourceClaimRule[];
+  /** 抢夺成功后的效果 */
+  claimEffects?: CardEffect[];
+  /** 资源耗尽时的事件 */
+  onDepletedEvent?: string;
+}
+
+export interface SharedResourceClaimRule {
+  /** 抢夺规则类型 */
+  type: 'first_come' | 'highest_stat' | 'lowest_stat' | 'random' | 'auction' | 'custom';
+  /** 用于比较的属性名 (用于 highest_stat/lowest_stat) */
+  statId?: string;
+  /** 自定义规则 ID */
+  customRuleId?: string;
+  /** 规则描述 */
+  description?: string;
+}
+
+export interface SharedResourceState {
+  /** 资源定义 ID */
+  resourceId: string;
+  /** 当前剩余数量 */
+  currentAmount: number;
+  /** 已抢夺记录: playerId -> 抢夺数量 */
+  claimedBy: Record<string, number>;
+  /** 上次再生的回合 */
+  lastRenewalTurn: number;
+}
+
+export interface SharedResourceClaimResult {
+  /** 是否抢夺成功 */
+  success: boolean;
+  /** 抢夺的数量 */
+  amountClaimed: number;
+  /** 失败原因 */
+  failureReason?: string;
+  /** 触发的效果 */
+  effects?: ResolvedEffect[];
+}
+
+export type SharedResourceClaimHandler = (
+  resourceDef: SharedResourceDefinition,
+  resourceState: SharedResourceState,
+  playerId: string,
+  gameState: GameState,
+  ruleIndex: number
+) => SharedResourceClaimResult;
+
+// ============================================================================
+// Competitive Mode Types
+// ============================================================================
+
+export type GameModeType = 'single_player' | 'local_multiplayer' | 'competitive';
+
+export interface GameModeConfig {
+  /** 游戏模式类型 */
+  type: GameModeType;
+  /** 玩家配置列表 */
+  players: PlayerConfig[];
+  /** 竞争模式专属配置 */
+  competitiveConfig?: CompetitiveConfig;
+}
+
+export interface PlayerConfig {
+  /** 玩家 ID */
+  id: string;
+  /** 玩家名称 */
+  name: string;
+  /** 是否为 AI 玩家 */
+  isAI: boolean;
+  /** AI 策略配置 (仅 AI 玩家需要) */
+  aiConfig?: AIStrategyConfig;
+}
+
+export interface CompetitiveConfig {
+  /** 是否启用共享资源 */
+  enableSharedResources: boolean;
+  /** 是否启用竞争卡牌 */
+  enableCompetitiveCards: boolean;
+  /** 是否启用目标选择 (多对手时) */
+  enableTargetSelection: boolean;
+  /** 竞争胜利条件 */
+  competitiveWinCondition?: CompetitiveWinCondition;
+  /** 每回合可攻击次数限制 */
+  attacksPerTurn?: number;
+}
+
+export interface CompetitiveWinCondition {
+  /** 胜利类型 */
+  type: 'first_to_threshold' | 'highest_at_turn_limit' | 'last_standing' | 'custom';
+  /** 阈值属性 */
+  stat?: string;
+  /** 阈值 */
+  threshold?: number;
+  /** 回合限制 */
+  turnLimit?: number;
+  /** 自定义检查器 ID */
+  customCheckerId?: string;
+}
+
+// ============================================================================
+// Target Selection Types
+// ============================================================================
+
+export interface TargetSelectionRequest {
+  /** 请求 ID */
+  requestId: string;
+  /** 源卡牌 ID */
+  sourceCardId: string;
+  /** 源玩家 ID */
+  sourcePlayerId: string;
+  /** 可选目标玩家列表 */
+  validTargets: string[];
+  /** 目标选择原因/描述 */
+  reason: string;
+  /** 是否允许取消 */
+  allowCancel: boolean;
+  /** 最小选择数量 */
+  minTargets: number;
+  /** 最大选择数量 */
+  maxTargets: number;
+}
+
+export interface TargetSelectionResponse {
+  /** 请求 ID */
+  requestId: string;
+  /** 是否取消 */
+  cancelled: boolean;
+  /** 选中的目标玩家 ID 列表 */
+  selectedTargets: string[];
 }

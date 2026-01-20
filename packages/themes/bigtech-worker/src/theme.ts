@@ -14,8 +14,11 @@ import {
   DailyChallengeConfig,
   GameSessionStats,
   GameState,
+  SharedResourceDefinition,
 } from '@theme-card-games/core';
 import { zhCN, enUS } from './locales';
+import { competitiveCards, competitiveCardIds } from './competitiveCards';
+import { sharedResourceDefinitions } from './sharedResources';
 
 /**
  * 大厂打工主题配置
@@ -1537,6 +1540,9 @@ const localization: Record<string, Record<string, string>> = {
 // ============================================================================
 // 主题配置导出 (Theme Config Export)
 // ============================================================================
+// 合并基础卡牌和竞争卡牌
+const allCards: CardDefinition[] = [...cards, ...competitiveCards];
+
 export const bigtechWorkerTheme: ThemeConfig = {
   id: 'bigtech-worker',
   name: '大厂打工',
@@ -1569,7 +1575,7 @@ export const bigtechWorkerTheme: ThemeConfig = {
     },
   },
 
-  cards,
+  cards: allCards,
   stats,
   resources,
   statusDefinitions,
@@ -1582,6 +1588,10 @@ export const bigtechWorkerTheme: ThemeConfig = {
   dailyChallengeConfig,
   uiTheme,
   localization,
+
+  // 竞争模式配置
+  sharedResourceDefinitions,
+  competitiveCardIds,
 
   // Custom achievement checker for "躺平先锋" achievement
   customAchievementCheckers: {
