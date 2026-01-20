@@ -1,16 +1,13 @@
 import React, { useRef, forwardRef, useImperativeHandle } from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 
-// Use react-native's ReactNode to avoid type conflicts
-type RNReactNode = React.ReactNode;
-
 export interface ShareCardContainerRef {
   /** 获取容器视图引用 (用于截图) */
   getViewRef: () => View | null;
 }
 
 export interface ShareCardContainerProps {
-  children: RNReactNode;
+  children: React.ReactNode;
   style?: ViewStyle;
   /** 背景颜色 */
   backgroundColor?: string;
@@ -37,9 +34,9 @@ export const ShareCardContainer = forwardRef<ShareCardContainerRef | null, Share
         ref={viewRef}
         style={[styles.container, { backgroundColor, padding }, style]}
         collapsable={false}
-        // @ts-expect-error - React/React Native type version mismatch
-        children={children}
-      />
+      >
+        {children as React.ReactNode & React.JSX.Element}
+      </View>
     );
   }
 );
