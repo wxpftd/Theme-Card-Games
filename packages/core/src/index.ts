@@ -72,3 +72,10 @@ export * from './types';
 
 // Utilities
 export * from './utils';
+
+// Share card system
+export {
+  ShareCardGenerator,
+  DEFAULT_SUMMARY_TEMPLATES,
+  type ShareCardGeneratorOptions,
+} from './share';

@@ -29,3 +29,10 @@ export {
 // 竞争模式系统
 export { AIPlayerSystem, type AIPlayerSystemOptions } from './AIPlayerSystem';
 export { SharedResourceSystem, type SharedResourceSystemOptions } from './SharedResourceSystem';
+
+// 分享卡系统
+export {
+  GameStatsCollector,
+  type GameStatsCollectorOptions,
+  type HighlightThresholds,
+} from './GameStatsCollector';

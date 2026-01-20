@@ -12,3 +12,16 @@ export { LanguageSwitcher } from './LanguageSwitcher';
 export { TargetSelector } from './TargetSelector';
 export { OpponentView } from './OpponentView';
 export { SharedResourceDisplay } from './SharedResourceDisplay';
+
+// 分享卡组件
+export {
+  ShareCardContainer,
+  SurvivalReportCard,
+  AchievementBadgeCard,
+  BattleReportCard,
+  type ShareCardContainerRef,
+  type ShareCardContainerProps,
+  type SurvivalReportCardProps,
+  type AchievementBadgeCardProps,
+  type BattleReportCardProps,
+} from './share';

@@ -92,4 +92,44 @@ export const enUS = {
   'language.title': 'Language',
   'language.zh-CN': '简体中文',
   'language.en-US': 'English',
+
+  // Share card
+  'share.dialogTitle': 'Share Result',
+  'share.share': 'Share',
+  'share.sharing': 'Sharing...',
+  'share.saveToGallery': 'Save to Gallery',
+  'share.saving': 'Saving...',
+  'share.notAvailable': 'Share feature is not available',
+  'share.watermark': 'Big Tech Survival Guide',
+
+  // Game over - share
+  'gameOver.shareResult': 'Share Result',
+  'gameOver.sharePreview': 'Share Preview',
+
+  // Survival report
+  'share.survivalReport.victory': 'Promoted!',
+  'share.survivalReport.defeat': 'Game Over',
+  'share.survivalReport.turns': '{turns} turns played',
+  'share.survivalReport.finalStats': 'Final Stats',
+  'share.survivalReport.highlights': 'Highlights',
+
+  // Achievement badge
+  'share.achievementBadge.unlockedBy': 'Unlocked by',
+  'share.achievementBadge.rarity.common': 'Common',
+  'share.achievementBadge.rarity.uncommon': 'Uncommon',
+  'share.achievementBadge.rarity.rare': 'Rare',
+  'share.achievementBadge.rarity.epic': 'Epic',
+  'share.achievementBadge.rarity.legendary': 'Legendary',
+
+  // Battle report
+  'share.battleReport.title': 'Battle Report',
+  'share.battleReport.players': '{count} Players',
+  'share.battleReport.turns': '{turns} Turns',
+  'share.battleReport.ranking': 'Ranking',
+  'share.battleReport.specialTitles': 'Special Titles',
+  'share.battleReport.myStats': 'My Stats',
+  'share.battleReport.blameShifted': 'Blame Shifted',
+  'share.battleReport.resourcesStolen': 'Resources Stolen',
+  'share.battleReport.attacksInitiated': 'Attacks Made',
+  'share.battleReport.attacksReceived': 'Attacks Received',
 };

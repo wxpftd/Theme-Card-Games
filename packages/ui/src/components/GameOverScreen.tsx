@@ -1,8 +1,26 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
-import { PlayerState, StatDefinition, ResourceDefinition } from '@theme-card-games/core';
+import React, { useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle,
+  Modal,
+  ScrollView,
+} from 'react-native';
+import {
+  PlayerState,
+  StatDefinition,
+  ResourceDefinition,
+  SurvivalReportShareCard,
+  BattleReportShareCard,
+} from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
 import { useI18n } from '../i18n';
+import { SurvivalReportCard } from './share/SurvivalReportCard';
+import { BattleReportCard } from './share/BattleReportCard';
+import { ShareCardContainerRef } from './share/ShareCardContainer';
+import { UseShareServiceReturn } from '../hooks/useShareService';
 
 interface GameOverScreenProps {
   winner: PlayerState | null;
@@ -13,6 +31,12 @@ interface GameOverScreenProps {
   onRestart?: () => void;
   onMainMenu?: () => void;
   style?: ViewStyle;
+  /** 生存报告分享卡数据 (单人模式) */
+  survivalReportData?: SurvivalReportShareCard;
+  /** 对战战报分享卡数据 (多人模式) */
+  battleReportData?: BattleReportShareCard;
+  /** 分享服务 (由 app 层提供) */
+  shareService?: UseShareServiceReturn;
 }
 
 export function GameOverScreen({
@@ -24,11 +48,44 @@ export function GameOverScreen({
   onRestart,
   onMainMenu,
   style,
+  survivalReportData,
+  battleReportData,
+  shareService,
 }: GameOverScreenProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
+  const [showShareModal, setShowShareModal] = useState(false);
+  const shareCardRef = useRef<ShareCardContainerRef>(null);
 
   const isWinner = winner?.id === player.id;
+  const hasShareData = survivalReportData || battleReportData;
+
+  const handleShare = async () => {
+    if (!shareService) {
+      setShowShareModal(true);
+      return;
+    }
+    const success = await shareService.captureAndShare(shareCardRef, t('share.dialogTitle'));
+    if (!success && shareService.error) {
+      // 错误由 shareService 处理
+    }
+  };
+
+  const handleSave = async () => {
+    if (!shareService) {
+      setShowShareModal(true);
+      return;
+    }
+    await shareService.saveToGallery(shareCardRef);
+  };
+
+  const handleOpenShareModal = () => {
+    setShowShareModal(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setShowShareModal(false);
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }, style]}>
@@ -93,6 +150,16 @@ export function GameOverScreen({
 
         {/* Actions */}
         <View style={styles.actions}>
+          {/* Share Button */}
+          {hasShareData && (
+            <TouchableOpacity
+              style={[styles.button, styles.shareButton, { backgroundColor: theme.colors.accent }]}
+              onPress={handleOpenShareModal}
+            >
+              <Text style={styles.shareButtonText}>{t('gameOver.shareResult')}</Text>
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             style={[styles.button, styles.primaryButton, { backgroundColor: theme.colors.primary }]}
             onPress={onRestart}
@@ -110,6 +177,90 @@ export function GameOverScreen({
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Share Modal */}
+      <Modal
+        visible={showShareModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={handleCloseShareModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+                {t('gameOver.sharePreview')}
+              </Text>
+              <TouchableOpacity onPress={handleCloseShareModal}>
+                <Text style={[styles.modalClose, { color: theme.colors.textSecondary }]}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              style={styles.modalScroll}
+              contentContainerStyle={styles.modalScrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {/* Share Card Preview */}
+              {survivalReportData && (
+                <SurvivalReportCard
+                  data={survivalReportData}
+                  statDefinitions={statDefinitions}
+                  resourceDefinitions={resourceDefinitions}
+                  containerRef={shareCardRef}
+                />
+              )}
+              {battleReportData && (
+                <BattleReportCard
+                  data={battleReportData}
+                  statDefinitions={statDefinitions}
+                  containerRef={shareCardRef}
+                />
+              )}
+            </ScrollView>
+
+            {/* Share Actions */}
+            <View style={styles.modalActions}>
+              {shareService && (
+                <>
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      styles.modalButton,
+                      { backgroundColor: theme.colors.primary },
+                    ]}
+                    onPress={handleShare}
+                    disabled={shareService.isSharing}
+                  >
+                    <Text style={styles.primaryButtonText}>
+                      {shareService.isSharing ? t('share.sharing') : t('share.share')}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.button,
+                      styles.modalButton,
+                      styles.secondaryButton,
+                      { borderColor: theme.colors.primary },
+                    ]}
+                    onPress={handleSave}
+                    disabled={shareService.isSaving}
+                  >
+                    <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>
+                      {shareService.isSaving ? t('share.saving') : t('share.saveToGallery')}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
+              {!shareService && (
+                <Text style={[styles.noShareServiceText, { color: theme.colors.textSecondary }]}>
+                  {t('share.notAvailable')}
+                </Text>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -224,5 +375,60 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  shareButton: {
+    marginBottom: 8,
+  },
+  shareButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '85%',
+    paddingBottom: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalClose: {
+    fontSize: 20,
+    padding: 4,
+  },
+  modalScroll: {
+    flex: 1,
+  },
+  modalScrollContent: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  modalActions: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    gap: 12,
+  },
+  modalButton: {
+    marginBottom: 0,
+  },
+  noShareServiceText: {
+    textAlign: 'center',
+    fontSize: 14,
+    paddingVertical: 12,
   },
 });

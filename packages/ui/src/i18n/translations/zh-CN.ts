@@ -92,6 +92,46 @@ export const zhCN = {
   'language.title': '语言',
   'language.zh-CN': '简体中文',
   'language.en-US': 'English',
+
+  // Share card
+  'share.dialogTitle': '分享战绩',
+  'share.share': '分享',
+  'share.sharing': '分享中...',
+  'share.saveToGallery': '保存到相册',
+  'share.saving': '保存中...',
+  'share.notAvailable': '分享功能暂不可用',
+  'share.watermark': '大厂生存指南',
+
+  // Game over - share
+  'gameOver.shareResult': '分享战绩',
+  'gameOver.sharePreview': '分享预览',
+
+  // Survival report
+  'share.survivalReport.victory': '成功晋升!',
+  'share.survivalReport.defeat': '游戏结束',
+  'share.survivalReport.turns': '历经 {turns} 回合',
+  'share.survivalReport.finalStats': '最终数据',
+  'share.survivalReport.highlights': '名场面',
+
+  // Achievement badge
+  'share.achievementBadge.unlockedBy': '解锁者',
+  'share.achievementBadge.rarity.common': '普通',
+  'share.achievementBadge.rarity.uncommon': '稀有',
+  'share.achievementBadge.rarity.rare': '精良',
+  'share.achievementBadge.rarity.epic': '史诗',
+  'share.achievementBadge.rarity.legendary': '传说',
+
+  // Battle report
+  'share.battleReport.title': '对战战报',
+  'share.battleReport.players': '{count}人对战',
+  'share.battleReport.turns': '共{turns}回合',
+  'share.battleReport.ranking': '排名',
+  'share.battleReport.specialTitles': '特殊称号',
+  'share.battleReport.myStats': '我的战绩',
+  'share.battleReport.blameShifted': '甩锅成功',
+  'share.battleReport.resourcesStolen': '抢夺资源',
+  'share.battleReport.attacksInitiated': '发起攻击',
+  'share.battleReport.attacksReceived': '承受攻击',
 };
 
 export type TranslationKey = keyof typeof zhCN;
