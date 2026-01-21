@@ -9,3 +9,6 @@ export * from './theme';
 
 // i18n
 export * from './i18n';
+
+// Tutorial
+export * from './tutorial';

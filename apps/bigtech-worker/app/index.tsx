@@ -71,8 +71,15 @@ export default function HomeScreen() {
           onPress={() => router.push('/tutorial')}
         >
           <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>
-            {uiT('common.next')}
+            {uiT('common.tutorial')}
           </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.lessonButton, { backgroundColor: theme.colors.warning }]}
+          onPress={() => router.push('/tutorial-game' as '/game')}
+        >
+          <Text style={styles.buttonText}>📚 加班的代价</Text>
         </TouchableOpacity>
       </View>
 
@@ -181,6 +188,9 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  lessonButton: {
+    marginTop: 8,
   },
   version: {
     textAlign: 'center',

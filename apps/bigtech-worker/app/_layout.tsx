@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ThemeProvider, I18nProvider, useI18n } from '@theme-card-games/ui';
+import { ThemeProvider, I18nProvider, useI18n, TutorialProvider } from '@theme-card-games/ui';
 import { bigtechWorkerTheme } from '@theme-card-games/theme-bigtech-worker';
 
 /**
@@ -11,13 +11,15 @@ function InnerLayout() {
 
   return (
     <ThemeProvider themeConfig={bigtechWorkerTheme} locale={locale}>
-      <StatusBar style="auto" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: 'slide_from_right',
-        }}
-      />
+      <TutorialProvider>
+        <StatusBar style="auto" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: 'slide_from_right',
+          }}
+        />
+      </TutorialProvider>
     </ThemeProvider>
   );
 }

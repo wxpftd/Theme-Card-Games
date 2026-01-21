@@ -12,6 +12,7 @@ export const enUS = {
   'common.back': 'Back',
   'common.next': 'Next',
   'common.more': 'More',
+  'common.tutorial': 'Tutorial',
 
   // Game phases
   'phase.setup': 'Setup',
