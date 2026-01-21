@@ -12,6 +12,7 @@ export const zhCN = {
   'common.back': '返回',
   'common.next': '下一步',
   'common.more': '更多',
+  'common.tutorial': '新手教程',
 
   // Game phases
   'phase.setup': '准备中',
