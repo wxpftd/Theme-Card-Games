@@ -167,10 +167,7 @@ function DraggableCardComponent({
         rotate.value = withSpring(0, SPRING_CONFIG);
 
         // 轻触视为选中
-        if (
-          Math.abs(event.translationX) < 10 &&
-          Math.abs(event.translationY) < 10
-        ) {
+        if (Math.abs(event.translationX) < 10 && Math.abs(event.translationY) < 10) {
           runOnJS(handleSelect)();
         }
       }
@@ -223,7 +220,9 @@ function DraggableCardComponent({
   const hintStyle = useAnimatedStyle(() => {
     const shouldShow = translateY.value < PLAY_THRESHOLD * 0.5;
     return {
-      opacity: shouldShow ? interpolate(translateY.value, [PLAY_THRESHOLD, PLAY_THRESHOLD * 0.5], [1, 0]) : 0,
+      opacity: shouldShow
+        ? interpolate(translateY.value, [PLAY_THRESHOLD, PLAY_THRESHOLD * 0.5], [1, 0])
+        : 0,
     };
   });
 
@@ -276,13 +275,8 @@ function DraggableCardComponent({
         {card.tags && card.tags.length > 0 && size !== 'small' && (
           <View style={styles.tags}>
             {card.tags.slice(0, 2).map((tag, index) => (
-              <View
-                key={index}
-                style={[styles.tag, { backgroundColor: theme.colors.background }]}
-              >
-                <Text style={[styles.tagText, { color: theme.colors.textSecondary }]}>
-                  {tag}
-                </Text>
+              <View key={index} style={[styles.tag, { backgroundColor: theme.colors.background }]}>
+                <Text style={[styles.tagText, { color: theme.colors.textSecondary }]}>{tag}</Text>
               </View>
             ))}
           </View>

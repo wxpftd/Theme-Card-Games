@@ -119,9 +119,7 @@ function DangerWarningComponent({
         <Text style={styles.badgeIcon}>{icon}</Text>
         <View style={styles.badgeContent}>
           <Text style={styles.badgeText}>{message}</Text>
-          {healthValue !== undefined && (
-            <Text style={styles.healthText}>HP: {healthValue}</Text>
-          )}
+          {healthValue !== undefined && <Text style={styles.healthText}>HP: {healthValue}</Text>}
         </View>
       </Animated.View>
 

@@ -7,7 +7,14 @@
  * - 卡牌拖拽打出
  */
 import React, { useMemo, useState, useCallback, memo, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, LayoutChangeEvent } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle,
+  LayoutChangeEvent,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { GameState, ThemeConfig, CardDefinition, ComboResult } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';

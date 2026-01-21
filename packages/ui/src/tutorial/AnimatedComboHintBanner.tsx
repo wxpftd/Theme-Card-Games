@@ -145,21 +145,11 @@ export function AnimatedComboHintBanner({ visible, hint, onDismiss, t }: ComboHi
       ]}
     >
       {/* 背景光晕 */}
-      <Animated.View
-        style={[
-          styles.glow,
-          { backgroundColor: theme.colors.warning },
-          glowStyle,
-        ]}
-      />
+      <Animated.View style={[styles.glow, { backgroundColor: theme.colors.warning }, glowStyle]} />
 
       {/* 组合图标（带旋转动画） */}
       <Animated.View
-        style={[
-          styles.iconContainer,
-          { backgroundColor: theme.colors.warning + '20' },
-          iconStyle,
-        ]}
+        style={[styles.iconContainer, { backgroundColor: theme.colors.warning + '20' }, iconStyle]}
       >
         <Text style={styles.icon}>{hint.combo.icon ?? '✨'}</Text>
       </Animated.View>

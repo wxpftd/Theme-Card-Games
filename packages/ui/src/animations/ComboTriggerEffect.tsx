@@ -76,15 +76,7 @@ const Particle = memo(function Particle({
     };
   });
 
-  return (
-    <Animated.View
-      style={[
-        styles.particle,
-        { backgroundColor: color },
-        animatedStyle,
-      ]}
-    />
-  );
+  return <Animated.View style={[styles.particle, { backgroundColor: color }, animatedStyle]} />;
 });
 
 function ComboTriggerEffectComponent({ combo, onComplete }: ComboTriggerEffectProps) {
@@ -182,9 +174,7 @@ function ComboTriggerEffectComponent({ combo, onComplete }: ComboTriggerEffectPr
       <Animated.View style={[styles.card, containerStyle]}>
         <Text style={styles.icon}>{combo.comboIcon || '✨'}</Text>
         <Text style={styles.title}>{combo.comboName}</Text>
-        {combo.comboDescription && (
-          <Text style={styles.description}>{combo.comboDescription}</Text>
-        )}
+        {combo.comboDescription && <Text style={styles.description}>{combo.comboDescription}</Text>}
         {combo.bonusEffects && combo.bonusEffects.length > 0 && (
           <View style={styles.bonusContainer}>
             {combo.bonusEffects.map((effect, index) => (
@@ -209,10 +199,7 @@ interface ComboTriggerContainerProps {
   onComboComplete?: (id: string) => void;
 }
 
-function ComboTriggerContainerComponent({
-  combos,
-  onComboComplete,
-}: ComboTriggerContainerProps) {
+function ComboTriggerContainerComponent({ combos, onComboComplete }: ComboTriggerContainerProps) {
   if (combos.length === 0) return null;
 
   // 只显示最新的一个组合
