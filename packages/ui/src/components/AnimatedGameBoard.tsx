@@ -16,7 +16,19 @@ import {
   LayoutChangeEvent,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { GameState, ThemeConfig, CardDefinition, ComboResult } from '@theme-card-games/core';
+import {
+  GameState,
+  ThemeConfig,
+  CardDefinition,
+  ComboDefinition,
+  ResolvedEffect,
+} from '@theme-card-games/core';
+
+/** 组合触发结果类型 */
+interface ComboTriggerResult {
+  combo: ComboDefinition;
+  effects: ResolvedEffect[];
+}
 import { useTheme } from '../theme/ThemeContext';
 import { useI18n } from '../i18n';
 import { PlayerStats } from './PlayerStats';
@@ -37,7 +49,7 @@ interface AnimatedGameBoardProps {
   onCardPlay?: (cardId: string) => void;
   onEndTurn?: () => void;
   /** 组合触发事件 */
-  onComboTriggered?: ComboResult[];
+  triggeredCombos?: ComboTriggerResult[];
   style?: ViewStyle;
 }
 
@@ -50,7 +62,7 @@ function AnimatedGameBoardComponent({
   currentPlayerId,
   onCardPlay,
   onEndTurn,
-  onComboTriggered,
+  triggeredCombos,
   style,
 }: AnimatedGameBoardProps) {
   const { theme } = useTheme();
@@ -80,24 +92,23 @@ function AnimatedGameBoardComponent({
 
   // 处理组合触发事件
   useEffect(() => {
-    if (onComboTriggered && onComboTriggered.length > 0) {
-      const newCombos: ComboTriggerData[] = onComboTriggered.map((result, index) => {
-        const comboDef = themeConfig.combos?.find((c) => c.id === result.comboId);
+    if (triggeredCombos && triggeredCombos.length > 0) {
+      const newCombos: ComboTriggerData[] = triggeredCombos.map((result, index) => {
         return {
           id: `combo-${Date.now()}-${index}`,
-          comboName: comboDef?.name ?? result.comboId,
-          comboIcon: comboDef?.icon,
-          comboDescription: comboDef?.description,
-          bonusEffects: result.effects?.map((e) => `${e.type}: ${e.value}`) ?? [],
+          comboName: result.combo.name,
+          comboIcon: result.combo.icon,
+          comboDescription: result.combo.description,
+          bonusEffects: result.effects.map((e: ResolvedEffect) => `${e.type}: ${e.target}`),
         };
       });
-      setCombos((prev) => [...prev, ...newCombos]);
+      setCombos((prev: ComboTriggerData[]) => [...prev, ...newCombos]);
     }
-  }, [onComboTriggered, themeConfig.combos]);
+  }, [triggeredCombos]);
 
   // 组合动画完成回调
   const handleComboComplete = useCallback((id: string) => {
-    setCombos((prev) => prev.filter((c) => c.id !== id));
+    setCombos((prev: ComboTriggerData[]) => prev.filter((c: ComboTriggerData) => c.id !== id));
   }, []);
 
   // Memoize handlers to prevent child re-renders
