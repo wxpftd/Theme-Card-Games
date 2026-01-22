@@ -30,6 +30,7 @@ export const zhCN = {
   'game.playArea': '场上',
   'game.noCards': '暂无打出的卡牌',
   'game.endTurn': '结束回合',
+  'game.dangerWarning': '危险！健康值过低',
 
   // Hand view
   'hand.title': '手牌',

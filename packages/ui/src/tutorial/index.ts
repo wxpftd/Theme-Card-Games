@@ -18,6 +18,10 @@ export { TutorialModal } from './TutorialModal';
 export { TutorialOverlay } from './TutorialOverlay';
 export { ComboHintBanner } from './ComboHintBanner';
 
+// Animated Components (使用 react-native-reanimated 的增强版)
+export { AnimatedTutorialOverlay } from './AnimatedTutorialOverlay';
+export { AnimatedComboHintBanner } from './AnimatedComboHintBanner';
+
 // Scenarios
 export { firstGameTutorial } from './scenarios/firstGameTutorial';
 export { overtimeLessonScenario } from './scenarios/overtimeLesson';

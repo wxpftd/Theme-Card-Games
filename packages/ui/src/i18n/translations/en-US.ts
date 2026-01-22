@@ -30,6 +30,7 @@ export const enUS = {
   'game.playArea': 'Play Area',
   'game.noCards': 'No cards played',
   'game.endTurn': 'End Turn',
+  'game.dangerWarning': 'Danger! Low health',
 
   // Hand view
   'hand.title': 'Hand',

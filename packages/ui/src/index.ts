@@ -12,3 +12,6 @@ export * from './i18n';
 
 // Tutorial
 export * from './tutorial';
+
+// Animations
+export * from './animations';

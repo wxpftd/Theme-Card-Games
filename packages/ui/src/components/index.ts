@@ -13,6 +13,10 @@ export { TargetSelector } from './TargetSelector';
 export { OpponentView } from './OpponentView';
 export { SharedResourceDisplay } from './SharedResourceDisplay';
 
+// 动画增强组件
+export { AnimatedHandView } from './AnimatedHandView';
+export { AnimatedGameBoard } from './AnimatedGameBoard';
+
 // 分享卡组件
 export {
   ShareCardContainer,
