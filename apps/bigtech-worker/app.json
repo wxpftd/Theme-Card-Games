@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "大厂生存指南",
-    "slug": "bigtech-worker-card-game",
+    "slug": "bigtech-worker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +17,8 @@
       "bundleIdentifier": "com.themecardgames.bigtechworker",
       "buildNumber": "1",
       "infoPlist": {
-        "CFBundleDisplayName": "大厂生存指南"
+        "CFBundleDisplayName": "大厂生存指南",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -35,6 +36,13 @@
     "experiments": {
       "typedRoutes": true
     },
-    "scheme": "bigtech-worker"
+    "scheme": "bigtech-worker",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "989900d3-1088-454a-b37e-99c7ea679014"
+      }
+    },
+    "owner": "wuxiupengftd"
   }
 }
