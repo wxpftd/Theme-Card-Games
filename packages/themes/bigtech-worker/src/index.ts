@@ -15,3 +15,36 @@ export { bigtechSummaryTemplates } from './summaryTemplates';
 // 导出角色和场景模块
 export * from './characters';
 export * from './scenarios';
+
+// 导出卡牌系列模块
+export {
+  allSeriesCards,
+  cardsBySeries,
+  seriesConfigs,
+  getSeriesFocusBonuses,
+  getCardsBySeries,
+  getCardStats,
+  findCardById,
+  findCardsByTag,
+  findCardsByRarity,
+  // 各系列卡牌
+  environmentCards,
+  businessCards,
+  healthCards,
+  accidentCards,
+  socialCards,
+  growthCards,
+  workCards,
+} from './cards';
+
+// 导出预构筑卡组模块
+export {
+  prebuiltDecks,
+  starterDeck,
+  hustlerDeck,
+  balanceDeck,
+  investorDeck,
+  getPrebuiltDeckById,
+  getPrebuiltDecksByTag,
+  getRecommendedDecks,
+} from './prebuiltDecks';

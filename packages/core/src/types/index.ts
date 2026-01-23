@@ -1411,3 +1411,207 @@ export type {
   CustomScenarioRuleHandler,
   CustomScenarioTransitionChecker,
 } from './scenario';
+
+// ============================================================================
+// Card Series & Deck Building System Types (卡牌系列与卡组构建系统)
+// ============================================================================
+
+/**
+ * 卡牌系列
+ * 用于分类卡牌，支持卡组构建和系列专精
+ */
+export type CardSeries =
+  | 'environment' // 环境系列 - 外部环境影响
+  | 'business' // 营商系列 - 商业机会、投资理财
+  | 'health' // 健康系列 - 身心健康管理
+  | 'accident' // 意外系列 - 突发事件
+  | 'social' // 社交系列 - 人际关系
+  | 'growth' // 成长系列 - 个人能力提升
+  | 'work' // 工作系列 - 日常工作
+  | 'neutral'; // 中立系列 - 可放入任何卡组
+
+/**
+ * 扩展卡牌定义 (支持系列分类)
+ */
+export interface CardDefinitionV2 extends CardDefinition {
+  /** 所属系列 */
+  series: CardSeries;
+  /** 单卡组最大数量 (默认3) */
+  maxCopies?: number;
+  /** 解锁条件 */
+  unlockCondition?: CardUnlockCondition;
+  /** 风味文字 */
+  flavorText?: string;
+}
+
+/**
+ * 卡牌解锁条件
+ */
+export type CardUnlockCondition =
+  | { type: 'default' } // 默认解锁
+  | { type: 'achievement'; achievementId: string } // 需要成就解锁
+  | { type: 'games_played'; count: number } // 需要玩一定局数
+  | { type: 'wins'; count: number } // 需要胜利一定次数
+  | { type: 'card_usage'; cardId: string; count: number }; // 需要使用某卡牌一定次数
+
+/**
+ * 卡组中的卡牌条目
+ */
+export interface DeckCardEntry {
+  /** 卡牌定义 ID */
+  cardId: string;
+  /** 数量 (1-3) */
+  count: number;
+}
+
+/**
+ * 卡组定义
+ */
+export interface DeckDefinition {
+  /** 卡组唯一标识 */
+  id: string;
+  /** 卡组名称 */
+  name: string;
+  /** 卡组描述 */
+  description: string;
+  /** 卡牌列表 */
+  cards: DeckCardEntry[];
+  /** 封面图标 */
+  icon?: string;
+  /** 主系列 (用于展示) */
+  primarySeries?: CardSeries;
+  /** 是否为预构筑卡组 */
+  isPrebuilt?: boolean;
+  /** 卡组标签 */
+  tags?: string[];
+  /** 创建时间 */
+  createdAt?: number;
+  /** 更新时间 */
+  updatedAt?: number;
+}
+
+/**
+ * 卡组构建规则
+ */
+export interface DeckBuildingRules {
+  /** 最小卡组大小 */
+  minDeckSize: number;
+  /** 最大卡组大小 */
+  maxDeckSize: number;
+  /** 同名卡最大数量 */
+  maxCopiesPerCard: number;
+  /** 稀有度限制 */
+  rarityLimits: {
+    legendary: number;
+    rare: number;
+    uncommon: number;
+    common: number;
+  };
+  /** 是否启用系列专精 */
+  enableSeriesFocus: boolean;
+  /** 系列专精阈值 (0-1) */
+  seriesFocusThreshold: number;
+}
+
+/**
+ * 默认卡组构建规则
+ */
+export const DEFAULT_DECK_BUILDING_RULES: DeckBuildingRules = {
+  minDeckSize: 30,
+  maxDeckSize: 40,
+  maxCopiesPerCard: 3,
+  rarityLimits: {
+    legendary: 3,
+    rare: 6,
+    uncommon: 12,
+    common: 999, // 无限制
+  },
+  enableSeriesFocus: true,
+  seriesFocusThreshold: 0.6,
+};
+
+/**
+ * 系列专精加成定义
+ */
+export interface SeriesFocusBonus {
+  /** 系列 */
+  series: CardSeries;
+  /** 加成名称 */
+  name: string;
+  /** 加成描述 */
+  description: string;
+  /** 加成效果 */
+  effects: CardEffect[];
+}
+
+/**
+ * 卡组验证结果
+ */
+export interface DeckValidationResult {
+  /** 是否有效 */
+  valid: boolean;
+  /** 错误信息列表 */
+  errors: DeckValidationError[];
+  /** 警告信息列表 */
+  warnings: string[];
+  /** 系列分布统计 */
+  seriesDistribution: Record<CardSeries, number>;
+  /** 稀有度分布统计 */
+  rarityDistribution: Record<CardRarity, number>;
+  /** 触发的系列专精加成 (如果有) */
+  focusBonus?: SeriesFocusBonus;
+  /** 卡组总卡牌数 */
+  totalCards: number;
+}
+
+/**
+ * 卡组验证错误
+ */
+export interface DeckValidationError {
+  /** 错误类型 */
+  type:
+    | 'deck_too_small'
+    | 'deck_too_large'
+    | 'card_not_found'
+    | 'card_over_limit'
+    | 'rarity_over_limit'
+    | 'card_locked';
+  /** 错误消息 */
+  message: string;
+  /** 相关卡牌 ID (如果适用) */
+  cardId?: string;
+}
+
+/**
+ * 玩家卡牌收藏
+ */
+export interface CardCollection {
+  /** 玩家 ID */
+  playerId: string;
+  /** 已解锁的卡牌 ID 列表 */
+  unlockedCards: string[];
+  /** 卡牌使用统计 */
+  cardUsageStats: Record<string, number>;
+  /** 收藏的卡组列表 */
+  decks: DeckDefinition[];
+  /** 当前选中的卡组 ID */
+  selectedDeckId?: string;
+}
+
+/**
+ * 卡牌系列配置 (主题可自定义)
+ */
+export interface CardSeriesConfig {
+  /** 系列 ID */
+  id: CardSeries;
+  /** 系列名称 */
+  name: string;
+  /** 系列描述 */
+  description: string;
+  /** 系列图标 */
+  icon: string;
+  /** 系列颜色 (用于 UI) */
+  color: string;
+  /** 系列专精加成 */
+  focusBonus?: SeriesFocusBonus;
+}
