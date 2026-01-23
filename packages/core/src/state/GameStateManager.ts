@@ -17,6 +17,7 @@ import {
   DailyChallengeConfig,
   DifficultyLevel,
   GameSessionStats,
+  MilestoneWinConfig,
 } from '../types';
 import { EventBus } from '../event';
 import { Card, Deck, Hand, EffectResolver } from '../card';
@@ -27,6 +28,7 @@ import { RandomEventSystem, RandomEventCustomHandler } from '../systems/RandomEv
 import { AchievementSystem, CustomAchievementChecker } from '../systems/AchievementSystem';
 import { DifficultySystem, CustomDifficultyRuleHandler } from '../systems/DifficultySystem';
 import { DailyChallengeSystem, CustomChallengeChecker } from '../systems/DailyChallengeSystem';
+import { MilestoneSystem, CustomMilestoneChecker } from '../systems/MilestoneSystem';
 import { generateId, deepClone } from '../utils';
 
 export interface GameStateManagerOptions {
@@ -44,6 +46,8 @@ export interface GameStateManagerOptions {
   difficultyCustomRuleHandlers?: Record<string, CustomDifficultyRuleHandler>;
   dailyChallengeConfig?: DailyChallengeConfig;
   dailyChallengeCustomCheckers?: Record<string, CustomChallengeChecker>;
+  milestoneConfig?: MilestoneWinConfig;
+  milestoneCustomCheckers?: Record<string, CustomMilestoneChecker>;
   eventBus?: EventBus;
   effectResolver?: EffectResolver;
 }
@@ -67,6 +71,7 @@ export class GameStateManager {
   private achievementSystem: AchievementSystem | null = null;
   private difficultySystem: DifficultySystem | null = null;
   private dailyChallengeSystem: DailyChallengeSystem | null = null;
+  private milestoneSystem: MilestoneSystem | null = null;
 
   /** State version counter for change detection */
   private stateVersion: number = 0;
@@ -148,6 +153,16 @@ export class GameStateManager {
         cardDefinitions: this.cardDefinitions,
         eventBus: this.eventBus,
         customCheckers: options.dailyChallengeCustomCheckers,
+      });
+    }
+
+    // Initialize milestone system
+    if (options.milestoneConfig && options.milestoneConfig.milestones.length > 0) {
+      this.milestoneSystem = new MilestoneSystem({
+        milestoneConfig: options.milestoneConfig,
+        effectResolver: this.effectResolver,
+        eventBus: this.eventBus,
+        customCheckers: options.milestoneCustomCheckers,
       });
     }
 
@@ -324,6 +339,7 @@ export class GameStateManager {
     // Initialize player in game systems
     this.comboSystem?.initializePlayer(id);
     this.cardUpgradeSystem?.initializePlayer(id);
+    this.milestoneSystem?.initializePlayer(id, playerState);
 
     this.eventBus.emitSimple(
       'custom',
@@ -727,7 +743,7 @@ export class GameStateManager {
   /**
    * Check win conditions
    */
-  checkWinConditions(): { winner: string | null; reason: string | null } {
+  checkWinConditions(): { winner: string | null; reason: string | null; isFailure?: boolean } {
     const { winConditions } = this.state.config;
 
     for (const condition of winConditions) {
@@ -737,7 +753,13 @@ export class GameStateManager {
             if (!condition.stat || condition.value === undefined || !condition.operator) break;
             const statValue = player.stats[condition.stat] ?? 0;
             if (this.checkThreshold(statValue, condition.operator, condition.value)) {
-              return { winner: player.id, reason: `${condition.stat} reached ${condition.value}` };
+              // 检查是否为失败条件 (如 health <= 0)
+              const isFailure = condition.operator === '<=' && condition.value === 0;
+              return {
+                winner: isFailure ? null : player.id,
+                reason: `${condition.stat} reached ${condition.value}`,
+                isFailure,
+              };
             }
             break;
           }
@@ -745,7 +767,12 @@ export class GameStateManager {
             if (!condition.stat || condition.value === undefined || !condition.operator) break;
             const resourceValue = player.resources[condition.stat] ?? 0;
             if (this.checkThreshold(resourceValue, condition.operator, condition.value)) {
-              return { winner: player.id, reason: `${condition.stat} reached ${condition.value}` };
+              const isFailure = condition.operator === '<=' && condition.value === 0;
+              return {
+                winner: isFailure ? null : player.id,
+                reason: `${condition.stat} reached ${condition.value}`,
+                isFailure,
+              };
             }
             break;
           }
@@ -765,6 +792,19 @@ export class GameStateManager {
               }
 
               return { winner: highestPlayer.id, reason: 'Turn limit reached' };
+            }
+            break;
+          }
+          case 'milestone': {
+            // 使用里程碑系统检查胜利条件
+            if (this.milestoneSystem) {
+              const result = this.milestoneSystem.updateProgress(player, this.state);
+              if (result.isVictory) {
+                return { winner: player.id, reason: result.reason };
+              }
+              if (result.isFailure) {
+                return { winner: null, reason: result.reason, isFailure: true };
+              }
             }
             break;
           }
@@ -842,6 +882,7 @@ export class GameStateManager {
     this.comboSystem?.reset();
     this.cardUpgradeSystem?.reset();
     this.randomEventSystem?.reset();
+    this.milestoneSystem?.reset();
     this.invalidateCache();
   }
 
@@ -956,6 +997,13 @@ export class GameStateManager {
    */
   getDailyChallengeSystem(): DailyChallengeSystem | null {
     return this.dailyChallengeSystem;
+  }
+
+  /**
+   * Get the milestone system
+   */
+  getMilestoneSystem(): MilestoneSystem | null {
+    return this.milestoneSystem;
   }
 
   /**

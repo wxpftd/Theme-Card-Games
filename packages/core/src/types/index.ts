@@ -114,6 +114,10 @@ export interface PlayerState {
   /** 玩家角色状态 (可选，用于多人角色对战) */
   character?: PlayerCharacterState;
 
+  // ==================== 里程碑系统扩展 ====================
+  /** 玩家里程碑状态 (可选，用于里程碑胜利条件) */
+  milestoneState?: PlayerMilestoneState;
+
   // ==================== 淘汰机制扩展 ====================
   /** 是否已被淘汰 */
   eliminated?: boolean;
@@ -269,11 +273,120 @@ export interface GameConfig {
 }
 
 export interface WinCondition {
-  type: 'stat_threshold' | 'resource_threshold' | 'turn_limit' | 'custom';
+  type: 'stat_threshold' | 'resource_threshold' | 'turn_limit' | 'milestone' | 'custom';
   stat?: string;
   operator?: '>' | '<' | '==' | '>=' | '<=';
   value?: number;
   customCheck?: string;
+  /** 里程碑胜利条件配置 (当 type 为 'milestone' 时使用) */
+  milestoneConfig?: MilestoneWinConfig;
+}
+
+// ============================================================================
+// Milestone System Types (里程碑系统类型)
+// ============================================================================
+
+/**
+ * 里程碑胜利条件配置
+ */
+export interface MilestoneWinConfig {
+  /** 里程碑列表 */
+  milestones: MilestoneDefinition[];
+  /** 最终里程碑 ID (达成此里程碑即胜利) */
+  finalMilestoneId: string;
+  /** 失败条件 (可选，如健康归零) */
+  failureConditions?: MilestoneFailureCondition[];
+}
+
+/**
+ * 里程碑定义
+ */
+export interface MilestoneDefinition {
+  /** 里程碑唯一标识 */
+  id: string;
+  /** 里程碑名称 (如 "晋升P6") */
+  name: string;
+  /** 里程碑描述 (如 "完成入职培训，独立承担任务") */
+  description: string;
+  /** 里程碑图标 */
+  icon?: string;
+  /** 里程碑顺序 (用于显示进度) */
+  order: number;
+  /** 达成条件 */
+  requirements: MilestoneRequirement[];
+  /** 达成奖励 */
+  rewards?: CardEffect[];
+  /** 解锁后的提示文本 */
+  unlockMessage?: string;
+  /** 是否为失败里程碑 (如"被裁员") */
+  isFailure?: boolean;
+}
+
+/**
+ * 里程碑达成条件
+ */
+export type MilestoneRequirement =
+  | {
+      type: 'stat_threshold';
+      stat: string;
+      operator: '>=' | '<=' | '>' | '<' | '==';
+      value: number;
+    }
+  | {
+      type: 'resource_threshold';
+      resource: string;
+      operator: '>=' | '<=' | '>' | '<' | '==';
+      value: number;
+    }
+  | { type: 'previous_milestone'; milestoneId: string }
+  | { type: 'card_played'; cardId?: string; cardTag?: string; count: number }
+  | { type: 'turns_played'; count: number }
+  | { type: 'combo_triggered'; comboId: string; count?: number }
+  | { type: 'status_acquired'; statusId: string }
+  | { type: 'custom'; checkerId: string };
+
+/**
+ * 里程碑失败条件
+ */
+export interface MilestoneFailureCondition {
+  /** 失败类型 */
+  type: 'stat_zero' | 'resource_depleted' | 'custom';
+  /** 属性/资源名称 */
+  target?: string;
+  /** 失败消息 */
+  message: string;
+  /** 自定义检查器 ID */
+  customCheckerId?: string;
+}
+
+/**
+ * 玩家里程碑状态 (运行时)
+ */
+export interface PlayerMilestoneState {
+  /** 当前里程碑 ID */
+  currentMilestoneId: string;
+  /** 已达成的里程碑 ID 列表 */
+  achievedMilestones: string[];
+  /** 各里程碑的进度 */
+  progress: Record<string, MilestoneProgress>;
+  /** 上次里程碑变化时间 */
+  lastMilestoneChangeAt?: number;
+}
+
+/**
+ * 里程碑进度
+ */
+export interface MilestoneProgress {
+  /** 里程碑 ID */
+  milestoneId: string;
+  /** 各条件的完成状态 */
+  requirementsMet: boolean[];
+  /** 是否已达成 */
+  achieved: boolean;
+  /** 达成时间 */
+  achievedAt?: number;
+  /** 达成时的回合数 */
+  achievedAtTurn?: number;
 }
 
 // ============================================================================
@@ -373,6 +486,10 @@ export type GameEventType =
   | 'scenario_effect_applied'
   | 'scenario_rule_triggered'
   | 'scenario_transition'
+  // 里程碑系统事件
+  | 'milestone_achieved'
+  | 'milestone_progress_updated'
+  | 'milestone_failure'
   | 'custom';
 
 export interface GameEvent {
@@ -502,6 +619,12 @@ export interface ThemeConfig {
 
   // Custom win condition checkers
   customWinCheckers?: Record<string, (state: GameState) => boolean>;
+
+  // Milestone system configuration
+  milestoneConfig?: MilestoneWinConfig;
+
+  // Custom milestone requirement checkers
+  customMilestoneCheckers?: Record<string, (playerId: string, state: GameState) => boolean>;
 
   // Custom achievement checkers
   customAchievementCheckers?: Record<

@@ -528,8 +528,10 @@ describe('GameStateManager', () => {
 
       const result = manager.checkWinConditions();
 
-      expect(result.winner).toBe('player1');
+      // 健康值归零是失败条件，winner 为 null，isFailure 为 true
+      expect(result.winner).toBeNull();
       expect(result.reason).toContain('health');
+      expect(result.isFailure).toBe(true);
     });
 
     it('should return null when no conditions met', () => {
