@@ -59,3 +59,18 @@ export {
   type MilestoneCheckResult,
   type CustomMilestoneChecker,
 } from './MilestoneSystem';
+
+// 骰子系统
+export {
+  DiceSystem,
+  type DiceSystemOptions,
+  type DiceConfig,
+  type DiceRollResult,
+  type DiceChallengeConfig,
+  type DiceEffectMapping,
+  type DiceHistoryEntry,
+  type DiceEffectMetadata,
+  type StandardDiceType,
+  type DiceEventType,
+  type DiceEvent,
+} from './DiceSystem';

@@ -21,6 +21,7 @@ import {
 } from '@theme-card-games/core';
 import { zhCN, enUS } from './locales';
 import { competitiveCards, competitiveCardIds } from './competitiveCards';
+import { diceCards, diceCardIds } from './diceCards';
 import { sharedResourceDefinitions } from './sharedResources';
 import {
   defaultCharacters,
@@ -1648,8 +1649,8 @@ const localization: Record<string, Record<string, string>> = {
 // ============================================================================
 // 主题配置导出 (Theme Config Export)
 // ============================================================================
-// 合并基础卡牌和竞争卡牌
-const allCards: CardDefinition[] = [...cards, ...competitiveCards];
+// 合并基础卡牌、竞争卡牌和骰子卡牌
+const allCards: CardDefinition[] = [...cards, ...competitiveCards, ...diceCards];
 
 export const bigtechWorkerTheme: ThemeConfig = {
   id: 'bigtech-worker',
@@ -1703,6 +1704,9 @@ export const bigtechWorkerTheme: ThemeConfig = {
   // 竞争模式配置
   sharedResourceDefinitions,
   competitiveCardIds,
+
+  // 骰子卡牌 ID
+  diceCardIds,
 
   // 竞争模式胜利条件
   competitiveWinCondition: {

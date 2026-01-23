@@ -65,6 +65,16 @@ export {
   EliminationReason,
   EliminationCheckResult,
   FinalRanking,
+  // 骰子系统
+  DiceSystem,
+  DiceSystemOptions,
+  DiceConfig,
+  DiceRollResult,
+  DiceChallengeConfig,
+  DiceEffectMapping,
+  DiceHistoryEntry,
+  DiceEffectMetadata,
+  StandardDiceType,
 } from './systems';
 
 // AI presets
