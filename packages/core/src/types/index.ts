@@ -15,6 +15,24 @@ import type {
 // Card Types
 // ============================================================================
 
+/**
+ * 卡牌视觉素材配置
+ */
+export interface CardAsset {
+  /** 卡牌图片路径（相对于主题资源目录） */
+  image?: {
+    small?: string;
+    medium?: string;
+    large?: string;
+  };
+  /** 使用 emoji 作为后备图标 */
+  fallbackIcon?: string;
+  /** 背景色（可以是单色或渐变数组） */
+  backgroundColor?: string | [string, string];
+  /** 插图风格标识（用于批量生成时的风格一致性） */
+  artStyle?: string;
+}
+
 export interface CardDefinition {
   id: string;
   type: CardType;
@@ -25,6 +43,8 @@ export interface CardDefinition {
   rarity?: CardRarity;
   tags?: string[];
   metadata?: Record<string, unknown>;
+  /** 卡牌视觉素材 */
+  asset?: CardAsset;
 }
 
 export type CardType = 'action' | 'event' | 'resource' | 'character' | 'modifier';

@@ -28,7 +28,13 @@
     "app:bigtech": "cd apps/bigtech-worker && pnpm start",
     "app:startup": "cd apps/startup && pnpm start",
     "app:travel": "cd apps/travel && pnpm start",
-    "app:parenting": "cd apps/parenting && pnpm start"
+    "app:parenting": "cd apps/parenting && pnpm start",
+    "asset:init": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline init",
+    "asset:extract": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline extract",
+    "asset:generate": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline generate",
+    "asset:batch": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline batch",
+    "asset:process": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline process",
+    "asset:status": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline status"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
