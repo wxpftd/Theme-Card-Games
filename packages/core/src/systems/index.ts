@@ -36,3 +36,18 @@ export {
   type GameStatsCollectorOptions,
   type HighlightThresholds,
 } from './GameStatsCollector';
+
+// 角色系统
+export { CharacterSystem, type CharacterSystemOptions } from './CharacterSystem';
+
+// 场景系统
+export { ScenarioSystem, type ScenarioSystemOptions } from './ScenarioSystem';
+
+// 游戏结束系统
+export {
+  GameEndSystem,
+  type GameEndSystemOptions,
+  type EliminationReason,
+  type EliminationCheckResult,
+  type FinalRanking,
+} from './GameEndSystem';

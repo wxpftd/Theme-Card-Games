@@ -669,15 +669,25 @@ export class GameStateManager {
       this.state
     );
 
-    // Move to next player
+    // Move to next non-eliminated player
     const playerIds = Object.keys(this.state.players);
     const currentIndex = playerIds.indexOf(currentPlayer);
-    const nextIndex = (currentIndex + 1) % playerIds.length;
+    let nextIndex = (currentIndex + 1) % playerIds.length;
+    const startIndex = nextIndex;
+
+    // Skip eliminated players
+    while (this.state.players[playerIds[nextIndex]]?.eliminated) {
+      nextIndex = (nextIndex + 1) % playerIds.length;
+      // If we've looped back to the start, all players are eliminated
+      if (nextIndex === startIndex) {
+        break;
+      }
+    }
 
     this.state.currentPlayerId = playerIds[nextIndex];
 
     // Increment turn if we've gone around (complete round)
-    if (nextIndex === 0) {
+    if (nextIndex <= currentIndex || nextIndex === 0) {
       this.state.turn++;
 
       // Process random events at end of each complete round

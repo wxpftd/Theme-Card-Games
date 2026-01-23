@@ -17,6 +17,13 @@ export { SharedResourceDisplay } from './SharedResourceDisplay';
 export { AnimatedHandView } from './AnimatedHandView';
 export { AnimatedGameBoard } from './AnimatedGameBoard';
 
+// 角色和场景系统组件
+export { CharacterCard } from './CharacterCard';
+export { CharacterSelector } from './CharacterSelector';
+export { ScenarioDisplay } from './ScenarioDisplay';
+export { AbilityButton } from './AbilityButton';
+export { EliminationOverlay } from './EliminationOverlay';
+
 // 分享卡组件
 export {
   ShareCardContainer,

@@ -2,6 +2,15 @@
  * Core type definitions for the card game engine
  */
 
+// Import character and scenario types for use in ThemeConfig
+import type { CharacterDefinition, ProfessionDefinition, PersonalityDefinition } from './character';
+import type {
+  ScenarioDefinition,
+  ScenarioSystemConfig,
+  CustomScenarioRuleHandler,
+  CustomScenarioTransitionChecker,
+} from './scenario';
+
 // ============================================================================
 // Card Types
 // ============================================================================
@@ -100,6 +109,34 @@ export interface PlayerState {
   deck: CardInstance[];
   discardPile: CardInstance[];
   playArea: CardInstance[];
+
+  // ==================== 角色系统扩展 ====================
+  /** 玩家角色状态 (可选，用于多人角色对战) */
+  character?: PlayerCharacterState;
+
+  // ==================== 淘汰机制扩展 ====================
+  /** 是否已被淘汰 */
+  eliminated?: boolean;
+  /** 淘汰时的回合数 */
+  eliminatedAtTurn?: number;
+  /** 淘汰原因 */
+  eliminationReason?: string;
+  /** 最终排名 */
+  finalRank?: number;
+}
+
+/**
+ * 玩家角色状态 (运行时)
+ */
+export interface PlayerCharacterState {
+  /** 角色定义 ID */
+  characterId: string;
+  /** 主动技能剩余使用次数 */
+  activeAbilityUsesRemaining: number;
+  /** 主动技能冷却剩余回合 */
+  activeAbilityCooldownRemaining: number;
+  /** 被动技能触发次数统计 */
+  passiveAbilityTriggerCounts: Record<string, number>;
 }
 
 export interface PlayerStatus {
@@ -325,6 +362,17 @@ export type GameEventType =
   | 'resource_stolen'
   | 'player_eliminated'
   | 'competitive_winner'
+  // 角色系统事件
+  | 'character_selected'
+  | 'character_passive_triggered'
+  | 'character_active_ability_used'
+  | 'character_active_ability_cooldown'
+  // 场景系统事件
+  | 'scenario_entered'
+  | 'scenario_exited'
+  | 'scenario_effect_applied'
+  | 'scenario_rule_triggered'
+  | 'scenario_transition'
   | 'custom';
 
 export interface GameEvent {
@@ -479,6 +527,44 @@ export interface ThemeConfig {
 
   /** 竞争卡牌 ID 列表 (用于区分竞争卡牌和普通卡牌) */
   competitiveCardIds?: string[];
+
+  /** 竞争模式胜利条件 */
+  competitiveWinCondition?: CompetitiveWinCondition;
+
+  // ============================================================================
+  // Character System Additions (角色系统)
+  // ============================================================================
+
+  /** 角色定义列表 */
+  characterDefinitions?: CharacterDefinition[];
+
+  /** 默认/推荐角色列表 */
+  defaultCharacters?: CharacterDefinition[];
+
+  /** 职位定义列表 (用于混合设计) */
+  professionDefinitions?: ProfessionDefinition[];
+
+  /** 性格定义列表 (用于混合设计) */
+  personalityDefinitions?: PersonalityDefinition[];
+
+  /** 自定义角色被动触发处理器 */
+  customPassiveHandlers?: Record<string, (playerId: string, state: GameState) => void>;
+
+  // ============================================================================
+  // Scenario System Additions (场景系统)
+  // ============================================================================
+
+  /** 场景定义列表 */
+  scenarioDefinitions?: ScenarioDefinition[];
+
+  /** 场景系统配置 */
+  scenarioConfig?: ScenarioSystemConfig;
+
+  /** 自定义场景规则处理器 */
+  customScenarioRuleHandlers?: Record<string, CustomScenarioRuleHandler>;
+
+  /** 自定义场景转换检查器 */
+  customScenarioTransitionCheckers?: Record<string, CustomScenarioTransitionChecker>;
 }
 
 export interface StatDefinition {
@@ -1151,3 +1237,43 @@ export type SummaryCondition =
   | { type: 'stat_reached'; stat: string; operator: '>=' | '<=' | '>' | '<'; value: number }
   | { type: 'competitive_title'; titleId: string }
   | { type: 'always' };
+
+// ============================================================================
+// Character System Type Re-exports
+// ============================================================================
+
+export type {
+  PassiveTrigger,
+  PassiveAbility,
+  PassiveTriggerData,
+  ActiveAbility,
+  CharacterRarity,
+  ScenarioAffinity,
+  CharacterDefinition,
+  CharacterUnlockCondition,
+  ProfessionDefinition,
+  PersonalityDefinition,
+  CharacterSelectionRequest,
+  CharacterSelectionResponse,
+} from './character';
+
+// Re-export PlayerCharacterState from this file (already defined above)
+
+// ============================================================================
+// Scenario System Type Re-exports
+// ============================================================================
+
+export type {
+  ScenarioRuleType,
+  ScenarioRule,
+  ScenarioCharacterModifier,
+  ScenarioTransitionCondition,
+  ScenarioDefinition,
+  ScenarioState,
+  ScenarioHistoryEntry,
+  ScenarioEventType,
+  ScenarioEventData,
+  ScenarioSystemConfig,
+  CustomScenarioRuleHandler,
+  CustomScenarioTransitionChecker,
+} from './scenario';

@@ -15,10 +15,18 @@ import {
   GameSessionStats,
   GameState,
   SharedResourceDefinition,
+  CompetitiveWinCondition,
 } from '@theme-card-games/core';
 import { zhCN, enUS } from './locales';
 import { competitiveCards, competitiveCardIds } from './competitiveCards';
 import { sharedResourceDefinitions } from './sharedResources';
+import {
+  defaultCharacters,
+  allCharacterDefinitions,
+  professions,
+  personalities,
+} from './characters';
+import { scenarios, defaultScenarioConfig, competitiveScenarioConfig } from './scenarios';
 
 /**
  * 大厂打工主题配置
@@ -1593,6 +1601,20 @@ export const bigtechWorkerTheme: ThemeConfig = {
   sharedResourceDefinitions,
   competitiveCardIds,
 
+  // 竞争模式胜利条件
+  competitiveWinCondition: {
+    type: 'last_standing',
+    description: '最后存活的玩家获胜',
+  } as CompetitiveWinCondition,
+
+  // 角色系统配置
+  characterDefinitions: allCharacterDefinitions,
+  defaultCharacters,
+
+  // 场景系统配置
+  scenarioDefinitions: scenarios,
+  scenarioConfig: defaultScenarioConfig,
+
   // Custom achievement checker for "躺平先锋" achievement
   customAchievementCheckers: {
     slacker_champion_checker: (stats: GameSessionStats, _state: GameState) => {
@@ -1600,6 +1622,17 @@ export const bigtechWorkerTheme: ThemeConfig = {
       return stats.won && restCardCount >= 5;
     },
   },
+};
+
+// 导出角色和场景相关配置供外部使用
+export {
+  professions,
+  personalities,
+  defaultCharacters,
+  allCharacterDefinitions,
+  scenarios,
+  defaultScenarioConfig,
+  competitiveScenarioConfig,
 };
 
 export default bigtechWorkerTheme;

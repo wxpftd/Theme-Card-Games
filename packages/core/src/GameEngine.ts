@@ -16,6 +16,10 @@ import {
   DifficultyConfig,
   DailyChallengeState,
   GameSessionStats,
+  CharacterDefinition,
+  ScenarioDefinition,
+  ScenarioSystemConfig,
+  PlayerCharacterState,
 } from './types';
 import { GameStateManager } from './state';
 import { TurnManager, TurnPhaseConfig } from './turn';
@@ -33,6 +37,10 @@ import {
   CustomDifficultyRuleHandler,
   DailyChallengeSystem,
   CustomChallengeChecker,
+  CharacterSystem,
+  ScenarioSystem,
+  GameEndSystem,
+  FinalRanking,
 } from './systems';
 
 export interface GameEngineOptions {
@@ -43,6 +51,12 @@ export interface GameEngineOptions {
   achievementCustomCheckers?: Record<string, CustomAchievementChecker>;
   difficultyCustomRuleHandlers?: Record<string, CustomDifficultyRuleHandler>;
   dailyChallengeCustomCheckers?: Record<string, CustomChallengeChecker>;
+  /** 自定义角色被动处理器 */
+  customPassiveHandlers?: Record<string, (playerId: string, state: GameState) => void>;
+  /** 自定义场景规则处理器 */
+  customScenarioRuleHandlers?: Record<string, unknown>;
+  /** 自定义场景转换检查器 */
+  customScenarioTransitionCheckers?: Record<string, unknown>;
 }
 
 /**
@@ -54,6 +68,9 @@ export class GameEngine {
   private turnManager: TurnManager;
   private eventBus: EventBus;
   private effectResolver: EffectResolver;
+  private characterSystem: CharacterSystem | null = null;
+  private scenarioSystem: ScenarioSystem | null = null;
+  private gameEndSystem: GameEndSystem | null = null;
 
   constructor(options: GameEngineOptions) {
     this.theme = options.theme;
@@ -100,6 +117,50 @@ export class GameEngine {
       phases: options.customPhases,
       autoDrawOnTurnStart: true,
       drawCount: 1,
+    });
+
+    // Initialize character system
+    if (this.theme.characterDefinitions && this.theme.characterDefinitions.length > 0) {
+      this.characterSystem = new CharacterSystem({
+        characterDefinitions: this.theme.characterDefinitions,
+        cardDefinitions: new Map(this.theme.cards.map((c) => [c.id, c])),
+        effectResolver: this.effectResolver,
+        eventBus: this.eventBus,
+        customPassiveHandlers: options.customPassiveHandlers ?? this.theme.customPassiveHandlers,
+      });
+    }
+
+    // Initialize scenario system
+    if (this.theme.scenarioDefinitions && this.theme.scenarioDefinitions.length > 0) {
+      const defaultConfig: ScenarioSystemConfig = {
+        scenarios: this.theme.scenarioDefinitions,
+        initialScenarioId: this.theme.scenarioConfig?.initialScenarioId,
+        enableAutoTransition: this.theme.scenarioConfig?.enableAutoTransition ?? true,
+        transitionMode: this.theme.scenarioConfig?.transitionMode ?? 'sequential',
+        sequentialScenarioIds: this.theme.scenarioConfig?.sequentialScenarioIds,
+        transitionInterval: this.theme.scenarioConfig?.transitionInterval,
+      };
+
+      this.scenarioSystem = new ScenarioSystem({
+        config: this.theme.scenarioConfig ?? defaultConfig,
+        effectResolver: this.effectResolver,
+        eventBus: this.eventBus,
+        customRuleHandlers: options.customScenarioRuleHandlers as Record<
+          string,
+          (rule: unknown, state: unknown, gameState: unknown, turn: number) => void
+        >,
+        customTransitionCheckers: options.customScenarioTransitionCheckers as Record<
+          string,
+          (scenario: unknown, state: unknown, gameState: unknown) => boolean
+        >,
+      });
+    }
+
+    // Initialize game end system
+    this.gameEndSystem = new GameEndSystem({
+      eventBus: this.eventBus,
+      winConditions: this.theme.gameConfig.winConditions,
+      customWinCheckers: this.theme.customWinCheckers,
     });
 
     // Register theme event handlers
@@ -629,5 +690,167 @@ export class GameEngine {
   isInDailyChallenge(): boolean {
     const system = this.getDailyChallengeSystem();
     return system?.isInChallenge() ?? false;
+  }
+
+  // ============================================================================
+  // Character System
+  // ============================================================================
+
+  /**
+   * Get the character system
+   */
+  getCharacterSystem(): CharacterSystem | null {
+    return this.characterSystem;
+  }
+
+  /**
+   * Get all character definitions
+   */
+  getCharacterDefinitions(): CharacterDefinition[] {
+    return this.theme.characterDefinitions ?? [];
+  }
+
+  /**
+   * Select a character for a player
+   */
+  selectCharacter(playerId: string, characterId: string): boolean {
+    if (!this.characterSystem) return false;
+
+    const player = this.getPlayer(playerId);
+    if (!player) return false;
+
+    return this.characterSystem.selectCharacter(playerId, characterId, player, this.state);
+  }
+
+  /**
+   * Get a player's character definition
+   */
+  getPlayerCharacter(playerId: string): CharacterDefinition | null {
+    if (!this.characterSystem) return null;
+    return this.characterSystem.getPlayerCharacter(playerId);
+  }
+
+  /**
+   * Get available characters (not yet selected)
+   */
+  getAvailableCharacters(excludePlayerId?: string): CharacterDefinition[] {
+    if (!this.characterSystem) return [];
+    return this.characterSystem.getAvailableCharacters(excludePlayerId);
+  }
+
+  /**
+   * Use a player's active ability
+   */
+  useActiveAbility(
+    playerId: string,
+    targetPlayerIds?: string[]
+  ): { success: boolean; effects: unknown[]; message?: string } {
+    if (!this.characterSystem) {
+      return { success: false, effects: [], message: 'Character system not available' };
+    }
+
+    const player = this.getPlayer(playerId);
+    if (!player) {
+      return { success: false, effects: [], message: 'Player not found' };
+    }
+
+    return this.characterSystem.useActiveAbility(playerId, player, this.state, targetPlayerIds);
+  }
+
+  /**
+   * Check if a player can use their active ability
+   */
+  canUseActiveAbility(playerId: string): boolean {
+    if (!this.characterSystem) return false;
+    const player = this.getPlayer(playerId);
+    if (!player) return false;
+    return this.characterSystem.canUseActiveAbility(playerId, player);
+  }
+
+  // ============================================================================
+  // Scenario System
+  // ============================================================================
+
+  /**
+   * Get the scenario system
+   */
+  getScenarioSystem(): ScenarioSystem | null {
+    return this.scenarioSystem;
+  }
+
+  /**
+   * Get all scenario definitions
+   */
+  getScenarioDefinitions(): ScenarioDefinition[] {
+    return this.theme.scenarioDefinitions ?? [];
+  }
+
+  /**
+   * Get current scenario
+   */
+  getCurrentScenario(): ScenarioDefinition | null {
+    if (!this.scenarioSystem) return null;
+    return this.scenarioSystem.getCurrentScenario();
+  }
+
+  /**
+   * Change to a specific scenario
+   */
+  changeScenario(scenarioId: string, reason?: string): boolean {
+    if (!this.scenarioSystem) return false;
+    return this.scenarioSystem.changeScenario(scenarioId, this.state, reason);
+  }
+
+  /**
+   * Get scenario state
+   */
+  getScenarioState() {
+    if (!this.scenarioSystem) return null;
+    return this.scenarioSystem.getScenarioState();
+  }
+
+  // ============================================================================
+  // Game End System
+  // ============================================================================
+
+  /**
+   * Get the game end system
+   */
+  getGameEndSystem(): GameEndSystem | null {
+    return this.gameEndSystem;
+  }
+
+  /**
+   * Eliminate a player
+   */
+  eliminatePlayer(playerId: string, reason: string): boolean {
+    if (!this.gameEndSystem) return false;
+    return this.gameEndSystem.forceEliminatePlayer(playerId, this.state, reason);
+  }
+
+  /**
+   * Get final rankings
+   */
+  getFinalRankings(): FinalRanking[] {
+    if (!this.gameEndSystem) return [];
+    return this.gameEndSystem.getFinalRankings(this.state);
+  }
+
+  /**
+   * Get active player count
+   */
+  getActivePlayerCount(): number {
+    if (!this.gameEndSystem) {
+      return Object.values(this.state.players).filter((p) => !p.eliminated).length;
+    }
+    return this.gameEndSystem.getActivePlayerCount();
+  }
+
+  /**
+   * Check if a player is eliminated
+   */
+  isPlayerEliminated(playerId: string): boolean {
+    const player = this.getPlayer(playerId);
+    return player?.eliminated ?? false;
   }
 }
