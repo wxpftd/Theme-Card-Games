@@ -51,3 +51,11 @@ export {
   type EliminationCheckResult,
   type FinalRanking,
 } from './GameEndSystem';
+
+// 里程碑系统
+export {
+  MilestoneSystem,
+  type MilestoneSystemOptions,
+  type MilestoneCheckResult,
+  type CustomMilestoneChecker,
+} from './MilestoneSystem';

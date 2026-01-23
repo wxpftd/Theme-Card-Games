@@ -16,6 +16,8 @@ import {
   GameState,
   SharedResourceDefinition,
   CompetitiveWinCondition,
+  MilestoneWinConfig,
+  MilestoneDefinition,
 } from '@theme-card-games/core';
 import { zhCN, enUS } from './locales';
 import { competitiveCards, competitiveCardIds } from './competitiveCards';
@@ -40,7 +42,7 @@ const stats: StatDefinition[] = [
   {
     id: 'performance',
     name: '绩效',
-    description: '工作表现评分，达到100即可晋升',
+    description: '工作表现评分，晋升的关键指标',
     min: 0,
     max: 100,
     icon: '📈',
@@ -56,7 +58,7 @@ const stats: StatDefinition[] = [
   {
     id: 'happiness',
     name: '幸福感',
-    description: '工作生活平衡度',
+    description: '工作生活平衡度，降到0会选择裸辞',
     min: 0,
     max: 100,
     icon: '😊',
@@ -64,7 +66,7 @@ const stats: StatDefinition[] = [
   {
     id: 'influence',
     name: '影响力',
-    description: '在公司的影响力和话语权',
+    description: '在公司的影响力，晋升的重要因素',
     min: 0,
     max: 100,
     icon: '🎯',
@@ -1497,6 +1499,104 @@ const dailyChallengeConfig: DailyChallengeConfig = {
 };
 
 // ============================================================================
+// 里程碑配置 (Milestone Configuration)
+// ============================================================================
+
+/**
+ * 职级里程碑定义
+ * P5 -> P6 -> P7 -> P8 (胜利)
+ */
+const milestoneDefinitions: MilestoneDefinition[] = [
+  // P5: 初级工程师 (起始职级)
+  {
+    id: 'p5',
+    name: 'P5 初级工程师',
+    description: '刚入职的新人，需要熟悉环境和业务',
+    icon: '🌱',
+    order: 1,
+    requirements: [], // 起始里程碑，无需条件
+    unlockMessage: '欢迎加入大厂！你的职场冒险开始了。',
+  },
+  // P6: 工程师
+  {
+    id: 'p6',
+    name: 'P6 工程师',
+    description: '能独立完成任务，开始承担更多责任',
+    icon: '💼',
+    order: 2,
+    requirements: [
+      { type: 'previous_milestone', milestoneId: 'p5' },
+      { type: 'stat_threshold', stat: 'performance', operator: '>=', value: 60 },
+      { type: 'stat_threshold', stat: 'influence', operator: '>=', value: 15 },
+    ],
+    rewards: [
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'money' }, value: 2 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 10 },
+    ],
+    unlockMessage: '🎉 恭喜晋升 P6！你已经能独当一面了。',
+  },
+  // P7: 高级工程师
+  {
+    id: 'p7',
+    name: 'P7 高级工程师',
+    description: '技术骨干，能带领小团队完成项目',
+    icon: '⭐',
+    order: 3,
+    requirements: [
+      { type: 'previous_milestone', milestoneId: 'p6' },
+      { type: 'stat_threshold', stat: 'performance', operator: '>=', value: 75 },
+      { type: 'stat_threshold', stat: 'influence', operator: '>=', value: 35 },
+      { type: 'resource_threshold', resource: 'connections', operator: '>=', value: 5 },
+    ],
+    rewards: [
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'money' }, value: 3 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 15 },
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'skills' }, value: 2 },
+    ],
+    unlockMessage: '🌟 晋升 P7！你已经是团队的技术骨干了。',
+  },
+  // P8: 专家/技术专家
+  {
+    id: 'p8',
+    name: 'P8 技术专家',
+    description: '技术领域专家，具有公司级影响力',
+    icon: '👑',
+    order: 4,
+    requirements: [
+      { type: 'previous_milestone', milestoneId: 'p7' },
+      { type: 'stat_threshold', stat: 'performance', operator: '>=', value: 90 },
+      { type: 'stat_threshold', stat: 'influence', operator: '>=', value: 60 },
+      { type: 'resource_threshold', resource: 'connections', operator: '>=', value: 8 },
+    ],
+    rewards: [
+      { type: 'gain_resource', target: 'self', metadata: { resource: 'money' }, value: 5 },
+      { type: 'modify_stat', target: 'self', metadata: { stat: 'happiness' }, value: 20 },
+    ],
+    unlockMessage: '🏆 恭喜晋升 P8！你已经成为技术专家，职场冒险大获成功！',
+  },
+];
+
+/**
+ * 里程碑胜利条件配置
+ */
+const milestoneConfig: MilestoneWinConfig = {
+  milestones: milestoneDefinitions,
+  finalMilestoneId: 'p8',
+  failureConditions: [
+    {
+      type: 'stat_zero',
+      target: 'health',
+      message: '💀 健康值归零，你因过度劳累被迫离职了...',
+    },
+    {
+      type: 'stat_zero',
+      target: 'happiness',
+      message: '😢 幸福感归零，你选择了裸辞...',
+    },
+  ],
+};
+
+// ============================================================================
 // UI主题 (UI Theme)
 // ============================================================================
 const uiTheme: UITheme = {
@@ -1564,7 +1664,9 @@ export const bigtechWorkerTheme: ThemeConfig = {
     maxHandSize: 10,
     turnTimeLimit: 60,
     winConditions: [
-      { type: 'stat_threshold', stat: 'performance', operator: '>=', value: 100 },
+      // 使用里程碑式胜利条件
+      { type: 'milestone', milestoneConfig },
+      // 保留失败条件作为后备检查
       { type: 'stat_threshold', stat: 'health', operator: '<=', value: 0 },
       { type: 'stat_threshold', stat: 'happiness', operator: '<=', value: 0 },
       { type: 'turn_limit', value: 30 },
@@ -1594,6 +1696,7 @@ export const bigtechWorkerTheme: ThemeConfig = {
   achievementDefinitions,
   difficultyDefinitions,
   dailyChallengeConfig,
+  milestoneConfig,
   uiTheme,
   localization,
 
