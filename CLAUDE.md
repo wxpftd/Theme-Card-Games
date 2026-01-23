@@ -39,15 +39,24 @@ pnpm app:bigtech   # Start bigtech-worker Expo app
 pnpm app:startup   # Start startup Expo app
 pnpm app:travel    # Start travel Expo app
 pnpm app:parenting # Start parenting Expo app
+
+# Asset pipeline (AI 卡牌素材生成)
+pnpm asset:init      # 初始化主题风格指南
+pnpm asset:extract   # 提取卡牌并生成 AI 提示词
+pnpm asset:generate  # 生成单张卡牌图片（测试用）
+pnpm asset:batch     # 批量生成卡牌图片
+pnpm asset:process   # 处理原始图片（裁剪、缩放、边框）
+pnpm asset:status    # 查看流水线状态
 ```
 
 ## Architecture
 
 ### Package Structure
 
-- **packages/core/**: Game engine - card system, state management, turn system, event bus, and advanced systems (combos, status effects, achievements, difficulty, daily challenges)
+- **packages/core/**: Game engine - card system, state management, turn system, event bus, and advanced systems (combos, status effects, achievements, difficulty, daily challenges, deck building, dice system)
 - **packages/ui/**: React Native UI components with `useGameEngine` hook, theming, and i18n support
 - **packages/themes/**: Theme configurations (bigtech-worker is complete, others in progress)
+- **packages/asset-pipeline/**: AI-powered card art generation pipeline (extract → generate → process → integrate)
 - **apps/**: Expo apps for each theme
 
 ### Core Engine Flow
@@ -57,15 +66,18 @@ GameEngine
 ├── GameStateManager (central state + subsystems)
 │   └── ComboSystem, StatusEffectSystem, CardUpgradeSystem,
 │       RandomEventSystem, AchievementSystem, DifficultySystem,
-│       DailyChallengeSystem
+│       DailyChallengeSystem, CharacterSystem, ScenarioSystem,
+│       GameEndSystem, DiceSystem, AIPlayerSystem, SharedResourceSystem
 ├── TurnManager (turn phases and flow)
 ├── EventBus (pub/sub for game events)
-└── EffectResolver (processes card effects with custom handlers)
+├── EffectResolver (processes card effects with custom handlers)
+├── DeckBuilder (deck construction with series focus bonuses)
+└── GameModeManager (single player, local multiplayer, competitive modes)
 ```
 
 ### Theme Integration
 
-Themes export a `ThemeConfig` containing: card definitions, stat/resource definitions, game rules, win conditions, combo/status/upgrade definitions, random events, achievements, difficulty levels, daily challenge config, localization strings, and UI theme.
+Themes export a `ThemeConfig` containing: card definitions, stat/resource definitions, game rules, win conditions, combo/status/upgrade definitions, random events, achievements, difficulty levels, daily challenge config, character/scenario definitions, milestone system, localization strings, and UI theme.
 
 ```typescript
 import { GameEngine } from '@theme-card-games/core';
@@ -78,7 +90,9 @@ import { bigtechWorkerTheme } from '@theme-card-games/theme-bigtech-worker';
 - **Constructor injection**: Options/Config interfaces passed to constructors
 - **Custom handler registries**: Extend behavior via `CustomEffectHandler`, `RandomEventCustomHandler`, etc.
 - **Event-driven**: EventBus enables decoupled communication between systems
-- **Card lifecycle**: CardDefinition (blueprint) → CardInstance (runtime) → Card states: 'in_deck' | 'in_hand' | 'played' | 'discarded'
+- **Card lifecycle**: CardDefinition (blueprint) → CardInstance (runtime) → Card states: 'in_deck' | 'in_hand' | 'in_play' | 'discarded' | 'removed'
+- **Game modes**: Single player, local multiplayer (human vs human), competitive (with AI players)
+- **Card series**: Cards belong to series (environment, business, health, etc.) with focus bonuses for deck building
 
 ## Testing
 
