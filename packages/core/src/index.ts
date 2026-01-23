@@ -101,3 +101,12 @@ export {
   DEFAULT_SUMMARY_TEMPLATES,
   type ShareCardGeneratorOptions,
 } from './share';
+
+// Deck building system
+export {
+  DeckBuilder,
+  DeckValidator,
+  DEFAULT_DECK_BUILDING_RULES,
+  type DeckBuilderOptions,
+  type DeckValidatorOptions,
+} from './deck';
