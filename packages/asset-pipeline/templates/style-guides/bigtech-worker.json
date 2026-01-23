@@ -1,0 +1,89 @@
+{
+  "id": "bigtech-worker",
+  "name": "大厂打工人",
+  "description": "互联网大厂职场生存主题，风格现代、略带幽默",
+  "promptTemplate": {
+    "base": "minimalist flat illustration, modern tech office theme, clean vector art style, soft shadows, professional design",
+    "byType": {
+      "action": "dynamic pose, motion elements, energetic composition, action scene",
+      "event": "scene-based illustration, environmental storytelling, narrative moment, slice of life",
+      "resource": "iconic centered object, simple background, symbolic representation, clean design",
+      "character": "portrait style, expressive character, professional attire, personality",
+      "modifier": "abstract glowing symbol, floating elements, magical effect, buff/debuff visual"
+    },
+    "byRarity": {
+      "common": "simple clean design, muted pastel colors, minimal details, everyday feel",
+      "uncommon": "subtle details, soft glow effect, slightly vibrant colors, notable moment",
+      "rare": "intricate details, vibrant colors, sparkle effects, premium feel, special occasion",
+      "legendary": "epic dramatic composition, golden accents, lens flare, mythical atmosphere, career milestone"
+    },
+    "bySeries": {
+      "work": "office desk, computer screen, documents, professional setting, workplace",
+      "environment": "cityscape, weather elements, global symbols, external factors",
+      "business": "charts, money, business symbols, corporate imagery, market trends",
+      "health": "wellness symbols, medical elements, lifestyle imagery, self-care",
+      "accident": "warning signs, unexpected events, dramatic moment, surprise",
+      "social": "people interaction, communication symbols, community, networking",
+      "growth": "upward arrows, learning symbols, achievement badges, skill development"
+    },
+    "negative": "text, watermark, signature, blurry, low quality, realistic photo, 3D render, anime style, cartoon face, ugly, deformed, nsfw, violent, gore"
+  },
+  "visualSpec": {
+    "artStyle": "flat vector illustration with subtle gradients and soft shadows, Dribbble style",
+    "colorPalette": [
+      "#4A90D9",
+      "#7C3AED",
+      "#10B981",
+      "#F59E0B",
+      "#EF4444",
+      "#6366F1",
+      "#EC4899",
+      "#14B8A6"
+    ],
+    "mood": "modern, slightly humorous, relatable, professional yet approachable",
+    "perspective": "isometric or front-facing, slightly elevated viewpoint",
+    "keywords": [
+      "tech",
+      "startup",
+      "office",
+      "modern",
+      "digital",
+      "professional",
+      "corporate",
+      "lifestyle"
+    ]
+  },
+  "outputSpec": {
+    "sizes": {
+      "small": { "width": 98, "height": 140 },
+      "medium": { "width": 140, "height": 200 },
+      "large": { "width": 280, "height": 400 }
+    },
+    "format": "webp",
+    "quality": 90,
+    "withFrame": true
+  },
+  "visualMappings": {
+    "加班": "person working late at glowing computer screen, dark office window showing night city, coffee cup, tired but determined expression",
+    "摸鱼": "person secretly browsing phone hidden behind monitor, sneaky expression, one eye on door, casual posture",
+    "会议": "conference room with multiple people around table, presentation screen, someone presenting, attentive audience",
+    "绩效": "performance chart trending upward, golden star badge, achievement notification, celebration confetti",
+    "裁员": "office desk being cleared, cardboard box with personal items, dramatic lighting, bittersweet moment",
+    "跳槽": "person confidently walking through door towards bright light, new opportunity ahead, suit and briefcase",
+    "内卷": "multiple people working intensely at desks, competitive atmosphere, pressure visualization, racing metaphor",
+    "躺平": "person relaxing in ergonomic office chair, zen expression, plants around, peaceful atmosphere",
+    "团建": "group of colleagues doing fun activity together, team bonding, laughter, outdoor or activity center",
+    "晋升": "person climbing corporate ladder visualization, spotlight, congratulations banner, level up effect",
+    "述职": "person presenting in front of executives, projection screen, confident posture, professional setting",
+    "996": "clock showing late hours, person at desk, moon visible, multiple coffee cups, dedication theme",
+    "福利": "gift box opening with benefits icons floating out, health insurance, snacks, gym membership symbols",
+    "面试": "two people across table, resume papers, nervous but prepared expression, office interview room",
+    "入职": "person receiving welcome package, new badge, excited expression, fresh start atmosphere",
+    "离职": "person shaking hands goodbye, colleagues waving, mixed emotions, transition moment",
+    "带薪休假": "person on beach with laptop closed, vacation vibes, relaxation, palm trees and sunshine",
+    "技术分享": "person at whiteboard explaining diagram, colleagues learning, knowledge transfer, educational",
+    "代码review": "two developers looking at screen together, code visible, discussion gestures, collaboration",
+    "产品需求": "product manager with feature list, sticky notes, planning session, brainstorming"
+  },
+  "customPrompts": {}
+}
