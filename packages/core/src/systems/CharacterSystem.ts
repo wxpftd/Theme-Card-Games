@@ -68,73 +68,65 @@ export class CharacterSystem {
   private setupEventListeners(): void {
     // 监听回合开始事件，触发 turn_start 被动
     this.unsubscribers.push(
-      this.eventBus.on('turn_started', (event) => {
+      this.eventBus.on('turn_started', (event, state) => {
         const playerId = event.data.playerId as string;
-        const gameState = event.data as unknown as GameState;
-        this.processPassiveTrigger(playerId, 'turn_start', gameState);
+        this.processPassiveTrigger(playerId, 'turn_start', state);
       })
     );
 
     // 监听回合结束事件，触发 turn_end 被动
     this.unsubscribers.push(
-      this.eventBus.on('turn_ended', (event) => {
+      this.eventBus.on('turn_ended', (event, state) => {
         const playerId = event.data.playerId as string;
-        const gameState = event.data as unknown as GameState;
-        this.processPassiveTrigger(playerId, 'turn_end', gameState);
+        this.processPassiveTrigger(playerId, 'turn_end', state);
       })
     );
 
     // 监听卡牌打出事件
     this.unsubscribers.push(
-      this.eventBus.on('card_played', (event) => {
+      this.eventBus.on('card_played', (event, state) => {
         const playerId = event.data.playerId as string;
-        const gameState = event.data as unknown as GameState;
-        this.processPassiveTrigger(playerId, 'card_played', gameState, event.data);
+        this.processPassiveTrigger(playerId, 'card_played', state, event.data);
       })
     );
 
     // 监听抽牌事件
     this.unsubscribers.push(
-      this.eventBus.on('card_drawn', (event) => {
+      this.eventBus.on('card_drawn', (event, state) => {
         const playerId = event.data.playerId as string;
-        const gameState = event.data as unknown as GameState;
-        this.processPassiveTrigger(playerId, 'card_drawn', gameState, event.data);
+        this.processPassiveTrigger(playerId, 'card_drawn', state, event.data);
       })
     );
 
     // 监听属性变化事件
     this.unsubscribers.push(
-      this.eventBus.on('stat_changed', (event) => {
+      this.eventBus.on('stat_changed', (event, state) => {
         const playerId = event.data.playerId as string;
-        const gameState = event.data as unknown as GameState;
-        this.processPassiveTrigger(playerId, 'stat_changed', gameState, event.data);
+        this.processPassiveTrigger(playerId, 'stat_changed', state, event.data);
       })
     );
 
     // 监听资源变化事件
     this.unsubscribers.push(
-      this.eventBus.on('resource_changed', (event) => {
+      this.eventBus.on('resource_changed', (event, state) => {
         const playerId = event.data.playerId as string;
-        const gameState = event.data as unknown as GameState;
-        this.processPassiveTrigger(playerId, 'resource_changed', gameState, event.data);
+        this.processPassiveTrigger(playerId, 'resource_changed', state, event.data);
       })
     );
 
     // 监听状态应用事件
     this.unsubscribers.push(
-      this.eventBus.on('status_applied', (event) => {
+      this.eventBus.on('status_applied', (event, state) => {
         const playerId = event.data.playerId as string;
-        const gameState = event.data as unknown as GameState;
-        this.processPassiveTrigger(playerId, 'status_applied', gameState, event.data);
+        this.processPassiveTrigger(playerId, 'status_applied', state, event.data);
       })
     );
 
     // 监听状态移除事件
     this.unsubscribers.push(
-      this.eventBus.on('status_removed', (event) => {
+      this.eventBus.on('status_removed', (event, state) => {
         const playerId = event.data.playerId as string;
-        const gameState = event.data as unknown as GameState;
-        this.processPassiveTrigger(playerId, 'status_removed', gameState, event.data);
+        this.processPassiveTrigger(playerId, 'status_removed', state, event.data);
       })
     );
   }

@@ -96,28 +96,25 @@ export class GameEndSystem {
   private setupEventListeners(): void {
     // 监听属性变化，检查淘汰条件
     this.unsubscribers.push(
-      this.eventBus.on('stat_changed', (event) => {
-        const gameState = event.data as unknown as GameState;
+      this.eventBus.on('stat_changed', (event, state) => {
         const playerId = event.data.playerId as string;
-        this.checkPlayerElimination(playerId, gameState);
+        this.checkPlayerElimination(playerId, state);
       })
     );
 
     // 监听资源变化，检查淘汰条件
     this.unsubscribers.push(
-      this.eventBus.on('resource_changed', (event) => {
-        const gameState = event.data as unknown as GameState;
+      this.eventBus.on('resource_changed', (event, state) => {
         const playerId = event.data.playerId as string;
-        this.checkPlayerElimination(playerId, gameState);
+        this.checkPlayerElimination(playerId, state);
       })
     );
 
     // 监听回合结束，检查所有玩家
     this.unsubscribers.push(
-      this.eventBus.on('turn_ended', (event) => {
-        const gameState = event.data as unknown as GameState;
-        this.checkAllPlayersElimination(gameState);
-        this.checkGameEnd(gameState);
+      this.eventBus.on('turn_ended', (_event, state) => {
+        this.checkAllPlayersElimination(state);
+        this.checkGameEnd(state);
       })
     );
   }
