@@ -52,6 +52,9 @@ export class ScenarioSystem {
     scenarioHistory: [],
   };
 
+  /** 取消订阅函数 */
+  private unsubscribers: (() => void)[] = [];
+
   constructor(options: ScenarioSystemOptions) {
     this.config = options.config;
     this.effectResolver = options.effectResolver;
@@ -72,18 +75,22 @@ export class ScenarioSystem {
    */
   private setupEventListeners(): void {
     // 监听回合开始，处理每回合效果
-    this.eventBus.on('turn_started', (event) => {
-      const gameState = event.data as unknown as GameState;
-      this.processTurnEffects(gameState);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('turn_started', (event) => {
+        const gameState = event.data as unknown as GameState;
+        this.processTurnEffects(gameState);
+      })
+    );
 
     // 监听游戏开始，初始化场景
-    this.eventBus.on('game_started', (event) => {
-      const gameState = event.data as unknown as GameState;
-      if (this.config.initialScenarioId) {
-        this.changeScenario(this.config.initialScenarioId, gameState, 'game_start');
-      }
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('game_started', (event) => {
+        const gameState = event.data as unknown as GameState;
+        if (this.config.initialScenarioId) {
+          this.changeScenario(this.config.initialScenarioId, gameState, 'game_start');
+        }
+      })
+    );
   }
 
   // ============================================================================
@@ -617,6 +624,22 @@ export class ScenarioSystem {
    * 重置系统状态
    */
   reset(): void {
+    this.state = {
+      currentScenarioId: null,
+      scenarioStartTurn: 0,
+      scenarioTurnsElapsed: 0,
+      scenarioHistory: [],
+    };
+  }
+
+  /**
+   * 清理资源，移除所有事件监听器
+   */
+  destroy(): void {
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
     this.state = {
       currentScenarioId: null,
       scenarioStartTurn: 0,

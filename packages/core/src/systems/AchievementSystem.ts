@@ -40,6 +40,9 @@ export class AchievementSystem {
   // Current game session stats
   private sessionStats: GameSessionStats | null = null;
 
+  /** 取消订阅函数 */
+  private unsubscribers: (() => void)[] = [];
+
   constructor(options: AchievementSystemOptions) {
     this.cardDefinitions = options.cardDefinitions;
     this.eventBus = options.eventBus;
@@ -54,61 +57,69 @@ export class AchievementSystem {
 
   private setupEventListeners(): void {
     // Track card plays
-    this.eventBus.on('card_played', (event) => {
-      if (this.sessionStats) {
-        const cardId = event.data.cardId as string;
-        const cardDef = this.cardDefinitions.get(cardId);
-        if (cardDef) {
-          this.sessionStats.cardsPlayed.push(cardId);
-          // Track by tags
-          if (cardDef.tags) {
-            for (const tag of cardDef.tags) {
-              this.sessionStats.cardUsage[tag] = (this.sessionStats.cardUsage[tag] || 0) + 1;
+    this.unsubscribers.push(
+      this.eventBus.on('card_played', (event) => {
+        if (this.sessionStats) {
+          const cardId = event.data.cardId as string;
+          const cardDef = this.cardDefinitions.get(cardId);
+          if (cardDef) {
+            this.sessionStats.cardsPlayed.push(cardId);
+            // Track by tags
+            if (cardDef.tags) {
+              for (const tag of cardDef.tags) {
+                this.sessionStats.cardUsage[tag] = (this.sessionStats.cardUsage[tag] || 0) + 1;
+              }
             }
           }
         }
-      }
-    });
+      })
+    );
 
     // Track stat changes
-    this.eventBus.on('stat_changed', (event) => {
-      if (this.sessionStats) {
-        const stat = event.data.stat as string;
-        const newValue = event.data.newValue as number;
+    this.unsubscribers.push(
+      this.eventBus.on('stat_changed', (event) => {
+        if (this.sessionStats) {
+          const stat = event.data.stat as string;
+          const newValue = event.data.newValue as number;
 
-        // Record history
-        if (!this.sessionStats.statHistory[stat]) {
-          this.sessionStats.statHistory[stat] = [];
+          // Record history
+          if (!this.sessionStats.statHistory[stat]) {
+            this.sessionStats.statHistory[stat] = [];
+          }
+          this.sessionStats.statHistory[stat].push(newValue);
+
+          // Track min/max
+          this.sessionStats.minStats[stat] = Math.min(
+            this.sessionStats.minStats[stat] ?? Infinity,
+            newValue
+          );
+          this.sessionStats.maxStats[stat] = Math.max(
+            this.sessionStats.maxStats[stat] ?? -Infinity,
+            newValue
+          );
         }
-        this.sessionStats.statHistory[stat].push(newValue);
-
-        // Track min/max
-        this.sessionStats.minStats[stat] = Math.min(
-          this.sessionStats.minStats[stat] ?? Infinity,
-          newValue
-        );
-        this.sessionStats.maxStats[stat] = Math.max(
-          this.sessionStats.maxStats[stat] ?? -Infinity,
-          newValue
-        );
-      }
-    });
+      })
+    );
 
     // Track turn ends
-    this.eventBus.on('turn_ended', () => {
-      if (this.sessionStats) {
-        this.sessionStats.turnsPlayed++;
-      }
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('turn_ended', () => {
+        if (this.sessionStats) {
+          this.sessionStats.turnsPlayed++;
+        }
+      })
+    );
 
     // Track game end
-    this.eventBus.on('game_ended', (event, state) => {
-      if (this.sessionStats) {
-        this.sessionStats.endTime = Date.now();
-        this.sessionStats.won = event.data.winnerId !== null;
-        this.checkAchievements(state);
-      }
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('game_ended', (event, state) => {
+        if (this.sessionStats) {
+          this.sessionStats.endTime = Date.now();
+          this.sessionStats.won = event.data.winnerId !== null;
+          this.checkAchievements(state);
+        }
+      })
+    );
   }
 
   /**
@@ -428,6 +439,17 @@ export class AchievementSystem {
       totalPoints: 0,
       claimedRewards: [],
     };
+    this.sessionStats = null;
+  }
+
+  /**
+   * 清理资源，移除所有事件监听器
+   */
+  destroy(): void {
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
     this.sessionStats = null;
   }
 }

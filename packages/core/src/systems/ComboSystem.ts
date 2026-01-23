@@ -23,6 +23,9 @@ export class ComboSystem {
   // Per-player combo state
   private playerStates: Map<string, ComboState> = new Map();
 
+  /** 取消订阅函数 */
+  private unsubscribers: (() => void)[] = [];
+
   constructor(options: ComboSystemOptions) {
     this.cardDefinitions = options.cardDefinitions;
     this.effectResolver = options.effectResolver;
@@ -37,10 +40,12 @@ export class ComboSystem {
   }
 
   private setupEventListeners(): void {
-    this.eventBus.on('turn_started', (event) => {
-      const playerId = event.data.playerId as string;
-      this.onTurnStart(playerId);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('turn_started', (event) => {
+        const playerId = event.data.playerId as string;
+        this.onTurnStart(playerId);
+      })
+    );
   }
 
   /**
@@ -269,6 +274,17 @@ export class ComboSystem {
    * Reset all player states
    */
   reset(): void {
+    this.playerStates.clear();
+  }
+
+  /**
+   * 清理资源，移除所有事件监听器
+   */
+  destroy(): void {
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
     this.playerStates.clear();
   }
 }
