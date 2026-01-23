@@ -43,6 +43,9 @@ export class DailyChallengeSystem {
   private sessionStats: GameSessionStats | null = null;
   private isInChallengeMode: boolean = false;
 
+  /** 取消订阅函数 */
+  private unsubscribers: (() => void)[] = [];
+
   constructor(options: DailyChallengeSystemOptions) {
     this.cardDefinitions = options.cardDefinitions;
     this.eventBus = options.eventBus;
@@ -58,63 +61,71 @@ export class DailyChallengeSystem {
 
   private setupEventListeners(): void {
     // Track card plays during challenge mode
-    this.eventBus.on('card_played', (event) => {
-      if (this.isInChallengeMode && this.sessionStats) {
-        const cardId = event.data.cardId as string;
-        const cardDef = this.cardDefinitions.get(cardId);
-        if (cardDef) {
-          this.sessionStats.cardsPlayed.push(cardId);
-          if (cardDef.tags) {
-            for (const tag of cardDef.tags) {
-              this.sessionStats.cardUsage[tag] = (this.sessionStats.cardUsage[tag] || 0) + 1;
+    this.unsubscribers.push(
+      this.eventBus.on('card_played', (event) => {
+        if (this.isInChallengeMode && this.sessionStats) {
+          const cardId = event.data.cardId as string;
+          const cardDef = this.cardDefinitions.get(cardId);
+          if (cardDef) {
+            this.sessionStats.cardsPlayed.push(cardId);
+            if (cardDef.tags) {
+              for (const tag of cardDef.tags) {
+                this.sessionStats.cardUsage[tag] = (this.sessionStats.cardUsage[tag] || 0) + 1;
+              }
             }
           }
         }
-      }
-    });
+      })
+    );
 
     // Track resource usage
-    this.eventBus.on('resource_changed', (event) => {
-      if (this.isInChallengeMode && this.sessionStats) {
-        const resource = event.data.resource as string;
-        const delta = event.data.delta as number;
-        if (delta < 0) {
-          // Track resource consumption
-          const key = `${resource}_used`;
-          this.sessionStats.cardUsage[key] =
-            (this.sessionStats.cardUsage[key] || 0) + Math.abs(delta);
+    this.unsubscribers.push(
+      this.eventBus.on('resource_changed', (event) => {
+        if (this.isInChallengeMode && this.sessionStats) {
+          const resource = event.data.resource as string;
+          const delta = event.data.delta as number;
+          if (delta < 0) {
+            // Track resource consumption
+            const key = `${resource}_used`;
+            this.sessionStats.cardUsage[key] =
+              (this.sessionStats.cardUsage[key] || 0) + Math.abs(delta);
+          }
         }
-      }
-    });
+      })
+    );
 
     // Track turn ends
-    this.eventBus.on('turn_ended', () => {
-      if (this.isInChallengeMode && this.sessionStats) {
-        this.sessionStats.turnsPlayed++;
-      }
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('turn_ended', () => {
+        if (this.isInChallengeMode && this.sessionStats) {
+          this.sessionStats.turnsPlayed++;
+        }
+      })
+    );
 
     // Track stat changes
-    this.eventBus.on('stat_changed', (event) => {
-      if (this.isInChallengeMode && this.sessionStats) {
-        const stat = event.data.stat as string;
-        const newValue = event.data.newValue as number;
+    this.unsubscribers.push(
+      this.eventBus.on('stat_changed', (event) => {
+        if (this.isInChallengeMode && this.sessionStats) {
+          const stat = event.data.stat as string;
+          const newValue = event.data.newValue as number;
 
-        if (!this.sessionStats.statHistory[stat]) {
-          this.sessionStats.statHistory[stat] = [];
+          if (!this.sessionStats.statHistory[stat]) {
+            this.sessionStats.statHistory[stat] = [];
+          }
+          this.sessionStats.statHistory[stat].push(newValue);
+
+          this.sessionStats.maxStats[stat] = Math.max(
+            this.sessionStats.maxStats[stat] ?? -Infinity,
+            newValue
+          );
+          this.sessionStats.minStats[stat] = Math.min(
+            this.sessionStats.minStats[stat] ?? Infinity,
+            newValue
+          );
         }
-        this.sessionStats.statHistory[stat].push(newValue);
-
-        this.sessionStats.maxStats[stat] = Math.max(
-          this.sessionStats.maxStats[stat] ?? -Infinity,
-          newValue
-        );
-        this.sessionStats.minStats[stat] = Math.min(
-          this.sessionStats.minStats[stat] ?? Infinity,
-          newValue
-        );
-      }
-    });
+      })
+    );
   }
 
   /**
@@ -500,6 +511,18 @@ export class DailyChallengeSystem {
       currentStreak: 0,
       bestStreak: 0,
     };
+    this.sessionStats = null;
+    this.isInChallengeMode = false;
+  }
+
+  /**
+   * 清理资源，移除所有事件监听器
+   */
+  destroy(): void {
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
     this.sessionStats = null;
     this.isInChallengeMode = false;
   }

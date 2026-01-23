@@ -46,6 +46,9 @@ export class MilestoneSystem {
   private eventBus: EventBus;
   private customCheckers: Record<string, CustomMilestoneChecker>;
 
+  /** 取消订阅函数 */
+  private unsubscribers: (() => void)[] = [];
+
   constructor(options: MilestoneSystemOptions) {
     this.config = options.milestoneConfig;
     this.effectResolver = options.effectResolver;
@@ -65,20 +68,26 @@ export class MilestoneSystem {
 
   private setupEventListeners(): void {
     // 监听属性变化以更新里程碑进度
-    this.eventBus.on('stat_changed', (event) => {
-      const playerId = event.data.playerId as string;
-      this.onStatChanged(playerId, event.data as { playerId: string; stat: string });
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('stat_changed', (event) => {
+        const playerId = event.data.playerId as string;
+        this.onStatChanged(playerId, event.data as { playerId: string; stat: string });
+      })
+    );
 
-    this.eventBus.on('resource_changed', (event) => {
-      const playerId = event.data.playerId as string;
-      this.onResourceChanged(playerId, event.data as { playerId: string; resource: string });
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('resource_changed', (event) => {
+        const playerId = event.data.playerId as string;
+        this.onResourceChanged(playerId, event.data as { playerId: string; resource: string });
+      })
+    );
 
-    this.eventBus.on('card_played', (event) => {
-      const playerId = event.data.playerId as string;
-      this.onCardPlayed(playerId, event.data as { playerId: string; cardId: string });
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('card_played', (event) => {
+        const playerId = event.data.playerId as string;
+        this.onCardPlayed(playerId, event.data as { playerId: string; cardId: string });
+      })
+    );
   }
 
   /**
@@ -466,5 +475,15 @@ export class MilestoneSystem {
    */
   reset(): void {
     // 里程碑系统状态存储在 PlayerState 中，无需在此重置
+  }
+
+  /**
+   * 清理资源，移除所有事件监听器
+   */
+  destroy(): void {
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
   }
 }

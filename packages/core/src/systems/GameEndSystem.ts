@@ -78,6 +78,9 @@ export class GameEndSystem {
   /** 当前活跃玩家数 */
   private activePlayerCount: number = 0;
 
+  /** 取消订阅函数 */
+  private unsubscribers: (() => void)[] = [];
+
   constructor(options: GameEndSystemOptions) {
     this.eventBus = options.eventBus;
     this.winConditions = options.winConditions;
@@ -92,25 +95,31 @@ export class GameEndSystem {
    */
   private setupEventListeners(): void {
     // 监听属性变化，检查淘汰条件
-    this.eventBus.on('stat_changed', (event) => {
-      const gameState = event.data as unknown as GameState;
-      const playerId = event.data.playerId as string;
-      this.checkPlayerElimination(playerId, gameState);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('stat_changed', (event) => {
+        const gameState = event.data as unknown as GameState;
+        const playerId = event.data.playerId as string;
+        this.checkPlayerElimination(playerId, gameState);
+      })
+    );
 
     // 监听资源变化，检查淘汰条件
-    this.eventBus.on('resource_changed', (event) => {
-      const gameState = event.data as unknown as GameState;
-      const playerId = event.data.playerId as string;
-      this.checkPlayerElimination(playerId, gameState);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('resource_changed', (event) => {
+        const gameState = event.data as unknown as GameState;
+        const playerId = event.data.playerId as string;
+        this.checkPlayerElimination(playerId, gameState);
+      })
+    );
 
     // 监听回合结束，检查所有玩家
-    this.eventBus.on('turn_ended', (event) => {
-      const gameState = event.data as unknown as GameState;
-      this.checkAllPlayersElimination(gameState);
-      this.checkGameEnd(gameState);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('turn_ended', (event) => {
+        const gameState = event.data as unknown as GameState;
+        this.checkAllPlayersElimination(gameState);
+        this.checkGameEnd(gameState);
+      })
+    );
   }
 
   // ============================================================================
@@ -486,6 +495,18 @@ export class GameEndSystem {
    * 重置系统状态
    */
   reset(): void {
+    this.eliminationOrder = [];
+    this.activePlayerCount = 0;
+  }
+
+  /**
+   * 清理资源，移除所有事件监听器
+   */
+  destroy(): void {
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
     this.eliminationOrder = [];
     this.activePlayerCount = 0;
   }

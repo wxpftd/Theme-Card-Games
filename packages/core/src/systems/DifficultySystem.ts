@@ -33,6 +33,9 @@ export class DifficultySystem {
   // Turn tracking for interval-based rules
   private currentTurn: number = 0;
 
+  /** 取消订阅函数 */
+  private unsubscribers: (() => void)[] = [];
+
   constructor(options: DifficultySystemOptions) {
     this.eventBus = options.eventBus;
     this.customRuleHandlers = options.customRuleHandlers ?? {};
@@ -46,15 +49,19 @@ export class DifficultySystem {
 
   private setupEventListeners(): void {
     // Track turn starts for interval-based rules
-    this.eventBus.on('turn_started', (event, state) => {
-      this.currentTurn = state.turn;
-      this.processIntervalRules(state);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('turn_started', (event, state) => {
+        this.currentTurn = state.turn;
+        this.processIntervalRules(state);
+      })
+    );
 
     // Apply per-turn stat/resource changes at turn end
-    this.eventBus.on('turn_ended', (_event, state) => {
-      this.applyPerTurnChanges(state);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('turn_ended', (_event, state) => {
+        this.applyPerTurnChanges(state);
+      })
+    );
   }
 
   /**
@@ -313,6 +320,17 @@ export class DifficultySystem {
       currentDifficulty: 'normal',
       unlockedDifficulties: ['easy', 'normal'],
     };
+    this.currentTurn = 0;
+  }
+
+  /**
+   * 清理资源，移除所有事件监听器
+   */
+  destroy(): void {
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
     this.currentTurn = 0;
   }
 }

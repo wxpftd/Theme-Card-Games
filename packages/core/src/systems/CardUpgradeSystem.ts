@@ -37,6 +37,9 @@ export class CardUpgradeSystem {
   // Combo trigger tracking for upgrade conditions
   private comboTriggerCounts: Map<string, Map<string, number>> = new Map();
 
+  /** 取消订阅函数 */
+  private unsubscribers: (() => void)[] = [];
+
   constructor(options: CardUpgradeSystemOptions) {
     this.cardDefinitions = options.cardDefinitions;
     this.eventBus = options.eventBus;
@@ -50,11 +53,13 @@ export class CardUpgradeSystem {
 
   private setupEventListeners(): void {
     // Listen for combo triggers to track for upgrade conditions
-    this.eventBus.on('combo_triggered', (event) => {
-      const playerId = event.data.playerId as string;
-      const comboId = event.data.comboId as string;
-      this.trackComboTrigger(playerId, comboId);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('combo_triggered', (event) => {
+        const playerId = event.data.playerId as string;
+        const comboId = event.data.comboId as string;
+        this.trackComboTrigger(playerId, comboId);
+      })
+    );
   }
 
   /**
@@ -368,6 +373,18 @@ export class CardUpgradeSystem {
    * Reset all player tracking
    */
   reset(): void {
+    this.playerUsage.clear();
+    this.comboTriggerCounts.clear();
+  }
+
+  /**
+   * 清理资源，移除所有事件监听器
+   */
+  destroy(): void {
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
     this.playerUsage.clear();
     this.comboTriggerCounts.clear();
   }

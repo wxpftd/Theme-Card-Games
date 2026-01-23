@@ -79,6 +79,9 @@ export class GameStateManager {
   private cachedSnapshot: GameState | null = null;
   private cachedSnapshotVersion: number = -1;
 
+  /** 取消订阅函数 */
+  private unsubscribers: (() => void)[] = [];
+
   constructor(options: GameStateManagerOptions) {
     this.cardDefinitions = new Map(options.cardDefinitions.map((def) => [def.id, def]));
     this.eventBus = options.eventBus ?? new EventBus();
@@ -174,15 +177,19 @@ export class GameStateManager {
    */
   private setupSystemEventListeners(): void {
     // Process status effects at turn boundaries
-    this.eventBus.on('turn_started', (event) => {
-      const playerId = event.data.playerId as string;
-      this.processStatusTurnStart(playerId);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('turn_started', (event) => {
+        const playerId = event.data.playerId as string;
+        this.processStatusTurnStart(playerId);
+      })
+    );
 
-    this.eventBus.on('turn_ended', (event) => {
-      const playerId = event.data.playerId as string;
-      this.processStatusTurnEnd(playerId);
-    });
+    this.unsubscribers.push(
+      this.eventBus.on('turn_ended', (event) => {
+        const playerId = event.data.playerId as string;
+        this.processStatusTurnEnd(playerId);
+      })
+    );
   }
 
   /**
@@ -883,6 +890,33 @@ export class GameStateManager {
     this.cardUpgradeSystem?.reset();
     this.randomEventSystem?.reset();
     this.milestoneSystem?.reset();
+    this.invalidateCache();
+  }
+
+  /**
+   * 清理资源，移除所有事件监听器
+   * 当 GameStateManager 不再需要时调用此方法
+   */
+  destroy(): void {
+    // 清理 GameStateManager 自身的事件监听器
+    for (const unsub of this.unsubscribers) {
+      unsub();
+    }
+    this.unsubscribers = [];
+
+    // 清理所有子系统的事件监听器
+    // 注意：StatusEffectSystem 和 RandomEventSystem 不注册事件监听器，无需 destroy
+    this.comboSystem?.destroy();
+    this.cardUpgradeSystem?.destroy();
+    this.achievementSystem?.destroy();
+    this.difficultySystem?.destroy();
+    this.dailyChallengeSystem?.destroy();
+    this.milestoneSystem?.destroy();
+
+    // 清理其他资源
+    this.playerDecks.clear();
+    this.playerHands.clear();
+    this.eventBus.clearHistory();
     this.invalidateCache();
   }
 
