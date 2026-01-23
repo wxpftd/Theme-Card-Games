@@ -10,6 +10,13 @@ import {
 } from '../types';
 import { Card } from './Card';
 import { generateId } from '../utils';
+import {
+  DiceSystem,
+  DiceConfig,
+  DiceRollResult,
+  DiceEffectMapping,
+  DiceEffectMetadata,
+} from '../systems/DiceSystem';
 
 export interface EffectContext {
   gameState: GameState;
@@ -31,6 +38,25 @@ export type CustomEffectHandler = (
  */
 export class EffectResolver {
   private customHandlers: Map<string, CustomEffectHandler> = new Map();
+  private diceSystem: DiceSystem;
+
+  constructor() {
+    this.diceSystem = new DiceSystem();
+  }
+
+  /**
+   * 设置骰子系统实例 (用于共享历史记录等)
+   */
+  setDiceSystem(diceSystem: DiceSystem): void {
+    this.diceSystem = diceSystem;
+  }
+
+  /**
+   * 获取骰子系统实例
+   */
+  getDiceSystem(): DiceSystem {
+    return this.diceSystem;
+  }
 
   /**
    * Register a custom effect handler
@@ -84,6 +110,11 @@ export class EffectResolver {
       case 'claim_shared':
         // claim_shared 需要外部系统处理，这里只返回意图
         return this.resolveClaimShared(effect, context);
+      // 骰子系统效果
+      case 'roll_dice':
+        return this.resolveRollDice(effect, context);
+      case 'dice_challenge':
+        return this.resolveDiceChallenge(effect, context);
       default:
         console.warn(`Unknown effect type: ${effect.type}`);
         return null;
@@ -600,5 +631,174 @@ export class EffectResolver {
       default:
         return '选择目标对手';
     }
+  }
+
+  // ============================================================================
+  // 骰子系统效果解析器
+  // ============================================================================
+
+  /**
+   * 掷骰子效果
+   * 根据骰子结果修改属性或资源
+   */
+  private resolveRollDice(effect: CardEffect, context: EffectContext): ResolvedEffect | null {
+    const targets = this.getTargetPlayers(effect, context);
+    const metadata = effect.metadata as DiceEffectMetadata | undefined;
+
+    if (!metadata?.diceConfig) {
+      console.warn('roll_dice effect missing diceConfig in metadata');
+      return null;
+    }
+
+    // 掷骰子
+    const rollResult = this.diceSystem.roll(metadata.diceConfig);
+
+    // 计算最终效果值
+    const baseValue = metadata.baseValue ?? 0;
+    const perPoint = metadata.perPoint ?? 1;
+    const effectValue = baseValue + rollResult.total * perPoint;
+
+    // 检查是否有结果映射
+    if (metadata.resultMappings && metadata.resultMappings.length > 0) {
+      const selectedMapping = this.findMatchingMapping(rollResult.total, metadata.resultMappings);
+      if (selectedMapping) {
+        // 执行映射中的效果
+        const mappingResults = this.resolveAll(selectedMapping.effects, context);
+        return {
+          type: 'roll_dice',
+          target: targets[0]?.id ?? context.sourcePlayerId,
+          before: {
+            diceConfig: metadata.diceConfig,
+            rollResult,
+          },
+          after: {
+            rollResult,
+            effectValue,
+            selectedMapping: selectedMapping.description,
+            mappingEffects: mappingResults,
+          },
+        };
+      }
+    }
+
+    // 默认行为: 根据骰子结果修改属性或资源
+    const targetPlayer = targets[0];
+    if (!targetPlayer) {
+      return {
+        type: 'roll_dice',
+        target: context.sourcePlayerId,
+        before: { diceConfig: metadata.diceConfig },
+        after: { rollResult, effectValue },
+      };
+    }
+
+    if (metadata.stat) {
+      const before = targetPlayer.stats[metadata.stat] ?? 0;
+      targetPlayer.stats[metadata.stat] = before + effectValue;
+      return {
+        type: 'roll_dice',
+        target: targetPlayer.id,
+        before: {
+          diceConfig: metadata.diceConfig,
+          stat: metadata.stat,
+          statValue: before,
+        },
+        after: {
+          rollResult,
+          effectValue,
+          stat: metadata.stat,
+          statValue: targetPlayer.stats[metadata.stat],
+        },
+      };
+    }
+
+    if (metadata.resource) {
+      const before = targetPlayer.resources[metadata.resource] ?? 0;
+      targetPlayer.resources[metadata.resource] = Math.max(0, before + effectValue);
+      return {
+        type: 'roll_dice',
+        target: targetPlayer.id,
+        before: {
+          diceConfig: metadata.diceConfig,
+          resource: metadata.resource,
+          resourceValue: before,
+        },
+        after: {
+          rollResult,
+          effectValue,
+          resource: metadata.resource,
+          resourceValue: targetPlayer.resources[metadata.resource],
+        },
+      };
+    }
+
+    // 仅返回骰子结果
+    return {
+      type: 'roll_dice',
+      target: targetPlayer.id,
+      before: { diceConfig: metadata.diceConfig },
+      after: { rollResult, effectValue },
+    };
+  }
+
+  /**
+   * 骰子挑战效果
+   * 掷骰子与难度等级比较，决定成功或失败
+   */
+  private resolveDiceChallenge(effect: CardEffect, context: EffectContext): ResolvedEffect | null {
+    const targets = this.getTargetPlayers(effect, context);
+    const metadata = effect.metadata as DiceEffectMetadata | undefined;
+
+    if (!metadata?.diceConfig) {
+      console.warn('dice_challenge effect missing diceConfig in metadata');
+      return null;
+    }
+
+    const difficultyClass = metadata.difficultyClass ?? 10;
+
+    // 掷骰子
+    const rollResult = this.diceSystem.roll(metadata.diceConfig);
+    const success = rollResult.total >= difficultyClass;
+
+    // 选择成功或失败效果
+    const triggeredEffects = success
+      ? (metadata.successEffects ?? [])
+      : (metadata.failureEffects ?? []);
+
+    // 执行效果
+    let effectResults: ResolvedEffect[] = [];
+    if (triggeredEffects.length > 0) {
+      effectResults = this.resolveAll(triggeredEffects, context);
+    }
+
+    return {
+      type: 'dice_challenge',
+      target: targets[0]?.id ?? context.sourcePlayerId,
+      before: {
+        diceConfig: metadata.diceConfig,
+        difficultyClass,
+      },
+      after: {
+        rollResult,
+        success,
+        difficultyClass,
+        effectResults,
+      },
+    };
+  }
+
+  /**
+   * 查找匹配的结果映射
+   */
+  private findMatchingMapping(
+    rollTotal: number,
+    mappings: DiceEffectMapping[]
+  ): DiceEffectMapping | null {
+    for (const mapping of mappings) {
+      if (rollTotal >= mapping.range[0] && rollTotal <= mapping.range[1]) {
+        return mapping;
+      }
+    }
+    return null;
   }
 }

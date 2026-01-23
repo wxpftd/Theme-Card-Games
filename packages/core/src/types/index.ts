@@ -73,6 +73,8 @@ export type EffectType =
   | 'steal_resource' // 竞争模式: 从对手偷取资源
   | 'claim_shared' // 竞争模式: 抢夺共享资源
   | 'damage_stat' // 竞争模式: 直接减少对手属性
+  | 'roll_dice' // 骰子系统: 掷骰子并根据结果触发效果
+  | 'dice_challenge' // 骰子系统: 骰子挑战 (有难度等级)
   | 'custom';
 
 export type EffectTarget =
@@ -490,6 +492,12 @@ export type GameEventType =
   | 'milestone_achieved'
   | 'milestone_progress_updated'
   | 'milestone_failure'
+  // 骰子系统事件
+  | 'dice_rolled'
+  | 'dice_challenge_started'
+  | 'dice_challenge_completed'
+  | 'dice_critical'
+  | 'dice_fumble'
   | 'custom';
 
 export interface GameEvent {
@@ -650,6 +658,9 @@ export interface ThemeConfig {
 
   /** 竞争卡牌 ID 列表 (用于区分竞争卡牌和普通卡牌) */
   competitiveCardIds?: string[];
+
+  /** 骰子卡牌 ID 列表 (用于区分骰子卡牌) */
+  diceCardIds?: string[];
 
   /** 竞争模式胜利条件 */
   competitiveWinCondition?: CompetitiveWinCondition;
