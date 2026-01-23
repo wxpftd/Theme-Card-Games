@@ -53,6 +53,18 @@ export {
   AIPlayerSystemOptions,
   SharedResourceSystem,
   SharedResourceSystemOptions,
+  // 角色系统
+  CharacterSystem,
+  CharacterSystemOptions,
+  // 场景系统
+  ScenarioSystem,
+  ScenarioSystemOptions,
+  // 游戏结束系统
+  GameEndSystem,
+  GameEndSystemOptions,
+  EliminationReason,
+  EliminationCheckResult,
+  FinalRanking,
 } from './systems';
 
 // AI presets
