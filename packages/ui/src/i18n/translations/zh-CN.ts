@@ -36,6 +36,9 @@ export const zhCN = {
   'hand.title': '手牌',
   'hand.more': '+{count} 更多',
   'hand.hint': '点击打出 | 长按查看详情',
+  'hand.selected': '已选择 {count} 张',
+  'hand.play': '打出',
+  'hand.cancel': '取消',
 
   // Player stats
   'stats.title': '状态',

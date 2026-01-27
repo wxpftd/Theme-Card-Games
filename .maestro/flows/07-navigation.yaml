@@ -1,0 +1,49 @@
+# 07-navigation.yaml
+# 测试: 导航流程
+# 验证应用内各页面导航正常
+
+appId: host.exp.Exponent
+name: '导航流程测试'
+tags:
+  - smoke
+  - p0
+---
+- launchApp:
+    clearState: true
+
+# 验证首页
+- assertVisible:
+    id: 'home-screen'
+
+# 点击教程按钮
+- tapOn:
+    id: 'tutorial-button'
+
+# 等待页面切换
+- swipe:
+    start: '50%, 50%'
+    end: '50%, 50%'
+    duration: 1000
+
+# 截图 - 教程页面
+- takeScreenshot: '07-tutorial-page'
+
+# 返回首页（使用系统返回手势）
+- swipe:
+    start: '5%, 50%'
+    end: '80%, 50%'
+    duration: 300
+
+# 等待返回
+- swipe:
+    start: '50%, 50%'
+    end: '50%, 50%'
+    duration: 500
+
+# 验证回到首页
+- assertVisible:
+    id: 'home-screen'
+    optional: true
+
+# 截图 - 返回首页
+- takeScreenshot: '07-back-to-home'

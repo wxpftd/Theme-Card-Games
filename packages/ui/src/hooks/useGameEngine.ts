@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import {
   GameEngine,
   GameState,
@@ -9,7 +9,20 @@ import {
   ScenarioDefinition,
   ScenarioState,
   FinalRanking,
+  GameModeManager,
+  createCompetitiveMode,
+  AIDifficulty,
 } from '@theme-card-games/core';
+
+/** 多人模式配置 */
+export interface MultiplayerConfig {
+  enabled: boolean;
+  aiOpponents?: Array<{
+    id: string;
+    name: string;
+    difficulty: AIDifficulty;
+  }>;
+}
 
 export interface UseGameEngineOptions {
   theme: ThemeConfig;
@@ -18,6 +31,8 @@ export interface UseGameEngineOptions {
   autoStart?: boolean;
   /** 预选角色 ID (游戏开始前设置) */
   characterId?: string;
+  /** 多人模式配置 */
+  multiplayer?: MultiplayerConfig;
 }
 
 export interface UseGameEngineReturn {
@@ -41,9 +56,21 @@ export interface UseGameEngineReturn {
   finalRankings: FinalRanking[] | null;
   lastEliminatedPlayer: { playerId: string; playerName: string; reason?: string } | null;
 
+  // Multiplayer state
+  opponents: PlayerState[];
+  isMultiplayer: boolean;
+  isAITurn: boolean;
+  aiThinking: string | null;
+  isAIPlayer: (playerId: string) => boolean;
+
   // Actions
   startGame: () => void;
   playCard: (cardId: string, targets?: Record<string, string>) => boolean;
+  /** 批量打出多张卡牌（按顺序） */
+  playCards: (
+    cardIds: string[],
+    delayMs?: number
+  ) => Promise<{ success: boolean; playedCount: number }>;
   discardCard: (cardId: string) => boolean;
   drawCards: (count?: number) => void;
   endTurn: () => void;
@@ -70,9 +97,25 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
     playerName = '玩家',
     autoStart = false,
     characterId,
+    multiplayer,
   } = options;
 
   const engineRef = useRef<GameEngine | null>(null);
+  const modeManagerRef = useRef<GameModeManager | null>(null);
+
+  // 使用 ref 存储初始配置，避免依赖项变化导致 useEffect 重新执行
+  const initialConfigRef = useRef({
+    theme,
+    playerId,
+    playerName,
+    autoStart,
+    characterId,
+    multiplayer,
+  });
+
+  // 挂载状态检查，防止组件卸载后更新状态
+  const isMountedRef = useRef(true);
+
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [winner, setWinner] = useState<string | null>(null);
   const [finalRankings, setFinalRankings] = useState<FinalRanking[] | null>(null);
@@ -81,17 +124,37 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
     playerName: string;
     reason?: string;
   } | null>(null);
+  const [aiThinking, setAiThinking] = useState<string | null>(null);
 
   // Initialize engine
   useEffect(() => {
-    const engine = new GameEngine({ theme });
+    // 设置挂载状态
+    isMountedRef.current = true;
+
+    // 使用 ref 中的初始配置，避免依赖项变化
+    const config = initialConfigRef.current;
+
+    const engine = new GameEngine({ theme: config.theme });
     engineRef.current = engine;
 
     // Subscribe to state changes
     const unsubscribers: (() => void)[] = [];
 
+    // 使用批量更新来避免每个事件都触发 setState，防止 React 无限循环
+    let updateScheduled = false;
     const updateState = () => {
-      setGameState(engine.state);
+      // 检查组件是否仍然挂载
+      if (updateScheduled || !isMountedRef.current) return;
+      updateScheduled = true;
+
+      // 使用 queueMicrotask 将同一事件循环中的多个事件合并为一次 setState
+      queueMicrotask(() => {
+        updateScheduled = false;
+        // 再次检查挂载状态
+        if (!isMountedRef.current) return;
+        // 使用 getStateSnapshot() 利用缓存机制，避免每次都深拷贝
+        setGameState(engine.getStateSnapshot() as GameState);
+      });
     };
 
     // Subscribe to key events
@@ -139,25 +202,73 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
       );
     }
 
-    // Add player
-    engine.addPlayer(playerId, playerName);
+    // 多人模式初始化
+    if (
+      config.multiplayer?.enabled &&
+      config.multiplayer.aiOpponents &&
+      config.multiplayer.aiOpponents.length > 0
+    ) {
+      // 使用 GameModeManager 初始化竞争模式
+      const modeConfig = createCompetitiveMode({
+        humanPlayer: { id: config.playerId, name: config.playerName },
+        aiPlayers: config.multiplayer.aiOpponents.map((ai) => ({
+          id: ai.id,
+          name: ai.name,
+          difficulty: ai.difficulty,
+        })),
+      });
 
-    // Select character if provided
-    if (characterId) {
-      engine.selectCharacter(playerId, characterId);
+      const modeManager = new GameModeManager({
+        engine,
+        modeConfig,
+      });
+      modeManagerRef.current = modeManager;
+
+      // 监听 AI 回合开始和结束
+      unsubscribers.push(
+        engine.on('ai_turn_started' as GameEventType, (event) => {
+          if (!isMountedRef.current) return;
+          const aiPlayer = engine.state.players[event.data.playerId as string];
+          setAiThinking(aiPlayer?.name ?? 'AI');
+        })
+      );
+
+      unsubscribers.push(
+        engine.on('ai_turn_ended' as GameEventType, () => {
+          if (!isMountedRef.current) return;
+          setAiThinking(null);
+        })
+      );
+
+      // 选择角色
+      if (config.characterId) {
+        engine.selectCharacter(config.playerId, config.characterId);
+      }
+    } else {
+      // 单人模式初始化
+      engine.addPlayer(config.playerId, config.playerName);
+
+      // Select character if provided
+      if (config.characterId) {
+        engine.selectCharacter(config.playerId, config.characterId);
+      }
     }
 
     // Auto-start if configured
-    if (autoStart) {
+    if (config.autoStart) {
       engine.startGame();
     }
 
     updateState();
 
     return () => {
+      // 标记组件已卸载
+      isMountedRef.current = false;
       unsubscribers.forEach((unsub) => unsub());
+      modeManagerRef.current?.destroy();
+      modeManagerRef.current = null;
     };
-  }, [theme, playerId, playerName, autoStart, characterId]);
+  }, []); // 空依赖数组 - 只在挂载时执行一次
 
   // Get current player state
   const currentPlayer = gameState?.players[playerId] ?? null;
@@ -199,6 +310,34 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
     [playerId]
   );
 
+  const playCards = useCallback(
+    async (
+      cardIds: string[],
+      delayMs: number = 100
+    ): Promise<{ success: boolean; playedCount: number }> => {
+      if (!engineRef.current || cardIds.length === 0) {
+        return { success: false, playedCount: 0 };
+      }
+
+      let playedCount = 0;
+      for (const cardId of cardIds) {
+        const success = engineRef.current.playCard(playerId, cardId);
+        if (!success) {
+          return { success: false, playedCount };
+        }
+        playedCount++;
+
+        // 短暂延迟让动画和事件有时间处理
+        if (delayMs > 0 && playedCount < cardIds.length) {
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
+      }
+
+      return { success: true, playedCount };
+    },
+    [playerId]
+  );
+
   const discardCard = useCallback(
     (cardId: string) => {
       return engineRef.current?.discardCard(playerId, cardId) ?? false;
@@ -219,11 +358,35 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
 
   const resetGame = useCallback(() => {
     engineRef.current?.reset();
-    engineRef.current?.addPlayer(playerId, playerName);
+    modeManagerRef.current?.reset();
+
+    // 重新初始化玩家
+    if (multiplayer?.enabled && multiplayer.aiOpponents && multiplayer.aiOpponents.length > 0) {
+      // 多人模式需要重新创建 GameModeManager
+      const modeConfig = createCompetitiveMode({
+        humanPlayer: { id: playerId, name: playerName },
+        aiPlayers: multiplayer.aiOpponents.map((ai) => ({
+          id: ai.id,
+          name: ai.name,
+          difficulty: ai.difficulty,
+        })),
+      });
+
+      if (engineRef.current) {
+        modeManagerRef.current = new GameModeManager({
+          engine: engineRef.current,
+          modeConfig,
+        });
+      }
+    } else {
+      engineRef.current?.addPlayer(playerId, playerName);
+    }
+
     setWinner(null);
     setFinalRankings(null);
     setLastEliminatedPlayer(null);
-  }, [playerId, playerName]);
+    setAiThinking(null);
+  }, [playerId, playerName, multiplayer]);
 
   // Character actions
   const selectCharacter = useCallback(
@@ -243,6 +406,21 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
   // Localization helper
   const t = useCallback((key: string) => {
     return engineRef.current?.t(key) ?? key;
+  }, []);
+
+  // Multiplayer computed properties
+  const isMultiplayer = multiplayer?.enabled ?? false;
+
+  // Memoize opponents to prevent unnecessary re-renders
+  const opponents = useMemo(() => {
+    if (!gameState) return [];
+    return Object.values(gameState.players).filter((p) => p.id !== playerId);
+  }, [gameState?.players, playerId]);
+
+  const isAITurn = isMultiplayer && aiThinking !== null;
+
+  const isAIPlayer = useCallback((targetPlayerId: string): boolean => {
+    return modeManagerRef.current?.isAIPlayer(targetPlayerId) ?? false;
   }, []);
 
   return {
@@ -266,9 +444,17 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
     finalRankings,
     lastEliminatedPlayer,
 
+    // Multiplayer state
+    opponents,
+    isMultiplayer,
+    isAITurn,
+    aiThinking,
+    isAIPlayer,
+
     // Actions
     startGame,
     playCard,
+    playCards,
     discardCard,
     drawCards,
     endTurn,

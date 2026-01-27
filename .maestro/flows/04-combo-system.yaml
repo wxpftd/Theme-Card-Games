@@ -1,0 +1,48 @@
+# 04-combo-system.yaml
+# 测试: 组合系统
+# 验证选择多张卡牌时 Combo 检测和显示
+
+appId: host.exp.Exponent
+name: '组合系统测试'
+tags:
+  - p1
+---
+- runFlow: helpers/start-game.yaml
+
+# 验证手牌存在
+- assertVisible:
+    id: 'hand-container'
+
+# 点击第一张卡牌
+- tapOn:
+    id: 'card-0'
+
+# 验证确认按钮出现
+- assertVisible:
+    id: 'play-confirm-button'
+
+# 点击第二张卡牌（尝试触发 combo）
+- tapOn:
+    id: 'card-1'
+    optional: true
+
+# 检查是否有 combo 预览（可选，取决于卡牌组合）
+- assertVisible:
+    id: 'combo-preview'
+    optional: true
+
+# 截图 - 多卡选中状态
+- takeScreenshot: '04-multi-card-selected'
+
+# 点击取消，验证可以取消选择
+- tapOn:
+    id: 'cancel-selection-button'
+
+# 验证确认按钮消失
+- extendedWaitUntil:
+    notVisible:
+      id: 'play-confirm-container'
+    timeout: 3000
+
+# 截图 - 取消选择后
+- takeScreenshot: '04-selection-cancelled'

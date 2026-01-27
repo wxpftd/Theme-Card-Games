@@ -1,0 +1,31 @@
+# 01-app-launch.yaml
+# 测试: 应用启动
+# 验证应用能够正常启动并显示首页
+
+appId: host.exp.Exponent
+name: '应用启动测试'
+tags:
+  - smoke
+  - p0
+---
+- launchApp:
+    clearState: true
+
+# 验证首页显示
+- assertVisible:
+    id: 'home-screen'
+
+# 验证游戏标题显示
+- assertVisible:
+    id: 'game-title'
+
+# 验证开始游戏按钮可见
+- assertVisible:
+    id: 'start-game-button'
+
+# 验证教程按钮可见
+- assertVisible:
+    id: 'tutorial-button'
+
+# 截图保存
+- takeScreenshot: '01-app-launch-success'

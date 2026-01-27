@@ -1,0 +1,41 @@
+# 05-turn-flow.yaml
+# 测试: 回合流程
+# 验证结束回合功能和回合计数器更新
+
+appId: host.exp.Exponent
+name: '回合流程测试'
+tags:
+  - smoke
+  - p0
+---
+- runFlow: helpers/start-game.yaml
+
+# 验证当前是回合 1
+- assertVisible:
+    id: 'turn-counter'
+
+# 截图 - 回合 1
+- takeScreenshot: '05-turn-1'
+
+# 点击结束回合按钮
+- tapOn:
+    id: 'end-turn-button'
+
+# 等待 AI 回合完成（如果有）
+- extendedWaitUntil:
+    visible:
+      id: 'turn-indicator'
+    timeout: 10000
+
+# 等待一下让 AI 完成回合
+- swipe:
+    start: '50%, 50%'
+    end: '50%, 50%'
+    duration: 2000
+
+# 截图 - 回合变化后
+- takeScreenshot: '05-turn-advanced'
+
+# 验证游戏板仍然显示（游戏未结束）
+- assertVisible:
+    id: 'game-board'

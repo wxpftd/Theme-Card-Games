@@ -1,0 +1,15 @@
+# Maestro E2E Test Configuration
+# https://maestro.mobile.dev/
+
+# App Configuration
+appId: host.exp.Exponent
+
+# 使用 Expo Go 运行时需要先启动 dev server
+# pnpm app:bigtech
+
+# Environment Variables
+env:
+  APP_NAME: 'bigtech-worker'
+
+# Test Settings
+initFlow: flows/helpers/start-app.yaml

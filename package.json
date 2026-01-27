@@ -26,6 +26,8 @@
     "precommit:full": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
     "ci:local": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "app:bigtech": "cd apps/bigtech-worker && pnpm start",
+    "app:bigtech:ios": "cd apps/bigtech-worker && pnpm ios",
+    "app:bigtech:ios:clean": "cd apps/bigtech-worker && pnpm ios:clean",
     "app:startup": "cd apps/startup && pnpm start",
     "app:travel": "cd apps/travel && pnpm start",
     "app:parenting": "cd apps/parenting && pnpm start",
@@ -34,7 +36,12 @@
     "asset:generate": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline generate",
     "asset:batch": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline batch",
     "asset:process": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline process",
-    "asset:status": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline status"
+    "asset:status": "pnpm --filter @theme-card-games/asset-pipeline exec asset-pipeline status",
+    "e2e": "maestro test .maestro/flows/",
+    "e2e:smoke": "maestro test .maestro/flows/ --include-tags=smoke",
+    "e2e:p0": "maestro test .maestro/flows/ --include-tags=p0",
+    "e2e:feature": "maestro test",
+    "e2e:studio": "maestro studio"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

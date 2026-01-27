@@ -1,0 +1,43 @@
+# 03-card-play.yaml
+# 测试: 卡牌打出
+# 验证选择卡牌并确认打出的完整流程
+
+appId: host.exp.Exponent
+name: '卡牌打出测试'
+tags:
+  - smoke
+  - p0
+---
+- runFlow: helpers/start-game.yaml
+
+# 验证手牌存在
+- assertVisible:
+    id: 'hand-container'
+
+# 点击第一张卡牌
+- tapOn:
+    id: 'card-0'
+
+# 验证确认按钮出现
+- assertVisible:
+    id: 'play-confirm-button'
+
+# 验证取消按钮出现
+- assertVisible:
+    id: 'cancel-selection-button'
+
+# 截图 - 卡牌选中状态
+- takeScreenshot: '03-card-selected'
+
+# 点击确认打出
+- tapOn:
+    id: 'play-confirm-button'
+
+# 等待卡牌打出完成
+- extendedWaitUntil:
+    notVisible:
+      id: 'play-confirm-container'
+    timeout: 5000
+
+# 截图 - 卡牌打出后
+- takeScreenshot: '03-card-played'

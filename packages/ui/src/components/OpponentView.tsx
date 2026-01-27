@@ -161,7 +161,48 @@ const StatRow = memo(function StatRow({ icon, label, value, max, color }: StatRo
   );
 });
 
-export const OpponentView = memo(OpponentViewComponent);
+/**
+ * Custom comparison function for OpponentView props.
+ * Compares opponents by their IDs and relevant state values.
+ */
+function areOpponentViewPropsEqual(
+  prevProps: OpponentViewProps,
+  nextProps: OpponentViewProps
+): boolean {
+  // Compare primitive props
+  if (prevProps.currentTurnPlayerId !== nextProps.currentTurnPlayerId) {
+    return false;
+  }
+
+  // Compare opponents array length
+  if (prevProps.opponents.length !== nextProps.opponents.length) {
+    return false;
+  }
+
+  // Compare each opponent by relevant state (id, name, stats, hand length)
+  for (let i = 0; i < prevProps.opponents.length; i++) {
+    const prev = prevProps.opponents[i];
+    const next = nextProps.opponents[i];
+    if (
+      prev.id !== next.id ||
+      prev.name !== next.name ||
+      prev.hand.length !== next.hand.length ||
+      prev.stats['performance'] !== next.stats['performance'] ||
+      prev.stats['health'] !== next.stats['health'] ||
+      prev.stats['happiness'] !== next.stats['happiness'] ||
+      prev.stats['influence'] !== next.stats['influence']
+    ) {
+      return false;
+    }
+  }
+
+  // statDefinitions and resourceDefinitions should be stable
+  // isAIPlayer callback - assume stable
+
+  return true;
+}
+
+export const OpponentView = memo(OpponentViewComponent, areOpponentViewPropsEqual);
 
 const styles = StyleSheet.create({
   container: {
