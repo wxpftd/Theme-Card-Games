@@ -8,7 +8,10 @@ export default function HomeScreen() {
   const { t: uiT } = useI18n();
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View
+      testID="home-screen"
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       {/* Language Switcher */}
       <View style={styles.languageSwitcher}>
         <LanguageSwitcher mode="compact" />
@@ -17,7 +20,9 @@ export default function HomeScreen() {
       {/* Logo / Title Area */}
       <View style={styles.header}>
         <Text style={styles.emoji}>🏢</Text>
-        <Text style={[styles.title, { color: theme.colors.text }]}>{t('game.title')}</Text>
+        <Text testID="game-title" style={[styles.title, { color: theme.colors.text }]}>
+          {t('game.title')}
+        </Text>
         <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
           {t('game.subtitle')}
         </Text>
@@ -60,6 +65,7 @@ export default function HomeScreen() {
       {/* Action Buttons */}
       <View style={styles.actions}>
         <TouchableOpacity
+          testID="start-game-button"
           style={[styles.button, { backgroundColor: theme.colors.primary }]}
           onPress={() => router.push('/game')}
         >
@@ -67,6 +73,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          testID="tutorial-button"
           style={[styles.button, styles.secondaryButton, { borderColor: theme.colors.primary }]}
           onPress={() => router.push('/tutorial')}
         >
@@ -76,6 +83,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          testID="lesson-button"
           style={[styles.button, styles.lessonButton, { backgroundColor: theme.colors.warning }]}
           onPress={() => router.push('/tutorial-game' as '/game')}
         >

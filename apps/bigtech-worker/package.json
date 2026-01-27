@@ -4,9 +4,11 @@
   "description": "Big Tech Worker Card Game - 大厂生存指南",
   "main": "expo-router/entry",
   "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
+    "start": "expo start --dev-client",
     "ios": "expo run:ios",
+    "ios:clean": "expo run:ios --no-build-cache",
+    "android": "expo run:android",
+    "android:clean": "expo run:android --no-build-cache",
     "web": "expo start --web",
     "build:ios": "eas build --platform ios",
     "build:android": "eas build --platform android",

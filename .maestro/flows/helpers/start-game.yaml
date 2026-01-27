@@ -1,0 +1,21 @@
+# Helper: Start Game
+# 从首页进入游戏
+
+appId: host.exp.Exponent
+---
+- runFlow: start-app.yaml
+
+# 点击开始游戏按钮
+- tapOn:
+    id: 'start-game-button'
+
+# 等待游戏加载完成
+- extendedWaitUntil:
+    visible:
+      id: 'game-board'
+    timeout: 15000
+
+# 处理可能出现的欢迎弹窗
+- tapOn:
+    text: '跳过引导'
+    optional: true

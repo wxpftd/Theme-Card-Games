@@ -7,6 +7,7 @@ export { AchievementList } from './AchievementList';
 export { DifficultySelector } from './DifficultySelector';
 export { DailyChallenge } from './DailyChallenge';
 export { LanguageSwitcher } from './LanguageSwitcher';
+export { PlayConfirmButton } from './PlayConfirmButton';
 
 // 竞争模式组件
 export { TargetSelector } from './TargetSelector';

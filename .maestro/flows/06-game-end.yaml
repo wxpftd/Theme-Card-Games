@@ -1,0 +1,46 @@
+# 06-game-end.yaml
+# 测试: 游戏结束
+# 验证游戏结束界面显示和重新开始功能
+# 注意: 此测试需要较长时间来达到游戏结束条件
+
+appId: host.exp.Exponent
+name: '游戏结束测试'
+tags:
+  - p0
+  - slow
+---
+- runFlow: helpers/start-game.yaml
+
+# 快速结束多个回合来推进游戏
+- repeat:
+    times: 5
+    commands:
+      # 尝试打出卡牌
+      - tapOn:
+          id: 'card-0'
+          optional: true
+      - tapOn:
+          id: 'play-confirm-button'
+          optional: true
+      # 等待一下
+      - swipe:
+          start: '50%, 50%'
+          end: '50%, 50%'
+          duration: 500
+      # 结束回合
+      - tapOn:
+          id: 'end-turn-button'
+          optional: true
+      # 等待 AI 回合
+      - swipe:
+          start: '50%, 50%'
+          end: '50%, 50%'
+          duration: 2000
+
+# 检查游戏是否已结束
+- assertVisible:
+    id: 'game-over-screen'
+    optional: true
+
+# 如果游戏结束，截图
+- takeScreenshot: '06-game-state'

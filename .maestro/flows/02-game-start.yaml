@@ -1,0 +1,54 @@
+# 02-game-start.yaml
+# 测试: 游戏开始流程
+# 验证点击开始游戏后能正确进入游戏界面
+
+appId: host.exp.Exponent
+name: '游戏开始流程测试'
+tags:
+  - smoke
+  - p0
+---
+- launchApp:
+    clearState: true
+
+# 等待首页加载
+- assertVisible:
+    id: 'start-game-button'
+
+# 点击开始游戏
+- tapOn:
+    id: 'start-game-button'
+
+# 等待游戏界面加载
+- extendedWaitUntil:
+    visible:
+      id: 'game-board'
+    timeout: 15000
+
+# 处理可能出现的欢迎弹窗
+- tapOn:
+    text: '跳过引导'
+    optional: true
+
+# 验证游戏板显示
+- assertVisible:
+    id: 'game-board'
+
+# 验证回合信息显示
+- assertVisible:
+    id: 'turn-info-bar'
+
+# 验证回合计数器显示
+- assertVisible:
+    id: 'turn-counter'
+
+# 验证手牌区域显示
+- assertVisible:
+    id: 'hand-container'
+
+# 验证结束回合按钮显示
+- assertVisible:
+    id: 'end-turn-button'
+
+# 截图保存
+- takeScreenshot: '02-game-start-success'

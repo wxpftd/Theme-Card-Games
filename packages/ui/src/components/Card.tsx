@@ -12,6 +12,8 @@ interface CardProps {
   faceDown?: boolean;
   size?: 'small' | 'medium' | 'large';
   style?: ViewStyle;
+  /** 用于 E2E 测试的标识符 */
+  testID?: string;
 }
 
 const rarityColors: Record<CardRarity, string> = {
@@ -38,6 +40,7 @@ function CardComponent({
   faceDown = false,
   size = 'medium',
   style,
+  testID,
 }: CardProps) {
   const { theme } = useTheme();
 
@@ -49,6 +52,7 @@ function CardComponent({
   if (faceDown) {
     return (
       <View
+        testID={testID ? `${testID}-facedown` : undefined}
         style={[
           styles.card,
           sizeStyles.card,
@@ -64,6 +68,7 @@ function CardComponent({
 
   return (
     <TouchableOpacity
+      testID={testID}
       onPress={onPress}
       onLongPress={onLongPress}
       disabled={disabled}
@@ -122,18 +127,19 @@ function CardComponent({
 
 /**
  * Memoized Card component to prevent unnecessary re-renders.
- * Only re-renders when card data, selection state, or handlers change.
+ * Only compares stable values (card.id, selected, disabled, faceDown, size).
+ * Callbacks are NOT compared to avoid re-renders when parent creates new function references.
  */
 export const Card = memo(CardComponent, (prevProps, nextProps) => {
-  // Custom comparison for better performance
   return (
     prevProps.card.id === nextProps.card.id &&
     prevProps.selected === nextProps.selected &&
     prevProps.disabled === nextProps.disabled &&
     prevProps.faceDown === nextProps.faceDown &&
     prevProps.size === nextProps.size &&
-    prevProps.onPress === nextProps.onPress &&
-    prevProps.onLongPress === nextProps.onLongPress
+    prevProps.testID === nextProps.testID
+    // Note: onPress and onLongPress are intentionally NOT compared
+    // to prevent re-renders caused by unstable callback references
   );
 });
 

@@ -176,6 +176,14 @@ export class GameEngine {
     return this.stateManager.currentState;
   }
 
+  /**
+   * Get a cached snapshot of the current state (read-only).
+   * More performant than the state getter for React integration.
+   */
+  getStateSnapshot(): Readonly<GameState> {
+    return this.stateManager.getStateSnapshot();
+  }
+
   get events(): EventBus {
     return this.eventBus;
   }

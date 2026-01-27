@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -14,6 +14,7 @@ import {
   ComboHintBanner,
   firstGameTutorial,
 } from '@theme-card-games/ui';
+import { ComboDefinition } from '@theme-card-games/core';
 import { bigtechWorkerTheme } from '@theme-card-games/theme-bigtech-worker';
 
 export default function GameScreen() {
@@ -21,22 +22,34 @@ export default function GameScreen() {
   const playedCardsThisTurnRef = useRef<string[]>([]);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
+  // 使用 useMemo 稳定化 multiplayer 配置，避免每次渲染创建新对象
+  const multiplayerConfig = useMemo(
+    () => ({
+      enabled: true,
+      aiOpponents: [{ id: 'ai1', name: 'AI 对手', difficulty: 'medium' as const }],
+    }),
+    []
+  );
+
   const {
     gameState,
     currentPlayer,
     isGameOver,
     winner,
     startGame,
-    playCard,
     endTurn,
     resetGame,
     engine,
     t,
+    opponents,
+    aiThinking,
+    isAIPlayer,
   } = useGameEngine({
     theme: bigtechWorkerTheme,
     playerId: 'player1',
     playerName: '打工人',
     autoStart: true,
+    multiplayer: multiplayerConfig,
   });
 
   // 引导系统
@@ -82,33 +95,38 @@ export default function GameScreen() {
     tutorial.markFirstGameCompleted();
   }, [tutorial]);
 
-  const handleCardPlay = useCallback(
-    (cardId: string) => {
-      const success = playCard(cardId);
-      if (success) {
+  // 多卡打出后的回调（新接口）
+  const handleCardsPlayed = useCallback(
+    (cardIds: string[], triggeredCombo: ComboDefinition | null) => {
+      // 触觉反馈
+      if (triggeredCombo) {
+        // combo 触发时使用更强的反馈
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } else if (cardIds.length > 0) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      }
 
-        // 记录打出的卡牌，用于组合提示
+      // 记录打出的卡牌
+      for (const cardId of cardIds) {
         const playedCard = currentPlayer?.hand.find((c) => c.instanceId === cardId);
         if (playedCard) {
           playedCardsThisTurnRef.current.push(playedCard.definitionId);
         }
+      }
 
-        // 检查组合机会（仅在非引导模式下）
-        if (!tutorial.isActive && currentPlayer && bigtechWorkerTheme.comboDefinitions) {
-          // 使用新的手牌（排除刚打出的卡）
-          const newHand = currentPlayer.hand.filter((c) => c.instanceId !== cardId);
-          comboHint.checkComboOpportunity(
-            newHand,
-            playedCardsThisTurnRef.current,
-            bigtechWorkerTheme.comboDefinitions
-          );
-        }
-      } else {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      // 检查组合机会（仅在非引导模式下）
+      if (!tutorial.isActive && currentPlayer && bigtechWorkerTheme.comboDefinitions) {
+        // 使用新的手牌（排除刚打出的卡）
+        const cardIdSet = new Set(cardIds);
+        const newHand = currentPlayer.hand.filter((c) => !cardIdSet.has(c.instanceId));
+        comboHint.checkComboOpportunity(
+          newHand,
+          playedCardsThisTurnRef.current,
+          bigtechWorkerTheme.comboDefinitions
+        );
       }
     },
-    [playCard, currentPlayer, tutorial.isActive, comboHint]
+    [currentPlayer, tutorial.isActive, comboHint]
   );
 
   const handleEndTurn = useCallback(() => {
@@ -139,7 +157,10 @@ export default function GameScreen() {
 
   if (!gameState || !currentPlayer) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} />
+      <SafeAreaView
+        testID="game-loading"
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      />
     );
   }
 
@@ -158,7 +179,10 @@ export default function GameScreen() {
     }
 
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <SafeAreaView
+        testID="game-over-screen"
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      >
         <GameOverScreen
           winner={winnerPlayer}
           reason={reason}
@@ -174,15 +198,22 @@ export default function GameScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={styles.gameContainer}>
+    <SafeAreaView
+      testID="game-screen"
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <View testID="game-container" style={styles.gameContainer}>
         <GameBoard
           gameState={gameState}
           themeConfig={bigtechWorkerTheme}
           currentPlayerId="player1"
-          onCardPlay={handleCardPlay}
+          engine={engine}
+          onCardsPlayed={handleCardsPlayed}
           onEndTurn={handleEndTurn}
           style={styles.gameBoard}
+          opponents={opponents}
+          isAIPlayer={isAIPlayer}
+          aiThinking={aiThinking}
         />
 
         {/* 组合提示横幅 */}

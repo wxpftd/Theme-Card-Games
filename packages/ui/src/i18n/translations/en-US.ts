@@ -36,6 +36,9 @@ export const enUS = {
   'hand.title': 'Hand',
   'hand.more': '+{count} more',
   'hand.hint': 'Tap to play | Hold for details',
+  'hand.selected': '{count} selected',
+  'hand.play': 'Play',
+  'hand.cancel': 'Cancel',
 
   // Player stats
   'stats.title': 'Stats',
