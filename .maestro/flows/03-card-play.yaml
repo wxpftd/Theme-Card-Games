@@ -14,11 +14,25 @@ tags:
 - assertVisible:
     id: 'hand-container'
 
+# 等待 UI 完全稳定
+- waitForAnimationToEnd:
+    timeout: 1000
+
 # 点击第一张卡牌
 - tapOn:
     id: 'card-0'
 
-# 验证确认按钮出现
+# 等待 React 状态同步（关键：给 Context 更新时间）
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# 验证确认按钮出现（使用更长的超时时间）
+- extendedWaitUntil:
+    visible:
+      id: 'play-confirm-button'
+    timeout: 8000
+
+# 验证确认按钮
 - assertVisible:
     id: 'play-confirm-button'
 
@@ -34,6 +48,9 @@ tags:
     id: 'play-confirm-button'
 
 # 等待卡牌打出完成
+- waitForAnimationToEnd:
+    timeout: 1000
+
 - extendedWaitUntil:
     notVisible:
       id: 'play-confirm-container'

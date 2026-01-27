@@ -17,6 +17,8 @@ import {
 import { ComboDefinition } from '@theme-card-games/core';
 import { bigtechWorkerTheme } from '@theme-card-games/theme-bigtech-worker';
 
+// Force Metro to reload dependencies - timestamp: 2026-01-27T17:10
+
 export default function GameScreen() {
   const { theme } = useTheme();
   const playedCardsThisTurnRef = useRef<string[]>([]);

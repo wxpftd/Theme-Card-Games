@@ -185,6 +185,9 @@ function GameBoardComponent({
         )}
       </View>
 
+      {/* Play Confirm Button (多卡选择模式) - 放在手牌区域上方，确保可见 */}
+      {isMultiSelectMode && isMyTurn && <PlayConfirmButton onPlayed={undefined} />}
+
       {/* Hand */}
       <View style={styles.handSection}>
         <HandView
@@ -196,9 +199,6 @@ function GameBoardComponent({
           disabled={!isMyTurn}
         />
       </View>
-
-      {/* Play Confirm Button (多卡选择模式) */}
-      {isMultiSelectMode && isMyTurn && <PlayConfirmButton onPlayed={undefined} />}
 
       {/* Action Buttons */}
       <View style={styles.actions}>

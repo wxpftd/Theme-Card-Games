@@ -26,3 +26,8 @@ appId: com.themecardgames.bigtechworker
     visible:
       id: 'game-board'
     timeout: 15000
+
+# 等待游戏进入主阶段（抽牌阶段会自动前进到主阶段）
+# 等待 1 秒让阶段自动转换完成
+- waitForAnimationToEnd:
+    timeout: 1000

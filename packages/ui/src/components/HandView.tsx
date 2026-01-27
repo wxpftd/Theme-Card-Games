@@ -89,6 +89,7 @@ function HandViewComponent({
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.cardsContainer}
+        keyboardShouldPersistTaps="always"
       >
         {visibleCards.map((card, index) => {
           const definition = getCardDefinition(card);
@@ -97,6 +98,7 @@ function HandViewComponent({
           return (
             <View
               key={card.instanceId}
+              accessible={false}
               style={[
                 styles.cardWrapper,
                 {
