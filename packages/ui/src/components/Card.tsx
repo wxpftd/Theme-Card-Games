@@ -72,6 +72,7 @@ function CardComponent({
       accessible={true}
       accessibilityRole="button"
       accessibilityLabel={`卡牌 ${card.name}`}
+      accessibilityState={{ disabled, selected }}
       onPress={onPress}
       onLongPress={onLongPress}
       disabled={disabled}

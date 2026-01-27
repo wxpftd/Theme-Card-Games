@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useI18n } from '../i18n';
@@ -18,8 +18,15 @@ interface PlayConfirmButtonProps {
 function PlayConfirmButtonComponent({ onPlayed }: PlayConfirmButtonProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
-  const { selectedCount, pendingCombo, confirmPlay, clearSelection, isPlaying } =
-    useCardSelection();
+  const contextValue = useCardSelection();
+  const { selectedCount, pendingCombo, confirmPlay, clearSelection, isPlaying } = contextValue;
+
+  // E2E 调试日志 - 每次渲染都输出
+  if (__DEV__) {
+    console.log(
+      `[E2E_DEBUG] PlayConfirmButton RENDER: selectedCount=${selectedCount}, isPlaying=${isPlaying}`
+    );
+  }
 
   const handleConfirm = useCallback(async () => {
     const success = await confirmPlay();
@@ -32,11 +39,14 @@ function PlayConfirmButtonComponent({ onPlayed }: PlayConfirmButtonProps) {
 
   // 没有选中卡牌时不显示
   if (selectedCount === 0) {
+    if (__DEV__) {
+      console.log(`[E2E_DEBUG] PlayConfirmButton HIDDEN (selectedCount=0)`);
+    }
     return null;
   }
 
   return (
-    <View testID="play-confirm-container" style={styles.container}>
+    <View testID="play-confirm-container" accessible={false} style={styles.container}>
       {/* Combo 预览 */}
       {pendingCombo && (
         <View
@@ -63,6 +73,9 @@ function PlayConfirmButtonComponent({ onPlayed }: PlayConfirmButtonProps) {
         {/* 取消按钮 */}
         <TouchableOpacity
           testID="cancel-selection-button"
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="取消选择"
           style={[styles.cancelButton, { backgroundColor: theme.colors.surface }]}
           onPress={handleCancel}
           disabled={isPlaying}
@@ -75,6 +88,9 @@ function PlayConfirmButtonComponent({ onPlayed }: PlayConfirmButtonProps) {
         {/* 确认打出按钮 */}
         <TouchableOpacity
           testID="play-confirm-button"
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="确认打出"
           style={[
             styles.confirmButton,
             {
@@ -105,7 +121,8 @@ function PlayConfirmButtonComponent({ onPlayed }: PlayConfirmButtonProps) {
   );
 }
 
-export const PlayConfirmButton = memo(PlayConfirmButtonComponent);
+// 不使用 memo 以确保 Context 变化时正确重渲染
+export const PlayConfirmButton = PlayConfirmButtonComponent;
 
 const styles = StyleSheet.create({
   container: {

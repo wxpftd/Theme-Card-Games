@@ -163,6 +163,7 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
       'game_ended',
       'turn_started',
       'turn_ended',
+      'phase_changed',
       'card_drawn',
       'card_played',
       'card_discarded',

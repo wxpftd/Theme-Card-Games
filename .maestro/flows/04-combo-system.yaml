@@ -19,25 +19,27 @@ tags:
 - assertVisible:
     id: 'hand-count'
 
-# 选择第一张卡牌
-# 先等待界面稳定
+# 等待 UI 完全稳定
 - waitForAnimationToEnd:
     timeout: 1000
 
-# 使用坐标点击卡牌（card-0 bounds: [16,645][156,845], 中心约 86,745）
-# 屏幕 390x844，百分比约 22%,88%
+# 点击第一张卡牌
 - tapOn:
-    point: '22%,88%'
+    id: 'card-0'
 
-# 等待点击生效
+# 等待 React 状态同步
 - waitForAnimationToEnd:
-    timeout: 2000
+    timeout: 1000
 
 # 验证确认按钮出现
 - extendedWaitUntil:
     visible:
       id: 'play-confirm-button'
-    timeout: 5000
+    timeout: 8000
+
+# 验证确认按钮
+- assertVisible:
+    id: 'play-confirm-button'
 
 # 验证选中数量显示为 1
 - assertVisible:
@@ -46,6 +48,10 @@ tags:
 # 选择第二张卡牌
 - tapOn:
     id: 'card-1'
+
+# 等待 React 状态同步
+- waitForAnimationToEnd:
+    timeout: 1000
 
 # 验证选中数量更新
 - assertVisible:
@@ -85,11 +91,25 @@ tags:
 
 # ========== 场景 3: 取消选择功能 ==========
 
+# 等待 UI 稳定
+- waitForAnimationToEnd:
+    timeout: 1000
+
 # 选择一张新卡牌
 - tapOn:
     id: 'card-0'
 
+# 等待 React 状态同步
+- waitForAnimationToEnd:
+    timeout: 1000
+
 # 验证确认按钮出现
+- extendedWaitUntil:
+    visible:
+      id: 'play-confirm-button'
+    timeout: 8000
+
+# 验证确认按钮
 - assertVisible:
     id: 'play-confirm-button'
 

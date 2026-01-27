@@ -71,7 +71,18 @@ export function CardSelectionProvider({
   // 切换卡牌选中状态
   const toggleCard = useCallback(
     (cardId: string) => {
-      if (disabled || playingRef.current) return;
+      if (disabled || playingRef.current) {
+        if (__DEV__) {
+          console.log(
+            `[E2E_DEBUG] toggleCard BLOCKED: cardId=${cardId}, disabled=${disabled}, isPlaying=${playingRef.current}`
+          );
+        }
+        return;
+      }
+
+      if (__DEV__) {
+        console.log(`[E2E_DEBUG] toggleCard CALLED: cardId=${cardId}`);
+      }
 
       setSelectedCardIds((prev) => {
         const newSet = new Set(prev);
@@ -80,6 +91,13 @@ export function CardSelectionProvider({
         } else {
           newSet.add(cardId);
         }
+
+        if (__DEV__) {
+          console.log(
+            `[E2E_DEBUG] selectedCardIds UPDATED: count=${newSet.size}, ids=${JSON.stringify(Array.from(newSet))}`
+          );
+        }
+
         return newSet;
       });
     },
@@ -205,7 +223,13 @@ export function CardSelectionProvider({
 
   // 当禁用状态变化时清空选择
   React.useEffect(() => {
+    if (__DEV__) {
+      console.log(`[E2E_DEBUG] CardSelectionProvider disabled changed: disabled=${disabled}`);
+    }
     if (disabled) {
+      if (__DEV__) {
+        console.log(`[E2E_DEBUG] CardSelectionProvider CLEARING selection due to disabled=true`);
+      }
       setSelectedCardIds(new Set());
     }
   }, [disabled]);

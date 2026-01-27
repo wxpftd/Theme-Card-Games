@@ -6,3 +6,4 @@ export {
   type UseShareServiceOptions,
   type UseShareServiceReturn,
 } from './useShareService';
+export { useTestDebug } from './useTestDebug';
