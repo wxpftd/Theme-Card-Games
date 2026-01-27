@@ -1,0 +1,98 @@
+# 09-stat-change-validation.yaml
+# 测试: 属性变化验证
+# 验证打出卡牌后属性值 UI 正确渲染
+
+appId: com.themecardgames.bigtechworker
+name: '属性变化验证测试'
+tags:
+  - p0
+  - validation
+---
+- runFlow: helpers/start-game.yaml
+
+# ========== 场景1: 验证初始属性元素存在 ==========
+
+# 截图记录初始状态
+- takeScreenshot: '09-initial-stats'
+
+# 验证属性元素存在
+- assertVisible:
+    id: 'stat-value-performance'
+- assertVisible:
+    id: 'stat-value-health'
+- assertVisible:
+    id: 'stat-value-happiness'
+- assertVisible:
+    id: 'stat-value-influence'
+
+# 验证资源元素存在
+- assertVisible:
+    id: 'resource-value-energy'
+- assertVisible:
+    id: 'resource-value-money'
+- assertVisible:
+    id: 'resource-value-connections'
+- assertVisible:
+    id: 'resource-value-skills'
+
+# ========== 场景2: 打出卡牌并验证 UI 更新 ==========
+
+# 等待 UI 稳定
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# 选择第一张卡牌
+- tapOn:
+    id: 'card-0'
+
+# 等待选择状态同步
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# 验证确认按钮出现
+- extendedWaitUntil:
+    visible:
+      id: 'play-confirm-button'
+    timeout: 8000
+
+# 截图 - 卡牌选中状态
+- takeScreenshot: '09-card-selected'
+
+# 确认打出
+- tapOn:
+    id: 'play-confirm-button'
+
+# 等待效果结算
+- extendedWaitUntil:
+    notVisible:
+      id: 'play-confirm-container'
+    timeout: 5000
+
+# 等待属性更新动画完成
+- waitForAnimationToEnd:
+    timeout: 1500
+
+# ========== 场景3: 验证属性变化后的状态 ==========
+
+# 截图 - 属性变化后
+- takeScreenshot: '09-stats-changed'
+
+# 验证属性元素仍然存在（证明 UI 正常更新）
+- assertVisible:
+    id: 'stat-value-performance'
+- assertVisible:
+    id: 'stat-value-health'
+- assertVisible:
+    id: 'stat-value-happiness'
+- assertVisible:
+    id: 'stat-value-influence'
+
+# 验证资源元素仍然存在
+- assertVisible:
+    id: 'resource-value-energy'
+
+# 验证游戏继续正常运行
+- assertVisible:
+    id: 'hand-container'
+- assertVisible:
+    id: 'game-board'

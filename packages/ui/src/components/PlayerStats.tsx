@@ -42,7 +42,9 @@ const StatItem = memo(function StatItem({
         <Text style={[styles.statName, { color: colors.text }]} numberOfLines={1}>
           {compact ? '' : stat.name}
         </Text>
-        <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
+        <Text testID={`stat-value-${stat.id}`} style={[styles.statValue, { color: colors.text }]}>
+          {value}
+        </Text>
       </View>
       <View style={[styles.progressBar, { backgroundColor: colors.background }]}>
         <View
@@ -74,7 +76,12 @@ const ResourceItem = memo(function ResourceItem({
   return (
     <View style={[styles.resourceItem, { backgroundColor: colors.background }]}>
       <Text style={styles.resourceIcon}>{resource.icon}</Text>
-      <Text style={[styles.resourceValue, { color: colors.text }]}>{value}</Text>
+      <Text
+        testID={`resource-value-${resource.id}`}
+        style={[styles.resourceValue, { color: colors.text }]}
+      >
+        {value}
+      </Text>
       {!compact && (
         <Text style={[styles.resourceName, { color: colors.textSecondary }]}>{resource.name}</Text>
       )}
@@ -165,11 +172,16 @@ function PlayerStatsComponent({
             {player.statuses.map((status, index) => (
               <View
                 key={index}
+                testID={`status-badge-${index}`}
                 style={[styles.statusBadge, { backgroundColor: theme.colors.warning }]}
               >
-                <Text style={styles.statusText}>{status.name}</Text>
+                <Text testID={`status-name-${index}`} style={styles.statusText}>
+                  {status.name}
+                </Text>
                 {status.duration > 0 && (
-                  <Text style={styles.statusDuration}>({status.duration})</Text>
+                  <Text testID={`status-duration-${index}`} style={styles.statusDuration}>
+                    ({status.duration})
+                  </Text>
                 )}
               </View>
             ))}

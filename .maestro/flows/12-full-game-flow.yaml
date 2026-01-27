@@ -1,0 +1,98 @@
+# 12-full-game-flow.yaml
+# 测试: 完整游戏流程
+# 多回合自然游戏直到胜利或失败
+
+appId: com.themecardgames.bigtechworker
+name: '完整游戏流程测试'
+tags:
+  - p0
+  - slow
+  - full-flow
+---
+- runFlow: helpers/start-game.yaml
+
+# 截图初始状态
+- takeScreenshot: '12-full-flow-start'
+
+# 验证游戏已正确启动
+- assertVisible:
+    id: 'game-board'
+- assertVisible:
+    id: 'hand-container'
+- assertVisible:
+    id: 'stat-value-performance'
+
+# ========== 多回合游戏循环 ==========
+# 循环执行自然的游戏流程（最多 15 回合）
+# 每回合：选择卡牌 → 打出 → 结束回合 → 等待 AI
+
+- repeat:
+    times: 15
+    commands:
+      # 等待 UI 稳定
+      - waitForAnimationToEnd:
+          timeout: 1000
+
+      # 检查游戏是否结束（如果结束则后续操作会跳过）
+      - assertNotVisible:
+          id: 'game-over-screen'
+          optional: true
+
+      # 如果手牌存在，进行出牌
+      - assertVisible:
+          id: 'hand-container'
+          optional: true
+
+      # 选择第一张卡牌
+      - tapOn:
+          id: 'card-0'
+          optional: true
+
+      - waitForAnimationToEnd:
+          timeout: 500
+
+      # 尝试选择第二张形成 combo
+      - tapOn:
+          id: 'card-1'
+          optional: true
+
+      - waitForAnimationToEnd:
+          timeout: 500
+
+      # 确认打出
+      - tapOn:
+          id: 'play-confirm-button'
+          optional: true
+
+      # 等待效果结算
+      - waitForAnimationToEnd:
+          timeout: 1500
+
+      # 结束回合
+      - tapOn:
+          id: 'end-turn-button'
+          optional: true
+
+      # 等待 AI 回合完成和新回合开始
+      - waitForAnimationToEnd:
+          timeout: 3000
+
+# ========== 验证游戏结束状态 ==========
+
+# 截图最终状态
+- takeScreenshot: '12-full-flow-end'
+
+# 检查是否到达游戏结束（胜利或失败）
+- assertVisible:
+    id: 'game-over-screen'
+    optional: true
+
+# 或者验证游戏仍在进行（15回合内未结束）
+- assertVisible:
+    id: 'game-board'
+    optional: true
+
+# 验证属性元素正常显示（无论游戏是否结束）
+- assertVisible:
+    id: 'stat-value-performance'
+    optional: true

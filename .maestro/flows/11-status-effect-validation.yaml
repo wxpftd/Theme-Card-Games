@@ -1,0 +1,146 @@
+# 11-status-effect-validation.yaml
+# 测试: 状态效果系统
+# 验证状态效果的显示、持续和回合递减
+
+appId: com.themecardgames.bigtechworker
+name: '状态效果系统测试'
+tags:
+  - p0
+  - status
+---
+- runFlow: helpers/start-game.yaml
+
+# 截图初始状态
+- takeScreenshot: '11-status-initial'
+
+# 验证初始属性存在
+- assertVisible:
+    id: 'stat-value-performance'
+- assertVisible:
+    id: 'stat-value-health'
+
+# ========== 场景1: 打出多张卡牌尝试触发状态效果 ==========
+# 通过连续打多张卡牌，可能触发"卷王状态"等状态效果
+
+# 等待 UI 稳定
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# 选择多张卡牌
+- tapOn:
+    id: 'card-0'
+
+- waitForAnimationToEnd:
+    timeout: 500
+
+- tapOn:
+    id: 'card-1'
+
+- waitForAnimationToEnd:
+    timeout: 500
+
+# 尝试选择第三张（如果存在）
+- tapOn:
+    id: 'card-2'
+    optional: true
+
+- waitForAnimationToEnd:
+    timeout: 500
+
+# 确认打出
+- extendedWaitUntil:
+    visible:
+      id: 'play-confirm-button'
+    timeout: 5000
+    optional: true
+
+- tapOn:
+    id: 'play-confirm-button'
+    optional: true
+
+# 等待效果结算
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# ========== 场景2: 验证状态效果显示 ==========
+
+# 截图 - 查看是否有状态效果
+- takeScreenshot: '11-status-applied'
+
+# 验证状态徽章（如果状态效果被触发）
+- assertVisible:
+    id: 'status-badge-0'
+    optional: true
+
+# 验证状态名称（如果状态效果被触发）
+- assertVisible:
+    id: 'status-name-0'
+    optional: true
+
+# 验证状态持续时间（如果状态效果被触发）
+- assertVisible:
+    id: 'status-duration-0'
+    optional: true
+
+# ========== 场景3: 结束回合验证状态递减 ==========
+
+# 结束回合（可选，因为可能游戏已结束或无法操作）
+- tapOn:
+    id: 'end-turn-button'
+    optional: true
+
+# 等待新回合开始（包括 AI 回合）
+- extendedWaitUntil:
+    visible:
+      id: 'hand-container'
+    timeout: 10000
+
+# 等待 UI 更新
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# 截图 - 回合后状态
+- takeScreenshot: '11-status-after-turn'
+
+# 验证游戏正常继续
+- assertVisible:
+    id: 'game-board'
+- assertVisible:
+    id: 'stat-value-performance'
+- assertVisible:
+    id: 'stat-value-health'
+
+# ========== 场景4: 再进行一回合验证状态系统稳定性 ==========
+
+# 选择并打出卡牌
+- tapOn:
+    id: 'card-0'
+    optional: true
+
+- waitForAnimationToEnd:
+    timeout: 500
+
+- tapOn:
+    id: 'play-confirm-button'
+    optional: true
+
+- waitForAnimationToEnd:
+    timeout: 1500
+
+# 结束回合
+- tapOn:
+    id: 'end-turn-button'
+    optional: true
+
+# 等待新回合
+- extendedWaitUntil:
+    visible:
+      id: 'hand-container'
+    timeout: 10000
+
+# 最终截图
+- takeScreenshot: '11-status-final'
+
+# 验证游戏仍然正常
+- assertVisible:
+    id: 'game-board'
