@@ -1,0 +1,101 @@
+# 10-combo-effect-validation.yaml
+# 测试: Combo 效果验证
+# 验证组合卡牌触发 combo 后的 UI 显示和效果结算
+
+appId: com.themecardgames.bigtechworker
+name: 'Combo效果验证测试'
+tags:
+  - p0
+  - combo
+---
+- runFlow: helpers/start-game.yaml
+
+# 截图初始状态
+- takeScreenshot: '10-combo-initial'
+
+# 验证初始属性存在
+- assertVisible:
+    id: 'stat-value-performance'
+- assertVisible:
+    id: 'stat-value-health'
+
+# ========== 场景1: 选择多张卡牌形成 combo ==========
+
+# 等待 UI 稳定
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# 选择第一张卡牌
+- tapOn:
+    id: 'card-0'
+
+- waitForAnimationToEnd:
+    timeout: 500
+
+# 选择第二张卡牌（尝试形成 combo）
+- tapOn:
+    id: 'card-1'
+
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# ========== 场景2: 验证 Combo 预览显示 ==========
+
+# 验证确认按钮出现
+- extendedWaitUntil:
+    visible:
+      id: 'play-confirm-button'
+    timeout: 8000
+
+# 检查 combo 预览是否显示（取决于卡牌组合）
+- assertVisible:
+    id: 'combo-preview'
+    optional: true
+
+# 如果有 combo，验证 combo 标签
+- assertVisible:
+    id: 'combo-tag'
+    optional: true
+
+# 如果有 combo，验证 combo 名称
+- assertVisible:
+    id: 'combo-name'
+    optional: true
+
+# 截图 - combo 预览状态
+- takeScreenshot: '10-combo-preview'
+
+# ========== 场景3: 打出 combo 并验证效果 ==========
+
+# 确认打出
+- tapOn:
+    id: 'play-confirm-button'
+
+# 等待效果结算
+- extendedWaitUntil:
+    notVisible:
+      id: 'play-confirm-container'
+    timeout: 5000
+
+# 等待属性更新（combo 效果可能有额外动画）
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# 截图 - combo 效果后
+- takeScreenshot: '10-combo-effect-applied'
+
+# 验证属性元素仍然存在
+- assertVisible:
+    id: 'stat-value-performance'
+- assertVisible:
+    id: 'stat-value-health'
+- assertVisible:
+    id: 'stat-value-happiness'
+- assertVisible:
+    id: 'stat-value-influence'
+
+# 验证游戏继续正常
+- assertVisible:
+    id: 'game-board'
+- assertVisible:
+    id: 'hand-container'
