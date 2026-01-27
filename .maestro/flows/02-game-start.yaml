@@ -2,7 +2,7 @@
 # 测试: 游戏开始流程
 # 验证点击开始游戏后能正确进入游戏界面
 
-appId: host.exp.Exponent
+appId: com.themecardgames.bigtechworker
 name: '游戏开始流程测试'
 tags:
   - smoke

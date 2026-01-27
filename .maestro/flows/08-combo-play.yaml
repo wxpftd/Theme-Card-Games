@@ -1,0 +1,65 @@
+# 08-combo-play.yaml
+# 测试: 完整的多卡出牌流程（多轮）
+# 验证: 连续多次出牌操作的稳定性
+
+appId: com.themecardgames.bigtechworker
+name: '多卡出牌流程测试'
+tags:
+  - p1
+---
+- runFlow: helpers/start-game.yaml
+
+# ========== 第一轮出牌 ==========
+
+# 选择两张卡牌并打出
+- tapOn:
+    id: 'card-0'
+- tapOn:
+    id: 'card-1'
+- tapOn:
+    id: 'play-confirm-button'
+
+# 等待打出完成
+- extendedWaitUntil:
+    notVisible:
+      id: 'play-confirm-container'
+    timeout: 5000
+
+# 截图
+- takeScreenshot: '08-round1-played'
+
+# ========== 第二轮出牌 ==========
+
+# 再次选择卡牌
+- tapOn:
+    id: 'card-0'
+    optional: true # 可能手牌已用完
+
+# 如果有卡牌，继续打出
+- tapOn:
+    id: 'play-confirm-button'
+    optional: true
+
+- extendedWaitUntil:
+    notVisible:
+      id: 'play-confirm-container'
+    timeout: 3000
+    optional: true
+
+# 截图
+- takeScreenshot: '08-round2-played'
+
+# ========== 结束回合 ==========
+
+# 点击结束回合
+- tapOn:
+    id: 'end-turn-button'
+
+# 等待新回合开始
+- extendedWaitUntil:
+    visible:
+      id: 'hand-container'
+    timeout: 5000
+
+# 截图 - 新回合
+- takeScreenshot: '08-new-turn'

@@ -1,10 +1,16 @@
 # Helper: Start App
 # 用于在每个测试开始前初始化应用状态
 
-appId: host.exp.Exponent
+appId: com.themecardgames.bigtechworker
 ---
 - launchApp:
     clearState: true
+    stopApp: false
+
+# 添加固定等待时间让应用完全启动
+- swipe:
+    direction: DOWN
+    duration: 100
 
 # 等待应用加载完成
 - extendedWaitUntil:

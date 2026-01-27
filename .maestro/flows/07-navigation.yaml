@@ -2,7 +2,7 @@
 # 测试: 导航流程
 # 验证应用内各页面导航正常
 
-appId: host.exp.Exponent
+appId: com.themecardgames.bigtechworker
 name: '导航流程测试'
 tags:
   - smoke

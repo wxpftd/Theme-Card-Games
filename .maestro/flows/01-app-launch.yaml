@@ -2,7 +2,7 @@
 # 测试: 应用启动
 # 验证应用能够正常启动并显示首页
 
-appId: host.exp.Exponent
+appId: com.themecardgames.bigtechworker
 name: '应用启动测试'
 tags:
   - smoke

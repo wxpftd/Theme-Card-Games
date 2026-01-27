@@ -3,7 +3,7 @@
 # 验证游戏结束界面显示和重新开始功能
 # 注意: 此测试需要较长时间来达到游戏结束条件
 
-appId: host.exp.Exponent
+appId: com.themecardgames.bigtechworker
 name: '游戏结束测试'
 tags:
   - p0

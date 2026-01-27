@@ -2,10 +2,10 @@
 # https://maestro.mobile.dev/
 
 # App Configuration
-appId: host.exp.Exponent
+# 使用 dev-client 模式的 bundle ID
+appId: com.themecardgames.bigtechworker
 
-# 使用 Expo Go 运行时需要先启动 dev server
-# pnpm app:bigtech
+# 启动开发服务器：pnpm app:bigtech
 
 # Environment Variables
 env:

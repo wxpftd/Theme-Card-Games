@@ -2,7 +2,7 @@
 # 测试: 回合流程
 # 验证结束回合功能和回合计数器更新
 
-appId: host.exp.Exponent
+appId: com.themecardgames.bigtechworker
 name: '回合流程测试'
 tags:
   - smoke
