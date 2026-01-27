@@ -1,7 +1,7 @@
 # Helper: Start Game
 # 从首页进入游戏
 
-appId: host.exp.Exponent
+appId: com.themecardgames.bigtechworker
 ---
 - runFlow: start-app.yaml
 
@@ -9,13 +9,20 @@ appId: host.exp.Exponent
 - tapOn:
     id: 'start-game-button'
 
+# 等待欢迎弹窗出现（首次进入游戏时会显示）
+- extendedWaitUntil:
+    visible:
+      id: 'skip-tutorial-button'
+    timeout: 10000
+    optional: true
+
+# 点击跳过引导按钮
+- tapOn:
+    id: 'skip-tutorial-button'
+    optional: true
+
 # 等待游戏加载完成
 - extendedWaitUntil:
     visible:
       id: 'game-board'
     timeout: 15000
-
-# 处理可能出现的欢迎弹窗
-- tapOn:
-    text: '跳过引导'
-    optional: true

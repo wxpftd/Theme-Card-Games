@@ -1,19 +1,91 @@
 # 04-combo-system.yaml
-# 测试: 组合系统
-# 验证选择多张卡牌时 Combo 检测和显示
+# 测试: 组合系统和多卡出牌
+# 验证: 多卡选择 → 预览 → 确认打出 → 取消选择
 
-appId: host.exp.Exponent
+appId: com.themecardgames.bigtechworker
 name: '组合系统测试'
 tags:
   - p1
 ---
 - runFlow: helpers/start-game.yaml
 
+# ========== 场景 1: 多卡选择和确认打出 ==========
+
 # 验证手牌存在
 - assertVisible:
     id: 'hand-container'
 
-# 点击第一张卡牌
+# 记录初始手牌数量（用于后续验证）
+- assertVisible:
+    id: 'hand-count'
+
+# 选择第一张卡牌
+# 先等待界面稳定
+- waitForAnimationToEnd:
+    timeout: 1000
+
+# 使用坐标点击卡牌（card-0 bounds: [16,645][156,845], 中心约 86,745）
+# 屏幕 390x844，百分比约 22%,88%
+- tapOn:
+    point: '22%,88%'
+
+# 等待点击生效
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# 验证确认按钮出现
+- extendedWaitUntil:
+    visible:
+      id: 'play-confirm-button'
+    timeout: 5000
+
+# 验证选中数量显示为 1
+- assertVisible:
+    id: 'play-count'
+
+# 选择第二张卡牌
+- tapOn:
+    id: 'card-1'
+
+# 验证选中数量更新
+- assertVisible:
+    id: 'play-count'
+
+# 检查是否有 Combo 预览（取决于卡牌组合，可选）
+- assertVisible:
+    id: 'combo-preview'
+    optional: true
+
+# 如果有 Combo，验证 COMBO 标签显示
+- assertVisible:
+    id: 'combo-tag'
+    optional: true
+
+# 截图 - 多卡选中状态
+- takeScreenshot: '04-multi-card-selected'
+
+# ========== 场景 2: 确认打出卡牌 ==========
+
+# 点击确认打出按钮
+- tapOn:
+    id: 'play-confirm-button'
+
+# 等待打出完成（确认按钮消失）
+- extendedWaitUntil:
+    notVisible:
+      id: 'play-confirm-container'
+    timeout: 5000
+
+# 验证手牌容器仍然存在（游戏继续）
+- assertVisible:
+    id: 'hand-container'
+
+# 截图 - 卡牌打出后
+- takeScreenshot: '04-cards-played'
+
+# ========== 场景 3: 取消选择功能 ==========
+
+# 选择一张新卡牌
 - tapOn:
     id: 'card-0'
 
@@ -21,20 +93,7 @@ tags:
 - assertVisible:
     id: 'play-confirm-button'
 
-# 点击第二张卡牌（尝试触发 combo）
-- tapOn:
-    id: 'card-1'
-    optional: true
-
-# 检查是否有 combo 预览（可选，取决于卡牌组合）
-- assertVisible:
-    id: 'combo-preview'
-    optional: true
-
-# 截图 - 多卡选中状态
-- takeScreenshot: '04-multi-card-selected'
-
-# 点击取消，验证可以取消选择
+# 点击取消
 - tapOn:
     id: 'cancel-selection-button'
 

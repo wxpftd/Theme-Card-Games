@@ -2,7 +2,7 @@
 # 测试: 卡牌打出
 # 验证选择卡牌并确认打出的完整流程
 
-appId: host.exp.Exponent
+appId: com.themecardgames.bigtechworker
 name: '卡牌打出测试'
 tags:
   - smoke

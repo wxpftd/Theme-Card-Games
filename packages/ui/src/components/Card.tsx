@@ -69,6 +69,9 @@ function CardComponent({
   return (
     <TouchableOpacity
       testID={testID}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={`卡牌 ${card.name}`}
       onPress={onPress}
       onLongPress={onLongPress}
       disabled={disabled}

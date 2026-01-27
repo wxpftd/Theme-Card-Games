@@ -33,62 +33,67 @@ export function TutorialModal({
 
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
-      <TouchableWithoutFeedback onPress={() => {}}>
-        <View style={styles.overlay}>
-          <Animated.View
-            style={[
-              styles.container,
-              {
-                backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.primary,
-              },
-            ]}
-          >
-            {/* Emoji */}
-            {emoji && <Text style={styles.emoji}>{emoji}</Text>}
+      <View style={styles.overlay} accessible={false}>
+        <Animated.View
+          accessible={false}
+          style={[
+            styles.container,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.primary,
+            },
+          ]}
+        >
+          {/* Emoji */}
+          {emoji && <Text style={styles.emoji}>{emoji}</Text>}
 
-            {/* Title */}
-            <Text style={[styles.title, { color: theme.colors.text }]}>{title}</Text>
+          {/* Title */}
+          <Text style={[styles.title, { color: theme.colors.text }]}>{title}</Text>
 
-            {/* Description */}
-            <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
-              {description}
-            </Text>
+          {/* Description */}
+          <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
+            {description}
+          </Text>
 
-            {/* Buttons */}
-            <View style={styles.buttons}>
-              {showSkip && onSkip && (
-                <TouchableOpacity
-                  style={[
-                    styles.button,
-                    styles.skipButton,
-                    { borderColor: theme.colors.textSecondary },
-                  ]}
-                  onPress={onSkip}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.buttonText, { color: theme.colors.textSecondary }]}>
-                    跳过引导
-                  </Text>
-                </TouchableOpacity>
-              )}
-
+          {/* Buttons */}
+          <View style={styles.buttons} accessible={false}>
+            {showSkip && onSkip && (
               <TouchableOpacity
+                testID="skip-tutorial-button"
+                accessibilityLabel="跳过引导按钮"
+                accessibilityRole="button"
                 style={[
                   styles.button,
-                  styles.primaryButton,
-                  { backgroundColor: theme.colors.primary },
-                  showSkip && { flex: 1 },
+                  styles.skipButton,
+                  { borderColor: theme.colors.textSecondary },
                 ]}
-                onPress={onPress}
+                onPress={onSkip}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.buttonText, { color: '#fff' }]}>{buttonText}</Text>
+                <Text style={[styles.buttonText, { color: theme.colors.textSecondary }]}>
+                  跳过引导
+                </Text>
               </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </View>
-      </TouchableWithoutFeedback>
+            )}
+
+            <TouchableOpacity
+              testID="start-tutorial-button"
+              accessibilityLabel="开始引导按钮"
+              accessibilityRole="button"
+              style={[
+                styles.button,
+                styles.primaryButton,
+                { backgroundColor: theme.colors.primary },
+                showSkip && { flex: 1 },
+              ]}
+              onPress={onPress}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.buttonText, { color: '#fff' }]}>{buttonText}</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </View>
     </Modal>
   );
 }
