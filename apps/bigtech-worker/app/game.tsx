@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, ImageBackground } from 'react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import {
   useGameEngine,
-  GameBoard,
-  GameOverScreen,
+  EnhancedGameBoard,
+  EnhancedGameOverScreen,
   useTheme,
   useTutorial,
   useComboHint,
@@ -15,16 +15,30 @@ import {
   firstGameTutorial,
 } from '@theme-card-games/ui';
 import { ComboDefinition } from '@theme-card-games/core';
-import { bigtechWorkerTheme } from '@theme-card-games/theme-bigtech-worker';
+import {
+  bigtechWorkerTheme,
+  getRandomTip,
+  turnStartMessages,
+  victoryMessages,
+  defeatMessages,
+} from '@theme-card-games/theme-bigtech-worker';
 
-// Force Metro to reload dependencies - timestamp: 2026-01-27T17:10
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const gameBgImage = require('../assets/images/game_bg.png');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const victoryBgImage = require('../assets/images/victory_bg.png');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const defeatBgImage = require('../assets/images/defeat_bg.png');
+
+// Force Metro to reload dependencies - timestamp: 2026-01-30T11:30
 
 export default function GameScreen() {
   const { theme } = useTheme();
   const playedCardsThisTurnRef = useRef<string[]>([]);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [turnMessage, setTurnMessage] = useState<string | null>(null);
 
-  // 使用 useMemo 稳定化 multiplayer 配置，避免每次渲染创建新对象
+  // 使用 useMemo 稳定化 multiplayer 配置
   const multiplayerConfig = useMemo(
     () => ({
       enabled: true,
@@ -63,24 +77,29 @@ export default function GameScreen() {
   // 首局引导检测
   useEffect(() => {
     if (gameState && !tutorial.hasCompletedFirstGame && !tutorial.isActive) {
-      // 显示欢迎弹窗
       setShowWelcomeModal(true);
     }
   }, [gameState, tutorial.hasCompletedFirstGame, tutorial.isActive]);
 
-  // 监听回合开始，重置本回合打出的卡牌记录
+  // 监听回合开始
   useEffect(() => {
     if (!engine) return;
 
     const unsubscribe = engine.on('turn_started', () => {
       playedCardsThisTurnRef.current = [];
       comboHint.resetHints();
+
+      // 显示回合开始消息
+      if (gameState?.currentPlayerId === 'player1') {
+        setTurnMessage(getRandomTip(turnStartMessages));
+        setTimeout(() => setTurnMessage(null), 2500);
+      }
     });
 
     return unsubscribe;
-  }, [engine, comboHint.resetHints]);
+  }, [engine, comboHint.resetHints, gameState?.currentPlayerId]);
 
-  // 监听游戏结束，标记首局引导完成
+  // 监听游戏结束
   useEffect(() => {
     if (isGameOver && !tutorial.hasCompletedFirstGame) {
       tutorial.markFirstGameCompleted();
@@ -97,12 +116,11 @@ export default function GameScreen() {
     tutorial.markFirstGameCompleted();
   }, [tutorial]);
 
-  // 多卡打出后的回调（新接口）
+  // 多卡打出后的回调
   const handleCardsPlayed = useCallback(
     (cardIds: string[], triggeredCombo: ComboDefinition | null) => {
       // 触觉反馈
       if (triggeredCombo) {
-        // combo 触发时使用更强的反馈
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else if (cardIds.length > 0) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -116,9 +134,8 @@ export default function GameScreen() {
         }
       }
 
-      // 检查组合机会（仅在非引导模式下）
+      // 检查组合机会
       if (!tutorial.isActive && currentPlayer && bigtechWorkerTheme.comboDefinitions) {
-        // 使用新的手牌（排除刚打出的卡）
         const cardIdSet = new Set(cardIds);
         const newHand = currentPlayer.hand.filter((c) => !cardIdSet.has(c.instanceId));
         comboHint.checkComboOpportunity(
@@ -159,25 +176,37 @@ export default function GameScreen() {
 
   if (!gameState || !currentPlayer) {
     return (
-      <SafeAreaView
-        testID="game-loading"
-        style={[styles.container, { backgroundColor: theme.colors.background }]}
-      />
+      <ImageBackground
+        source={gameBgImage}
+        style={styles.loadingContainer}
+        imageStyle={{ opacity: 0.3 }}
+      >
+        <SafeAreaView
+          testID="game-loading"
+          style={[styles.container, { backgroundColor: 'transparent' }]}
+        />
+      </ImageBackground>
     );
   }
 
   if (isGameOver) {
     const winnerPlayer = winner ? (gameState.players[winner] ?? null) : null;
+    const isVictory = winnerPlayer?.id === currentPlayer.id;
 
     let reason = '';
+    let _reasonType: 'health' | 'happiness' | 'turnLimit' = 'turnLimit';
+
     if (currentPlayer.stats.performance >= 100) {
-      reason = '绩效满分，成功晋升！';
+      reason = getRandomTip(victoryMessages);
     } else if (currentPlayer.stats.health <= 0) {
-      reason = '身体扛不住了，被迫离职休养...';
+      reason = getRandomTip(defeatMessages.health);
+      _reasonType = 'health';
     } else if (currentPlayer.stats.happiness <= 0) {
-      reason = '太累了，选择躺平离开...';
+      reason = getRandomTip(defeatMessages.happiness);
+      _reasonType = 'happiness';
     } else if (gameState.turn >= 30) {
-      reason = '一年过去了，是时候总结一下了';
+      reason = getRandomTip(defeatMessages.turnLimit);
+      _reasonType = 'turnLimit';
     }
 
     return (
@@ -185,7 +214,7 @@ export default function GameScreen() {
         testID="game-over-screen"
         style={[styles.container, { backgroundColor: theme.colors.background }]}
       >
-        <GameOverScreen
+        <EnhancedGameOverScreen
           winner={winnerPlayer}
           reason={reason}
           player={currentPlayer}
@@ -194,6 +223,8 @@ export default function GameScreen() {
           onRestart={handleRestart}
           onMainMenu={handleMainMenu}
           style={styles.gameOver}
+          victoryBackground={isVictory ? victoryBgImage : undefined}
+          defeatBackground={!isVictory ? defeatBgImage : undefined}
         />
       </SafeAreaView>
     );
@@ -205,7 +236,7 @@ export default function GameScreen() {
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       <View testID="game-container" style={styles.gameContainer}>
-        <GameBoard
+        <EnhancedGameBoard
           gameState={gameState}
           themeConfig={bigtechWorkerTheme}
           currentPlayerId="player1"
@@ -216,6 +247,7 @@ export default function GameScreen() {
           opponents={opponents}
           isAIPlayer={isAIPlayer}
           aiThinking={aiThinking}
+          turnStartMessage={turnMessage ?? undefined}
         />
 
         {/* 组合提示横幅 */}
@@ -251,6 +283,9 @@ export default function GameScreen() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
   },

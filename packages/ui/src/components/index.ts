@@ -3,6 +3,7 @@ export { EnhancedCard } from './EnhancedCard';
 export { HandView } from './HandView';
 export { PlayerStats } from './PlayerStats';
 export { GameBoard } from './GameBoard';
+export { EnhancedGameBoard } from './EnhancedGameBoard';
 export { GameOverScreen } from './GameOverScreen';
 export { EnhancedGameOverScreen } from './EnhancedGameOverScreen';
 export { AchievementList } from './AchievementList';
