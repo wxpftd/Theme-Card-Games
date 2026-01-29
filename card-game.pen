@@ -680,20 +680,58 @@
                   "id": "VVMud",
                   "name": "OppPlayArea",
                   "width": "fill_container",
-                  "height": 50,
-                  "gap": 6,
+                  "height": 58,
+                  "gap": 8,
                   "justifyContent": "center",
                   "alignItems": "center",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "Pxfln",
-                      "name": "oppLabel",
-                      "fill": "#A3A09C",
-                      "content": "Opponent",
-                      "fontFamily": "Inter",
-                      "fontSize": 9,
-                      "fontWeight": "normal"
+                      "id": "iNUPY",
+                      "type": "ref",
+                      "ref": "Pcy1u",
+                      "width": 36,
+                      "height": 50,
+                      "rotation": -5,
+                      "name": "oppCard"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "oWQoH",
+                      "name": "oppPlayInfo",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "1qWq4",
+                          "name": "oppPlayLabel",
+                          "fill": "#A3A09C",
+                          "content": "Opponent played",
+                          "fontFamily": "Inter",
+                          "fontSize": 8
+                        },
+                        {
+                          "type": "text",
+                          "id": "X4pcA",
+                          "name": "oppCardName",
+                          "fill": "#EF4444",
+                          "content": "Server Crash",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "hS3VF",
+                          "name": "oppDmg",
+                          "fill": "#EF4444",
+                          "content": "-6 HP",
+                          "fontFamily": "DM Mono",
+                          "fontSize": 9,
+                          "fontWeight": "600"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -749,20 +787,99 @@
                   "id": "eFnED",
                   "name": "PlayerPlayArea",
                   "width": "fill_container",
-                  "height": 50,
-                  "gap": 6,
+                  "height": 58,
+                  "gap": 8,
                   "justifyContent": "center",
                   "alignItems": "center",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "I9lou",
-                      "name": "playerLabel",
-                      "fill": "#A3A09C",
-                      "content": "Your Play",
-                      "fontFamily": "Inter",
-                      "fontSize": 9,
-                      "fontWeight": "normal"
+                      "id": "PxlNH",
+                      "type": "ref",
+                      "ref": "XRnJH",
+                      "width": 36,
+                      "height": 50,
+                      "rotation": 5,
+                      "name": "playerCard",
+                      "descendants": {
+                        "8211c": {
+                          "height": 12,
+                          "padding": [
+                            1,
+                            3
+                          ]
+                        },
+                        "Iiy8G": {
+                          "content": "Coffee",
+                          "fill": "#1A1918",
+                          "fontSize": 6
+                        },
+                        "Sbzeh": {
+                          "fill": "#22C55E",
+                          "width": 12,
+                          "height": 12
+                        },
+                        "VFsIB": {
+                          "content": "1",
+                          "fill": "#FFFFFF",
+                          "fontSize": 7
+                        },
+                        "dzAWY": {
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "./apps/bigtech-worker/assets/images/cards/coffee_break.png",
+                            "mode": "fill"
+                          },
+                          "clip": true
+                        },
+                        "Fp9S5": {
+                          "height": 0,
+                          "enabled": false
+                        },
+                        "6GLHH": {
+                          "content": "",
+                          "fill": "#6B7280"
+                        }
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GYjn7",
+                      "name": "playerPlayInfo",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "FKjkD",
+                          "name": "playerPlayLabel",
+                          "fill": "#A3A09C",
+                          "content": "You played",
+                          "fontFamily": "Inter",
+                          "fontSize": 8
+                        },
+                        {
+                          "type": "text",
+                          "id": "WTB4a",
+                          "name": "playerCardName",
+                          "fill": "#22C55E",
+                          "content": "Coffee Break",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "A0Z0k",
+                          "name": "playerHeal",
+                          "fill": "#22C55E",
+                          "content": "+3 HP",
+                          "fontFamily": "DM Mono",
+                          "fontSize": 9,
+                          "fontWeight": "600"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -936,25 +1053,31 @@
                   },
                   "descendants": {
                     "Iiy8G": {
-                      "fill": "#1A1918"
+                      "fill": "#1A1918",
+                      "content": "Coffee Break"
                     },
                     "Sbzeh": {
-                      "fill": "#FF5C00"
+                      "fill": "#22C55E"
                     },
                     "VFsIB": {
-                      "fill": "#FFFFFF"
+                      "fill": "#FFFFFF",
+                      "content": "1"
                     },
                     "dzAWY": {
-                      "fill": "#F0EDFA"
-                    },
-                    "5si9w": {
-                      "fill": "#FF5C00"
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "./apps/bigtech-worker/assets/images/cards/coffee_break.png",
+                        "mode": "fill"
+                      },
+                      "clip": true
                     },
                     "Fp9S5": {
                       "fill": "#FFFFFF"
                     },
                     "6GLHH": {
-                      "fill": "#7A7875"
+                      "fill": "#6B7280",
+                      "content": "Restore 3 HP, reduce stress"
                     }
                   }
                 },
@@ -979,25 +1102,31 @@
                   },
                   "descendants": {
                     "Iiy8G": {
-                      "fill": "#1A1918"
+                      "fill": "#1A1918",
+                      "content": "Code Review"
                     },
                     "Sbzeh": {
-                      "fill": "#FF5C00"
+                      "fill": "#3B82F6"
                     },
                     "VFsIB": {
-                      "fill": "#FFFFFF"
+                      "fill": "#FFFFFF",
+                      "content": "2"
                     },
                     "dzAWY": {
-                      "fill": "#F0EDFA"
-                    },
-                    "5si9w": {
-                      "fill": "#FF5C00"
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "./apps/bigtech-worker/assets/images/cards/code_review.png",
+                        "mode": "fill"
+                      },
+                      "clip": true
                     },
                     "Fp9S5": {
                       "fill": "#FFFFFF"
                     },
                     "6GLHH": {
-                      "fill": "#7A7875"
+                      "fill": "#6B7280",
+                      "content": "Deal 4 dmg, gain 1 energy"
                     }
                   }
                 },
@@ -1023,25 +1152,31 @@
                   "fill": "#FFFFFF",
                   "descendants": {
                     "Iiy8G": {
-                      "fill": "#1A1918"
+                      "fill": "#1A1918",
+                      "content": "Promotion"
                     },
                     "Sbzeh": {
-                      "fill": "#FF5C00"
+                      "fill": "#F59E0B"
                     },
                     "VFsIB": {
-                      "fill": "#FFFFFF"
+                      "fill": "#FFFFFF",
+                      "content": "4"
                     },
                     "dzAWY": {
-                      "fill": "#F0EDFA"
-                    },
-                    "5si9w": {
-                      "fill": "#FF5C00"
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "./apps/bigtech-worker/assets/images/cards/promotion.png",
+                        "mode": "fill"
+                      },
+                      "clip": true
                     },
                     "Fp9S5": {
                       "fill": "#FFFFFF"
                     },
                     "6GLHH": {
-                      "fill": "#7A7875"
+                      "fill": "#6B7280",
+                      "content": "Deal 8 dmg, boost all stats"
                     }
                   }
                 },
@@ -1066,25 +1201,31 @@
                   },
                   "descendants": {
                     "Iiy8G": {
-                      "fill": "#1A1918"
+                      "fill": "#1A1918",
+                      "content": "Overtime"
                     },
                     "Sbzeh": {
-                      "fill": "#FF5C00"
+                      "fill": "#EF4444"
                     },
                     "VFsIB": {
-                      "fill": "#FFFFFF"
+                      "fill": "#FFFFFF",
+                      "content": "2"
                     },
                     "dzAWY": {
-                      "fill": "#F0EDFA"
-                    },
-                    "5si9w": {
-                      "fill": "#FF5C00"
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "./apps/bigtech-worker/assets/images/cards/overtime.png",
+                        "mode": "fill"
+                      },
+                      "clip": true
                     },
                     "Fp9S5": {
                       "fill": "#FFFFFF"
                     },
                     "6GLHH": {
-                      "fill": "#7A7875"
+                      "fill": "#6B7280",
+                      "content": "Deal 5 dmg, take 2 stress"
                     }
                   }
                 },
@@ -1109,25 +1250,31 @@
                   },
                   "descendants": {
                     "Iiy8G": {
-                      "fill": "#1A1918"
+                      "fill": "#1A1918",
+                      "content": "Team Build"
                     },
                     "Sbzeh": {
-                      "fill": "#FF5C00"
+                      "fill": "#8B5CF6"
                     },
                     "VFsIB": {
-                      "fill": "#FFFFFF"
+                      "fill": "#FFFFFF",
+                      "content": "3"
                     },
                     "dzAWY": {
-                      "fill": "#F0EDFA"
-                    },
-                    "5si9w": {
-                      "fill": "#FF5C00"
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "./apps/bigtech-worker/assets/images/cards/team_building.png",
+                        "mode": "fill"
+                      },
+                      "clip": true
                     },
                     "Fp9S5": {
                       "fill": "#FFFFFF"
                     },
                     "6GLHH": {
-                      "fill": "#7A7875"
+                      "fill": "#6B7280",
+                      "content": "Heal 4 HP, draw 1 card"
                     }
                   }
                 }
@@ -1242,6 +1389,7 @@
       "y": 0,
       "name": "Card",
       "reusable": true,
+      "clip": true,
       "width": 68,
       "height": 92,
       "fill": "#FFFFFF",
@@ -1317,24 +1465,16 @@
           "type": "frame",
           "id": "dzAWY",
           "name": "CardIcon",
+          "clip": true,
           "width": "fill_container",
           "height": "fill_container",
-          "fill": "#F0EDFA",
-          "layout": "vertical",
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "icon_font",
-              "id": "5si9w",
-              "name": "IconSymbol",
-              "width": 22,
-              "height": 22,
-              "iconFontName": "zap",
-              "iconFontFamily": "lucide",
-              "fill": "#FF5C00"
-            }
-          ]
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "./apps/bigtech-worker/assets/images/cards/coffee_break.png",
+            "mode": "fill"
+          },
+          "layout": "none"
         },
         {
           "type": "frame",
@@ -1574,10 +1714,10 @@
       "children": [
         {
           "type": "frame",
-          "id": "tZ5WR",
+          "id": "7Qt3W",
           "name": "topSpacer",
           "width": 1,
-          "height": 100,
+          "height": 80,
           "fill": "transparent",
           "layout": "none"
         },
@@ -1586,6 +1726,7 @@
           "id": "1ln9M",
           "name": "LogoArea",
           "width": "fill_container",
+          "fill": "transparent",
           "layout": "vertical",
           "gap": 8,
           "alignItems": "center",
@@ -1599,7 +1740,8 @@
               "textAlign": "center",
               "fontFamily": "Inter",
               "fontSize": 32,
-              "fontWeight": "700"
+              "fontWeight": "800",
+              "letterSpacing": 1
             },
             {
               "type": "text",
@@ -1609,23 +1751,15 @@
               "content": "Card Battle",
               "textAlign": "center",
               "fontFamily": "Inter",
-              "fontSize": 18,
+              "fontSize": 16,
+              "fontWeight": "500",
               "letterSpacing": 4
             }
           ]
         },
         {
           "type": "frame",
-          "id": "anhqV",
-          "name": "midSpacer",
-          "width": 1,
-          "height": 20,
-          "fill": "transparent",
-          "layout": "none"
-        },
-        {
-          "type": "frame",
-          "id": "4CQ8c",
+          "id": "YilUM",
           "name": "MascotArea",
           "clip": true,
           "width": 180,
@@ -1641,8 +1775,8 @@
             {
               "type": "shadow",
               "shadowType": "outer",
-              "color": "#FFFFFF80",
-              "blur": 20,
+              "color": "#FFFFFF90",
+              "blur": 24,
               "spread": 4
             },
             {
@@ -1659,10 +1793,10 @@
         },
         {
           "type": "frame",
-          "id": "NyAzc",
-          "name": "midSpacer2",
+          "id": "xgzzo",
+          "name": "midSpacer",
           "width": 1,
-          "height": 40,
+          "height": 36,
           "fill": "transparent",
           "layout": "none"
         },
@@ -1670,9 +1804,9 @@
           "type": "frame",
           "id": "8vJ0U",
           "name": "ButtonArea",
-          "width": 260,
+          "width": 280,
           "layout": "vertical",
-          "gap": 14,
+          "gap": 12,
           "alignItems": "center",
           "children": [
             {
@@ -1680,7 +1814,7 @@
               "id": "GUjle",
               "name": "StartButton",
               "width": "fill_container",
-              "height": 52,
+              "height": 54,
               "fill": {
                 "type": "gradient",
                 "gradientType": "linear",
@@ -1700,17 +1834,29 @@
                   }
                 ]
               },
-              "cornerRadius": 26,
-              "effect": {
-                "type": "shadow",
-                "shadowType": "outer",
-                "color": "#2980B960",
-                "offset": {
-                  "x": 0,
-                  "y": 6
+              "cornerRadius": 27,
+              "effect": [
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#2980B970",
+                  "offset": {
+                    "x": 0,
+                    "y": 6
+                  },
+                  "blur": 20
                 },
-                "blur": 16
-              },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#2980B930",
+                  "offset": {
+                    "x": 0,
+                    "y": 12
+                  },
+                  "blur": 40
+                }
+              ],
               "gap": 10,
               "justifyContent": "center",
               "alignItems": "center",
@@ -1743,16 +1889,28 @@
               "name": "DeckButton",
               "width": "fill_container",
               "height": 46,
-              "fill": "#FFFFFFC0",
+              "fill": "#FFFFFFD0",
               "cornerRadius": 23,
               "stroke": {
-                "thickness": 1.5,
-                "fill": "#2980B940"
+                "thickness": 1,
+                "fill": "#2980B930"
               },
-              "effect": {
-                "type": "background_blur",
-                "radius": 10
-              },
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 12
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#00000010",
+                  "offset": {
+                    "x": 0,
+                    "y": 2
+                  },
+                  "blur": 8
+                }
+              ],
               "gap": 10,
               "justifyContent": "center",
               "alignItems": "center",
@@ -1785,16 +1943,28 @@
               "name": "SettingsButton",
               "width": "fill_container",
               "height": 46,
-              "fill": "#FFFFFFC0",
+              "fill": "#FFFFFFD0",
               "cornerRadius": 23,
               "stroke": {
-                "thickness": 1.5,
-                "fill": "#2980B940"
+                "thickness": 1,
+                "fill": "#2980B930"
               },
-              "effect": {
-                "type": "background_blur",
-                "radius": 10
-              },
+              "effect": [
+                {
+                  "type": "background_blur",
+                  "radius": 12
+                },
+                {
+                  "type": "shadow",
+                  "shadowType": "outer",
+                  "color": "#00000010",
+                  "offset": {
+                    "x": 0,
+                    "y": 2
+                  },
+                  "blur": 8
+                }
+              ],
               "gap": 10,
               "justifyContent": "center",
               "alignItems": "center",
@@ -1824,19 +1994,10 @@
           ]
         },
         {
-          "type": "frame",
-          "id": "KwZa5",
-          "name": "versionText",
-          "width": 1,
-          "height": "fill_container",
-          "fill": "transparent",
-          "layout": "none"
-        },
-        {
           "type": "text",
           "id": "2fyXA",
           "name": "VersionText",
-          "fill": "#8AAFCF",
+          "fill": "#7AACCC",
           "content": "v1.0.0",
           "textAlign": "center",
           "fontFamily": "Inter",
@@ -1847,7 +2008,7 @@
           "id": "XdgdD",
           "name": "footerSpacer",
           "width": 1,
-          "height": 30,
+          "height": 24,
           "fill": "transparent",
           "layout": "none"
         }
