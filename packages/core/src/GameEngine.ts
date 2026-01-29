@@ -20,6 +20,8 @@ import {
   ScenarioDefinition,
   ScenarioSystemConfig,
   PlayerCharacterState,
+  TurnPlayState,
+  ComboPreview,
 } from './types';
 import { GameStateManager } from './state';
 import { TurnManager, TurnPhaseConfig } from './turn';
@@ -482,6 +484,21 @@ export class GameEngine {
   }
 
   /**
+   * 获取当前可触发的 combo 预览信息
+   * 分析手牌和本回合已打出的卡牌，返回哪些 combo 可以被触发以及还需要哪些卡牌
+   */
+  getAvailableCombos(playerId: string): ComboPreview[] {
+    const comboSystem = this.getComboSystem();
+    if (!comboSystem) return [];
+
+    const hand = this.getPlayerHand(playerId);
+    if (!hand) return [];
+
+    const handCards = hand.getCards().map((c) => ({ definitionId: c.definitionId }));
+    return comboSystem.getAvailableCombos(playerId, handCards, this.state);
+  }
+
+  /**
    * Get status definitions
    */
   getStatusDefinitions(): StatusDefinition[] {
@@ -860,5 +877,48 @@ export class GameEngine {
   isPlayerEliminated(playerId: string): boolean {
     const player = this.getPlayer(playerId);
     return player?.eliminated ?? false;
+  }
+
+  // ============================================================================
+  // Turn Play State (出牌限制)
+  // ============================================================================
+
+  /**
+   * 检查玩家是否还可以出牌
+   * @param playerId 玩家 ID
+   * @param cardId 可选的卡牌定义 ID，用于检查互斥标签
+   */
+  canPlayCard(playerId: string, cardId?: string): boolean {
+    return this.stateManager.canPlayCard(playerId, cardId);
+  }
+
+  /**
+   * 获取玩家回合出牌状态
+   */
+  getTurnPlayState(playerId: string): TurnPlayState {
+    return this.stateManager.getTurnPlayState(playerId);
+  }
+
+  /**
+   * 获取当前回合剩余出牌数量
+   * @returns 如果没有限制返回 undefined，否则返回剩余数量
+   */
+  getRemainingCardPlays(playerId: string): number | undefined {
+    return this.stateManager.getRemainingCardPlays(playerId);
+  }
+
+  /**
+   * 获取因互斥标签被禁用的卡牌定义 ID 列表
+   */
+  getDisabledCardsByMutualExclusion(playerId: string): Set<string> {
+    return this.stateManager.getDisabledCardsByMutualExclusion(playerId);
+  }
+
+  /**
+   * 获取每回合最大出牌数量
+   * @returns 如果没有限制返回 undefined
+   */
+  getMaxCardsPerTurn(): number | undefined {
+    return this.theme.gameConfig.maxCardsPerTurn;
   }
 }

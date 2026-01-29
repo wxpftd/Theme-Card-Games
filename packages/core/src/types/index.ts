@@ -242,6 +242,38 @@ export interface ComboState {
   triggeredCombos: Map<string, number>; // Combo ID -> last triggered turn
 }
 
+/**
+ * 回合内出牌状态（用于策略性限制）
+ */
+export interface TurnPlayState {
+  /** 本回合已打出的卡牌数量 */
+  cardsPlayedThisTurn: number;
+  /** 本回合已打出的卡牌标签（用于互斥检查） */
+  tagsPlayedThisTurn: string[];
+}
+
+/**
+ * Combo 预览信息（用于 UI 显示可触发的 combo）
+ */
+export interface ComboPreview {
+  /** combo 定义 */
+  combo: ComboDefinition;
+  /** 完成进度 (0-1) */
+  progress: number;
+  /** 本回合已打出的匹配卡牌 definitionId */
+  alreadyPlayed: string[];
+  /** 还需要打出的卡牌 definitionId */
+  stillNeeded: string[];
+  /** 还需要的数量（用于 tag_count 类型） */
+  stillNeededCount?: number;
+  /** 所需的标签（用于 tag_count 类型） */
+  requiredTag?: string;
+  /** 所需的标签序列（用于 tag_sequence 类型） */
+  requiredTags?: string[];
+  /** 手牌中是否有足够的卡牌来完成这个 combo */
+  canComplete: boolean;
+}
+
 // ============================================================================
 // Card Upgrade System Types
 // ============================================================================
@@ -292,6 +324,24 @@ export interface GameConfig {
   winConditions: WinCondition[];
   initialStats: Record<string, number>;
   initialResources: Record<string, number>;
+  /** 每回合最大出牌数量限制（策略性限制） */
+  maxCardsPerTurn?: number;
+  /** 互斥标签组定义（同回合不能同时打出互斥组内标签的卡牌） */
+  mutuallyExclusiveTagGroups?: MutuallyExclusiveTagGroup[];
+}
+
+/**
+ * 互斥标签组
+ * 同回合内不能同时打出属于同一互斥组的不同标签的卡牌
+ * 例如：work 和 rest 互斥，打了加班就不能打摸鱼
+ */
+export interface MutuallyExclusiveTagGroup {
+  /** 互斥组 ID */
+  id: string;
+  /** 互斥组名称（用于 UI 显示） */
+  name: string;
+  /** 互斥的标签列表 */
+  tags: string[];
 }
 
 export interface WinCondition {

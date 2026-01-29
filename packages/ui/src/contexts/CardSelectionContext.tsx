@@ -26,6 +26,14 @@ export interface CardSelectionContextValue {
   isSelected: (cardId: string) => boolean;
   /** 是否正在处理打出 */
   isPlaying: boolean;
+  /** 当前回合剩余出牌数量，无限制时返回 undefined */
+  remainingCardPlays: number | undefined;
+  /** 每回合最大出牌数量，无限制时返回 undefined */
+  maxCardsPerTurn: number | undefined;
+  /** 检查指定卡牌是否可以打出（考虑数量限制和互斥标签） */
+  canPlayCard: (definitionId: string) => boolean;
+  /** 因互斥标签被禁用的卡牌定义 ID 集合 */
+  disabledCardsByMutualExclusion: Set<string>;
 }
 
 const CardSelectionContext = createContext<CardSelectionContextValue | null>(null);
@@ -234,6 +242,30 @@ export function CardSelectionProvider({
     }
   }, [disabled]);
 
+  // 出牌限制相关的计算属性
+  const remainingCardPlays = useMemo(() => {
+    if (!engine) return undefined;
+    return engine.getRemainingCardPlays(playerId);
+  }, [engine, playerId, selectedCardIds]); // selectedCardIds 变化时重新计算（因为可能刚打出卡牌）
+
+  const maxCardsPerTurn = useMemo(() => {
+    if (!engine) return undefined;
+    return engine.getMaxCardsPerTurn();
+  }, [engine]);
+
+  const disabledCardsByMutualExclusion = useMemo(() => {
+    if (!engine) return new Set<string>();
+    return engine.getDisabledCardsByMutualExclusion(playerId);
+  }, [engine, playerId, selectedCardIds]); // selectedCardIds 变化时重新计算
+
+  const canPlayCard = useCallback(
+    (definitionId: string): boolean => {
+      if (!engine) return false;
+      return engine.canPlayCard(playerId, definitionId);
+    },
+    [engine, playerId]
+  );
+
   const value = useMemo(
     (): CardSelectionContextValue => ({
       selectedCardIds,
@@ -244,8 +276,24 @@ export function CardSelectionProvider({
       selectedCount: selectedCardIds.size,
       isSelected,
       isPlaying,
+      remainingCardPlays,
+      maxCardsPerTurn,
+      canPlayCard,
+      disabledCardsByMutualExclusion,
     }),
-    [selectedCardIds, toggleCard, clearSelection, confirmPlay, pendingCombo, isSelected, isPlaying]
+    [
+      selectedCardIds,
+      toggleCard,
+      clearSelection,
+      confirmPlay,
+      pendingCombo,
+      isSelected,
+      isPlaying,
+      remainingCardPlays,
+      maxCardsPerTurn,
+      canPlayCard,
+      disabledCardsByMutualExclusion,
+    ]
   );
 
   return <CardSelectionContext.Provider value={value}>{children}</CardSelectionContext.Provider>;

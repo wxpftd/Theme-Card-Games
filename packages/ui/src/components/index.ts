@@ -8,6 +8,7 @@ export { DifficultySelector } from './DifficultySelector';
 export { DailyChallenge } from './DailyChallenge';
 export { LanguageSwitcher } from './LanguageSwitcher';
 export { PlayConfirmButton } from './PlayConfirmButton';
+export { ComboPreview } from './ComboPreview';
 
 // 竞争模式组件
 export { TargetSelector } from './TargetSelector';

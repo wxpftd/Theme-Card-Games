@@ -6,6 +6,7 @@ import {
   PlayerState,
   GameEngine,
   ComboDefinition,
+  ComboPreview as ComboPreviewType,
 } from '@theme-card-games/core';
 import { useTheme } from '../theme/ThemeContext';
 import { useI18n } from '../i18n';
@@ -13,6 +14,7 @@ import { PlayerStats } from './PlayerStats';
 import { HandView } from './HandView';
 import { OpponentView } from './OpponentView';
 import { PlayConfirmButton } from './PlayConfirmButton';
+import { ComboPreview } from './ComboPreview';
 import { CardSelectionProvider } from '../contexts/CardSelectionContext';
 
 interface GameBoardProps {
@@ -33,6 +35,14 @@ interface GameBoardProps {
   isAIPlayer?: (playerId: string) => boolean;
   /** AI 思考中提示 */
   aiThinking?: string | null;
+  /** 每回合最大出牌数量 */
+  maxCardsPerTurn?: number;
+  /** 当前回合剩余出牌数量 */
+  remainingCardPlays?: number;
+  /** 因互斥标签被禁用的卡牌定义 ID 集合 */
+  disabledCardsByMutualExclusion?: Set<string>;
+  /** 可触发的 combo 预览列表 */
+  comboPreviews?: ComboPreviewType[];
 }
 
 function GameBoardComponent({
@@ -47,6 +57,10 @@ function GameBoardComponent({
   opponents,
   isAIPlayer,
   aiThinking,
+  maxCardsPerTurn,
+  remainingCardPlays,
+  disabledCardsByMutualExclusion,
+  comboPreviews,
 }: GameBoardProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
@@ -113,6 +127,14 @@ function GameBoardComponent({
   // Memoize hand cards to prevent HandView re-renders
   const handCards = useMemo(() => player.hand, [player.hand]);
 
+  // 计算已出牌数量
+  const cardsPlayedThisTurn = useMemo(() => {
+    if (maxCardsPerTurn === undefined || remainingCardPlays === undefined) {
+      return undefined;
+    }
+    return maxCardsPerTurn - remainingCardPlays;
+  }, [maxCardsPerTurn, remainingCardPlays]);
+
   // 内部渲染内容 - 用于共享两种模式的通用 UI
   const renderBoardContent = (isMultiSelectMode: boolean) => (
     <View
@@ -126,6 +148,8 @@ function GameBoardComponent({
         isMyTurn={isMyTurn}
         colors={theme.colors}
         t={t}
+        maxCardsPerTurn={maxCardsPerTurn}
+        cardsPlayedThisTurn={cardsPlayedThisTurn}
       />
 
       {/* Opponents (Multiplayer) */}
@@ -184,6 +208,15 @@ function GameBoardComponent({
           </View>
         )}
       </View>
+
+      {/* Combo Preview */}
+      {comboPreviews && comboPreviews.length > 0 && isMyTurn && (
+        <ComboPreview
+          comboPreviews={comboPreviews}
+          cardDefinitions={cardDefinitions}
+          compact={false}
+        />
+      )}
 
       {/* Play Confirm Button (多卡选择模式) - 放在手牌区域上方，确保可见 */}
       {isMultiSelectMode && isMyTurn && <PlayConfirmButton onPlayed={undefined} />}
@@ -254,6 +287,8 @@ const TurnInfoBar = memo(function TurnInfoBar({
   isMyTurn,
   colors,
   t,
+  maxCardsPerTurn,
+  cardsPlayedThisTurn,
 }: {
   turn: number;
   phaseText: string;
@@ -264,9 +299,15 @@ const TurnInfoBar = memo(function TurnInfoBar({
     primary: string;
     success: string;
     warning: string;
+    accent?: string;
   };
   t: (key: string, params?: Record<string, string | number>) => string;
+  maxCardsPerTurn?: number;
+  cardsPlayedThisTurn?: number;
 }) {
+  const showCardLimit = maxCardsPerTurn !== undefined && cardsPlayedThisTurn !== undefined;
+  const isAtLimit = showCardLimit && cardsPlayedThisTurn >= maxCardsPerTurn;
+
   return (
     <View testID="turn-info-bar" style={[styles.turnBar, { backgroundColor: colors.surface }]}>
       <View style={styles.turnInfo}>
@@ -276,6 +317,25 @@ const TurnInfoBar = memo(function TurnInfoBar({
         <Text testID="phase-text" style={[styles.phaseText, { color: colors.primary }]}>
           {phaseText}
         </Text>
+        {showCardLimit && (
+          <View
+            testID="card-limit-indicator"
+            style={[
+              styles.cardLimitBadge,
+              {
+                backgroundColor: isAtLimit ? colors.warning : colors.success + '20',
+                borderColor: isAtLimit ? colors.warning : colors.success,
+              },
+            ]}
+          >
+            <Text
+              testID="card-limit-text"
+              style={[styles.cardLimitText, { color: isAtLimit ? '#fff' : colors.success }]}
+            >
+              {t('game.cardsPlayed', { played: cardsPlayedThisTurn, max: maxCardsPerTurn })}
+            </Text>
+          </View>
+        )}
       </View>
       <View
         testID="turn-indicator"
@@ -398,5 +458,16 @@ const styles = StyleSheet.create({
   aiThinkingText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  cardLimitBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginLeft: 8,
+  },
+  cardLimitText: {
+    fontSize: 11,
+    fontWeight: '600',
   },
 });

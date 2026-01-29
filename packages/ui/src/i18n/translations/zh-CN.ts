@@ -31,6 +31,17 @@ export const zhCN = {
   'game.noCards': '暂无打出的卡牌',
   'game.endTurn': '结束回合',
   'game.dangerWarning': '危险！健康值过低',
+  'game.cardsPlayed': '已出 {played}/{max}',
+  'game.cardLimitReached': '本回合已达出牌上限',
+  'game.mutualExclusion': '与本回合已打出的卡牌互斥',
+
+  // Combo preview
+  'combo.available': '可触发组合',
+  'combo.ready': '已就绪',
+  'combo.canTrigger': '可触发',
+  'combo.need': '还需: {cards}',
+  'combo.needCount': '还需 {count} 张',
+  'combo.needTagCount': '还需 {count} 张 {tag} 卡',
 
   // Hand view
   'hand.title': '手牌',

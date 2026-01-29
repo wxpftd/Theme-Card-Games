@@ -18,6 +18,8 @@ interface HandViewProps {
   disabled?: boolean;
   maxVisible?: number;
   style?: ViewStyle;
+  /** 因互斥标签被禁用的卡牌定义 ID 集合（旧版模式使用，新模式从 Context 获取） */
+  disabledCardsByMutualExclusion?: Set<string>;
 }
 
 function HandViewComponent({
@@ -29,6 +31,7 @@ function HandViewComponent({
   disabled = false,
   maxVisible = 10,
   style,
+  disabledCardsByMutualExclusion: legacyDisabledCards,
 }: HandViewProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
@@ -95,6 +98,19 @@ function HandViewComponent({
           const definition = getCardDefinition(card);
           if (!definition) return null;
 
+          // 检查卡牌是否因互斥标签被禁用
+          const isMutuallyExcluded = useMultiSelectMode
+            ? (cardSelection?.disabledCardsByMutualExclusion.has(definition.id) ?? false)
+            : (legacyDisabledCards?.has(definition.id) ?? false);
+
+          // 检查是否因出牌限制被禁用（只在多选模式下）
+          const isLimitReached =
+            useMultiSelectMode &&
+            cardSelection?.remainingCardPlays !== undefined &&
+            cardSelection.remainingCardPlays <= 0;
+
+          const isCardDisabled = disabled || isMutuallyExcluded || isLimitReached;
+
           return (
             <View
               key={card.instanceId}
@@ -112,7 +128,7 @@ function HandViewComponent({
                 cardId={card.instanceId}
                 cardIndex={index}
                 selected={isCardSelected(card.instanceId)}
-                disabled={disabled}
+                disabled={isCardDisabled}
                 useMultiSelectMode={useMultiSelectMode}
                 cardSelection={cardSelection}
                 onCardSelect={onCardSelect}
