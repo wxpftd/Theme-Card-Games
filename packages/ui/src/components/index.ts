@@ -1,8 +1,10 @@
 export { Card } from './Card';
 export { EnhancedCard } from './EnhancedCard';
+export { IllustratedCard } from './IllustratedCard';
 export { HandView } from './HandView';
 export { PlayerStats } from './PlayerStats';
 export { GameBoard } from './GameBoard';
+export { EnhancedGameBoard } from './EnhancedGameBoard';
 export { GameOverScreen } from './GameOverScreen';
 export { EnhancedGameOverScreen } from './EnhancedGameOverScreen';
 export { AchievementList } from './AchievementList';
