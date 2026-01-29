@@ -1,0 +1,2735 @@
+{
+  "version": "2.6",
+  "children": [
+    {
+      "type": "frame",
+      "id": "bi8Au",
+      "x": 0,
+      "y": 0,
+      "name": "Game Board Mobile",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": [
+        {
+          "type": "image",
+          "enabled": true,
+          "url": "./apps/bigtech-worker/assets/images/game_bg.png",
+          "mode": "fill"
+        },
+        "#1A191830"
+      ],
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "V6RIG",
+          "name": "TurnInfoBar",
+          "width": "fill_container",
+          "height": 40,
+          "fill": "#FFFFFF90",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#E8E3DD"
+          },
+          "effect": {
+            "type": "background_blur",
+            "radius": 12
+          },
+          "padding": [
+            0,
+            12
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "hTx65",
+              "name": "TurnLabel",
+              "fill": "#F3F4F6",
+              "cornerRadius": 8,
+              "gap": 8,
+              "padding": [
+                4,
+                8
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Bu90E",
+                  "name": "turnIcon",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "rotate-cw",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FF6B1A"
+                },
+                {
+                  "type": "text",
+                  "id": "ybk1j",
+                  "name": "turnText",
+                  "fill": "#1A1918",
+                  "content": "Round 3",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "5reyl",
+              "name": "TurnRight",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zUtU4",
+                  "name": "energyInfo",
+                  "fill": "#FFF7ED",
+                  "cornerRadius": 12,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#FFEDD5"
+                  },
+                  "gap": 4,
+                  "padding": [
+                    4,
+                    8
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "hhyCL",
+                      "name": "energyIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "battery-charging",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FF5C00"
+                    },
+                    {
+                      "type": "text",
+                      "id": "jgI0Z",
+                      "name": "energyText",
+                      "fill": "#FF5C00",
+                      "content": "Energy: 6/8",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "oP3kb",
+                  "name": "deckInfo",
+                  "fill": "#F3F4F6",
+                  "cornerRadius": 12,
+                  "gap": 4,
+                  "padding": [
+                    4,
+                    8
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "UgrAq",
+                      "name": "deckIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "layers",
+                      "iconFontFamily": "lucide",
+                      "fill": "#8B8B90"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xqjdS",
+                      "name": "deckText",
+                      "fill": "#7A7875",
+                      "content": "Deck: 15",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "p8xnr",
+                  "name": "discardInfo",
+                  "fill": "#F3F4F6",
+                  "cornerRadius": 12,
+                  "gap": 4,
+                  "padding": [
+                    4,
+                    8
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "Nil3n",
+                      "name": "discardIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "trash-2",
+                      "iconFontFamily": "lucide",
+                      "fill": "#8B8B90"
+                    },
+                    {
+                      "type": "text",
+                      "id": "sjoP5",
+                      "name": "discardText",
+                      "fill": "#7A7875",
+                      "content": "Discard: 5",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "aootK",
+          "name": "OpponentArea",
+          "width": "fill_container",
+          "height": 90,
+          "fill": "#FFFFFFA0",
+          "cornerRadius": 16,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#FFFFFF"
+          },
+          "effect": {
+            "type": "background_blur",
+            "radius": 14
+          },
+          "layout": "vertical",
+          "gap": 6,
+          "padding": [
+            10,
+            12
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "Q19iR",
+              "name": "opponentHeader",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "C2bj7",
+                  "name": "opponentInfo",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "KLgeG",
+                      "name": "opponentAvatar",
+                      "width": 36,
+                      "height": 36,
+                      "fill": "$accent-pink",
+                      "cornerRadius": 18,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "CjvX3",
+                          "name": "avatarIcon",
+                          "width": 20,
+                          "height": 20,
+                          "iconFontName": "bot",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FFFFFF"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZJIPR",
+                      "name": "opponentName",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "TAxu4",
+                          "name": "nameText",
+                          "fill": "#1A1918",
+                          "content": "AI Opponent",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "CrqmY",
+                          "name": "levelBadge",
+                          "fill": "$accent-pink",
+                          "content": "Level 5 · Hard",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "1CaFR",
+                  "name": "opponentCards",
+                  "width": 60,
+                  "height": 24,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "zdkvY",
+                      "x": 48,
+                      "y": 6,
+                      "name": "cardCountText",
+                      "fill": "#7A7875",
+                      "content": "4 cards",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "id": "sSLFE",
+                      "type": "ref",
+                      "ref": "Pcy1u",
+                      "width": 16,
+                      "height": 22,
+                      "x": 0,
+                      "y": 1,
+                      "rotation": -8,
+                      "name": "miniCard1"
+                    },
+                    {
+                      "id": "Dmkh9",
+                      "type": "ref",
+                      "ref": "Pcy1u",
+                      "width": 16,
+                      "height": 22,
+                      "x": 10,
+                      "y": 0,
+                      "rotation": -3.0000000000000004,
+                      "name": "miniCard2"
+                    },
+                    {
+                      "id": "glX9I",
+                      "type": "ref",
+                      "ref": "Pcy1u",
+                      "width": 16,
+                      "height": 22,
+                      "x": 20,
+                      "y": 0,
+                      "rotation": 3.0000000000000004,
+                      "name": "miniCard3"
+                    },
+                    {
+                      "id": "QyhJP",
+                      "type": "ref",
+                      "ref": "Pcy1u",
+                      "width": 16,
+                      "height": 22,
+                      "x": 30,
+                      "y": 1,
+                      "rotation": 8,
+                      "name": "miniCard4"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "40AFM",
+              "name": "opponentStats",
+              "width": "fill_container",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "F9cz9",
+                  "name": "oppHealthLabel",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "h6sAh",
+                      "name": "oppHealthIcon",
+                      "width": 12,
+                      "height": 12,
+                      "iconFontName": "heart",
+                      "iconFontFamily": "lucide",
+                      "fill": "#EF4444"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zVKDK",
+                      "name": "oppHealthText",
+                      "fill": "#7A7875",
+                      "content": "HP",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "id": "6PZ5l",
+                  "type": "ref",
+                  "ref": "QBasT",
+                  "width": "fill_container",
+                  "height": 5,
+                  "name": "oppHealthBar",
+                  "fill": "#E8E3DD",
+                  "descendants": {
+                    "dvpTL": {
+                      "fill": "#EF4444",
+                      "width": 160
+                    }
+                  }
+                },
+                {
+                  "type": "text",
+                  "id": "I7KKS",
+                  "name": "oppHealthValue",
+                  "fill": "#EF4444",
+                  "content": "80/100",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "16zjf",
+          "name": "PlayerStats",
+          "width": "fill_container",
+          "height": 60,
+          "fill": "#FFFFFFA0",
+          "cornerRadius": 16,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#FFFFFF"
+          },
+          "effect": {
+            "type": "background_blur",
+            "radius": 14
+          },
+          "layout": "vertical",
+          "gap": 6,
+          "padding": [
+            8,
+            12
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "9L6Bt",
+              "name": "playerHeader",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ysRzZ",
+                  "name": "playerInfo",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "aex03",
+                      "name": "playerAvatar",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$accent-primary",
+                      "cornerRadius": 16,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "LvCwZ",
+                          "name": "playerAvatarIcon",
+                          "width": 18,
+                          "height": 18,
+                          "iconFontName": "user",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FFFFFF"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "z14rV",
+                      "name": "playerName",
+                      "fill": "#1A1918",
+                      "content": "You",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "YA5w7",
+                  "name": "turnIndicator",
+                  "fill": "#7C3AED15",
+                  "cornerRadius": 12,
+                  "gap": 4,
+                  "padding": [
+                    4,
+                    8
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "Wz80n",
+                      "name": "turnDot",
+                      "fill": "$accent-primary",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "CdyVM",
+                      "name": "turnText",
+                      "fill": "$accent-primary",
+                      "content": "Your Turn",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "7rIk6",
+              "name": "statsRow",
+              "width": "fill_container",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "BKI4K",
+                  "name": "healthStat",
+                  "width": "fill_container",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "YkT3m",
+                      "name": "healthIcon",
+                      "width": 12,
+                      "height": 12,
+                      "iconFontName": "heart",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22C55E"
+                    },
+                    {
+                      "id": "oKLnb",
+                      "type": "ref",
+                      "ref": "QBasT",
+                      "width": "fill_container",
+                      "height": 5,
+                      "name": "healthBarNew",
+                      "fill": "#E8E3DD",
+                      "descendants": {
+                        "dvpTL": {
+                          "fill": "#22C55E"
+                        }
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "CZqMD",
+                      "name": "healthVal",
+                      "fill": "#22C55E",
+                      "content": "75",
+                      "fontFamily": "DM Mono",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "FwcFb",
+                  "name": "stressStat",
+                  "width": "fill_container",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "UREba",
+                      "name": "stressIcon",
+                      "width": 12,
+                      "height": 12,
+                      "iconFontName": "zap",
+                      "iconFontFamily": "lucide",
+                      "fill": "#F59E0B"
+                    },
+                    {
+                      "id": "NRoWH",
+                      "type": "ref",
+                      "ref": "QBasT",
+                      "width": "fill_container",
+                      "height": 5,
+                      "name": "stressBarNew",
+                      "fill": "#E8E3DD",
+                      "descendants": {
+                        "dvpTL": {
+                          "fill": "#F59E0B",
+                          "width": 70
+                        }
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "ITyp5",
+                      "name": "stressVal",
+                      "fill": "#F59E0B",
+                      "content": "35",
+                      "fontFamily": "DM Mono",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "j6xLV",
+          "name": "PlayArea",
+          "width": "fill_container",
+          "height": 180,
+          "fill": "#FFFFFFB0",
+          "effect": {
+            "type": "background_blur",
+            "radius": 10
+          },
+          "layout": "vertical",
+          "gap": 6,
+          "padding": [
+            8,
+            12
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "fEnTG",
+              "name": "PlayedCards",
+              "width": "fill_container",
+              "height": "fill_container",
+              "fill": "#FFFFFF30",
+              "cornerRadius": 16,
+              "stroke": {
+                "thickness": 2,
+                "fill": "#A78BFA"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 6
+              },
+              "layout": "vertical",
+              "gap": 8,
+              "padding": 6,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "VVMud",
+                  "name": "OppPlayArea",
+                  "width": "fill_container",
+                  "height": 50,
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Pxfln",
+                      "name": "oppLabel",
+                      "fill": "#A3A09C",
+                      "content": "Opponent",
+                      "fontFamily": "Inter",
+                      "fontSize": 9,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ZEIBQ",
+                  "name": "vsIcon",
+                  "width": 24,
+                  "height": 24,
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 90,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#7C3AED",
+                        "position": 0
+                      },
+                      {
+                        "color": "#A78BFA",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "cornerRadius": 12,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#7C3AED80",
+                    "blur": 6
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "HQpJE",
+                      "name": "vsText",
+                      "fill": "#FFFFFF",
+                      "content": "VS",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "eFnED",
+                  "name": "PlayerPlayArea",
+                  "width": "fill_container",
+                  "height": 50,
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "I9lou",
+                      "name": "playerLabel",
+                      "fill": "#A3A09C",
+                      "content": "Your Play",
+                      "fontFamily": "Inter",
+                      "fontSize": 9,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "sYsfu",
+          "name": "ComboPreview",
+          "width": "fill_container",
+          "height": 36,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 90,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#FFF7EDE0",
+                "position": 0
+              },
+              {
+                "color": "#FFEDD5E0",
+                "position": 1
+              }
+            ]
+          },
+          "stroke": {
+            "thickness": {
+              "top": 1,
+              "bottom": 1
+            },
+            "fill": "#FDBA74"
+          },
+          "effect": {
+            "type": "background_blur",
+            "radius": 8
+          },
+          "gap": 6,
+          "padding": [
+            0,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "zmM3q",
+              "name": "comboIcon",
+              "width": 14,
+              "height": 14,
+              "iconFontName": "sparkles",
+              "iconFontFamily": "lucide",
+              "fill": "#FF5C00"
+            },
+            {
+              "type": "text",
+              "id": "DzXp8",
+              "name": "comboLabel",
+              "fill": "#7A7875",
+              "content": "Combo:",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "ndIdb",
+              "name": "comboName",
+              "fill": "#FF5C00",
+              "content": "Work-Life Balance",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "600"
+            },
+            {
+              "id": "A6AGG",
+              "type": "ref",
+              "ref": "KJcUd",
+              "name": "comboBadge",
+              "descendants": {
+                "9KJv1": {
+                  "fill": "#FF5C00"
+                },
+                "YGcKh": {
+                  "content": "Buff +2",
+                  "fill": "#FF5C00"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "UAAFW",
+          "name": "HandView",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#FFFFFF70",
+          "effect": {
+            "type": "background_blur",
+            "radius": 10
+          },
+          "layout": "vertical",
+          "gap": 6,
+          "padding": 12,
+          "children": [
+            {
+              "type": "frame",
+              "id": "1yywu",
+              "name": "handHeader",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "GIePM",
+                  "name": "handTitle",
+                  "fill": "#7A7875",
+                  "content": "Your Hand",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "JT3Ce",
+                  "name": "handCount",
+                  "fill": "#A3A09C",
+                  "content": "5 cards",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "SZFN7",
+              "name": "HandCards",
+              "width": "fill_container",
+              "height": "fill_container",
+              "gap": 8,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "SdwZ2",
+                  "type": "ref",
+                  "ref": "XRnJH",
+                  "name": "card1",
+                  "x": -3,
+                  "y": 123.5,
+                  "fill": "#FFFFFF",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1.5,
+                    "fill": "#C8C5C0"
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000012",
+                    "blur": 8
+                  },
+                  "descendants": {
+                    "Iiy8G": {
+                      "fill": "#1A1918"
+                    },
+                    "Sbzeh": {
+                      "fill": "#FF5C00"
+                    },
+                    "VFsIB": {
+                      "fill": "#FFFFFF"
+                    },
+                    "dzAWY": {
+                      "fill": "#F0EDFA"
+                    },
+                    "5si9w": {
+                      "fill": "#FF5C00"
+                    },
+                    "Fp9S5": {
+                      "fill": "#FFFFFF"
+                    },
+                    "6GLHH": {
+                      "fill": "#7A7875"
+                    }
+                  }
+                },
+                {
+                  "id": "88JZV",
+                  "type": "ref",
+                  "ref": "XRnJH",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 2,
+                    "fill": "$accent-teal"
+                  },
+                  "name": "card2",
+                  "x": 73,
+                  "y": 123.5,
+                  "fill": "#FFFFFF",
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000012",
+                    "blur": 8
+                  },
+                  "descendants": {
+                    "Iiy8G": {
+                      "fill": "#1A1918"
+                    },
+                    "Sbzeh": {
+                      "fill": "#FF5C00"
+                    },
+                    "VFsIB": {
+                      "fill": "#FFFFFF"
+                    },
+                    "dzAWY": {
+                      "fill": "#F0EDFA"
+                    },
+                    "5si9w": {
+                      "fill": "#FF5C00"
+                    },
+                    "Fp9S5": {
+                      "fill": "#FFFFFF"
+                    },
+                    "6GLHH": {
+                      "fill": "#7A7875"
+                    }
+                  }
+                },
+                {
+                  "id": "1zamF",
+                  "type": "ref",
+                  "ref": "XRnJH",
+                  "stroke": {
+                    "align": "outside",
+                    "thickness": 2,
+                    "fill": "$accent-primary"
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#7C3AED40",
+                    "blur": 14,
+                    "spread": 3
+                  },
+                  "name": "card3",
+                  "x": 149,
+                  "y": 123.5,
+                  "fill": "#FFFFFF",
+                  "descendants": {
+                    "Iiy8G": {
+                      "fill": "#1A1918"
+                    },
+                    "Sbzeh": {
+                      "fill": "#FF5C00"
+                    },
+                    "VFsIB": {
+                      "fill": "#FFFFFF"
+                    },
+                    "dzAWY": {
+                      "fill": "#F0EDFA"
+                    },
+                    "5si9w": {
+                      "fill": "#FF5C00"
+                    },
+                    "Fp9S5": {
+                      "fill": "#FFFFFF"
+                    },
+                    "6GLHH": {
+                      "fill": "#7A7875"
+                    }
+                  }
+                },
+                {
+                  "id": "OxgS4",
+                  "type": "ref",
+                  "ref": "XRnJH",
+                  "name": "card4",
+                  "x": 225,
+                  "y": 123.5,
+                  "fill": "#FFFFFF",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1.5,
+                    "fill": "#C8C5C0"
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000012",
+                    "blur": 8
+                  },
+                  "descendants": {
+                    "Iiy8G": {
+                      "fill": "#1A1918"
+                    },
+                    "Sbzeh": {
+                      "fill": "#FF5C00"
+                    },
+                    "VFsIB": {
+                      "fill": "#FFFFFF"
+                    },
+                    "dzAWY": {
+                      "fill": "#F0EDFA"
+                    },
+                    "5si9w": {
+                      "fill": "#FF5C00"
+                    },
+                    "Fp9S5": {
+                      "fill": "#FFFFFF"
+                    },
+                    "6GLHH": {
+                      "fill": "#7A7875"
+                    }
+                  }
+                },
+                {
+                  "id": "Agghc",
+                  "type": "ref",
+                  "ref": "XRnJH",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 2,
+                    "fill": "$accent-pink"
+                  },
+                  "name": "card5",
+                  "x": 301,
+                  "y": 123.5,
+                  "fill": "#FFFFFF",
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000012",
+                    "blur": 8
+                  },
+                  "descendants": {
+                    "Iiy8G": {
+                      "fill": "#1A1918"
+                    },
+                    "Sbzeh": {
+                      "fill": "#FF5C00"
+                    },
+                    "VFsIB": {
+                      "fill": "#FFFFFF"
+                    },
+                    "dzAWY": {
+                      "fill": "#F0EDFA"
+                    },
+                    "5si9w": {
+                      "fill": "#FF5C00"
+                    },
+                    "Fp9S5": {
+                      "fill": "#FFFFFF"
+                    },
+                    "6GLHH": {
+                      "fill": "#7A7875"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "5zsaU",
+          "name": "ActionBar",
+          "width": "fill_container",
+          "height": 56,
+          "fill": "#FFFFFFE8",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#E8E3DD"
+          },
+          "effect": [
+            {
+              "type": "background_blur",
+              "radius": 12
+            },
+            {
+              "type": "shadow",
+              "shadowType": "outer",
+              "color": "#00000015",
+              "offset": {
+                "x": 0,
+                "y": -4
+              },
+              "blur": 12
+            }
+          ],
+          "gap": 8,
+          "padding": [
+            10,
+            12
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "lmNoK",
+              "type": "ref",
+              "ref": "vSRaz",
+              "name": "discardBtn",
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#D1D0CD"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#00000008",
+                "blur": 6
+              },
+              "descendants": {
+                "7CNOb": {
+                  "content": "Discard",
+                  "fill": "#1A1918"
+                }
+              }
+            },
+            {
+              "id": "8rbs5",
+              "type": "ref",
+              "ref": "dhYjJ",
+              "name": "playBtn",
+              "descendants": {
+                "s9h5D": {
+                  "content": "Play",
+                  "fill": "#FFFFFF"
+                }
+              }
+            },
+            {
+              "id": "Jow3b",
+              "type": "ref",
+              "ref": "vSRaz",
+              "name": "endTurnBtn",
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#D1D0CD"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#00000008",
+                "blur": 6
+              },
+              "descendants": {
+                "7CNOb": {
+                  "content": "End Turn",
+                  "fill": "#1A1918"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "XRnJH",
+      "x": 850,
+      "y": 0,
+      "name": "Card",
+      "reusable": true,
+      "width": 68,
+      "height": 92,
+      "fill": "#FFFFFF",
+      "cornerRadius": 12,
+      "stroke": {
+        "thickness": 2,
+        "fill": "#6366F1"
+      },
+      "effect": {
+        "type": "shadow",
+        "shadowType": "outer",
+        "color": "#0000001A",
+        "offset": {
+          "x": 0,
+          "y": 2
+        },
+        "blur": 4
+      },
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "8211c",
+          "name": "CardHeader",
+          "width": "fill_container",
+          "height": 18,
+          "fill": "#F5F3FF",
+          "padding": [
+            2,
+            5
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Iiy8G",
+              "name": "CardName",
+              "fill": "#1A1918",
+              "textGrowth": "fixed-width",
+              "width": 42,
+              "content": "Card Name",
+              "fontFamily": "Inter",
+              "fontSize": 8,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "Sbzeh",
+              "name": "CardCost",
+              "width": 20,
+              "height": 20,
+              "fill": "#7C3AED",
+              "cornerRadius": 100,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "VFsIB",
+                  "name": "CostText",
+                  "fill": "#FFFFFF",
+                  "content": "2",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "dzAWY",
+          "name": "CardIcon",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#F0EDFA",
+          "layout": "vertical",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "5si9w",
+              "name": "IconSymbol",
+              "width": 22,
+              "height": 22,
+              "iconFontName": "zap",
+              "iconFontFamily": "lucide",
+              "fill": "#FF5C00"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Fp9S5",
+          "name": "CardDesc",
+          "width": "fill_container",
+          "height": 26,
+          "fill": "#FFFFFF",
+          "layout": "vertical",
+          "padding": [
+            3,
+            4
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "6GLHH",
+              "name": "DescText",
+              "fill": "#7A7875",
+              "textGrowth": "fixed-width",
+              "width": 60,
+              "content": "Effect description here",
+              "lineHeight": 1.3,
+              "fontFamily": "Inter",
+              "fontSize": 7,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "QBasT",
+      "x": 850,
+      "y": 154.77124183006535,
+      "name": "ProgressBar",
+      "reusable": true,
+      "width": 200,
+      "height": 6,
+      "fill": "#E8E3DD",
+      "cornerRadius": 4,
+      "children": [
+        {
+          "type": "frame",
+          "id": "dvpTL",
+          "name": "ProgressFill",
+          "width": 120,
+          "height": "fill_container",
+          "fill": "#22C55E",
+          "cornerRadius": 4
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "KJcUd",
+      "x": 850,
+      "y": 174.11764705882354,
+      "name": "Badge",
+      "reusable": true,
+      "height": 19,
+      "fill": "#8B5CF620",
+      "cornerRadius": 100,
+      "gap": 4,
+      "padding": [
+        4,
+        8
+      ],
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "9KJv1",
+          "name": "BadgeIcon",
+          "width": 12,
+          "height": 12,
+          "iconFontName": "flame",
+          "iconFontFamily": "lucide",
+          "fill": "#FF5C00"
+        },
+        {
+          "type": "text",
+          "id": "YGcKh",
+          "name": "BadgeText",
+          "fill": "#FF5C00",
+          "content": "Buff +2",
+          "fontFamily": "Inter",
+          "fontSize": 10,
+          "fontWeight": "500"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "dhYjJ",
+      "x": 850,
+      "y": 212.81045751633988,
+      "name": "ButtonPrimary",
+      "reusable": true,
+      "height": 35,
+      "fill": {
+        "type": "gradient",
+        "gradientType": "linear",
+        "enabled": true,
+        "rotation": 90,
+        "size": {
+          "height": 1
+        },
+        "colors": [
+          {
+            "color": "#7C3AED",
+            "position": 0
+          },
+          {
+            "color": "#9F7AEA",
+            "position": 1
+          }
+        ]
+      },
+      "cornerRadius": 20,
+      "effect": {
+        "type": "shadow",
+        "shadowType": "outer",
+        "color": "#7C3AED60",
+        "offset": {
+          "x": 0,
+          "y": 4
+        },
+        "blur": 12
+      },
+      "gap": 8,
+      "padding": [
+        10,
+        16
+      ],
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "s9h5D",
+          "name": "ButtonText",
+          "fill": "#FFFFFF",
+          "content": "End Turn",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "500"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "vSRaz",
+      "x": 850,
+      "y": 261.1764705882353,
+      "name": "ButtonSecondary",
+      "reusable": true,
+      "height": 35,
+      "fill": "transparent",
+      "cornerRadius": 20,
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "#D1D0CD"
+      },
+      "gap": 8,
+      "padding": [
+        10,
+        16
+      ],
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "7CNOb",
+          "name": "ButtonText",
+          "fill": "#1A1918",
+          "content": "Cancel",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "500"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Pcy1u",
+      "x": 850,
+      "y": 326,
+      "name": "CardBack",
+      "reusable": true,
+      "clip": true,
+      "width": 68,
+      "height": 92,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./apps/bigtech-worker/assets/images/card_back.png",
+        "mode": "fill"
+      },
+      "cornerRadius": 12,
+      "stroke": {
+        "thickness": 1.5,
+        "fill": "#C9A84C"
+      },
+      "effect": {
+        "type": "shadow",
+        "shadowType": "outer",
+        "color": "#00000025",
+        "offset": {
+          "x": 0,
+          "y": 2
+        },
+        "blur": 6
+      }
+    },
+    {
+      "type": "frame",
+      "id": "IAaEd",
+      "x": -450,
+      "y": 0,
+      "name": "Home Screen",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./apps/bigtech-worker/assets/images/home_bg.png",
+        "mode": "fill"
+      },
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "tZ5WR",
+          "name": "topSpacer",
+          "width": 1,
+          "height": 100,
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "1ln9M",
+          "name": "LogoArea",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 8,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "4Er3p",
+              "name": "GameTitle",
+              "fill": "#1A3A5C",
+              "content": "BigTech Worker",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 32,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "B9baZ",
+              "name": "GameSubtitle",
+              "fill": "#4A6B8A",
+              "content": "Card Battle",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "letterSpacing": 4
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "anhqV",
+          "name": "midSpacer",
+          "width": 1,
+          "height": 20,
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "4CQ8c",
+          "name": "MascotArea",
+          "clip": true,
+          "width": 180,
+          "height": 180,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "./apps/bigtech-worker/assets/icon.png",
+            "mode": "fill"
+          },
+          "cornerRadius": 100,
+          "effect": [
+            {
+              "type": "shadow",
+              "shadowType": "outer",
+              "color": "#FFFFFF80",
+              "blur": 20,
+              "spread": 4
+            },
+            {
+              "type": "shadow",
+              "shadowType": "outer",
+              "color": "#3B82F640",
+              "offset": {
+                "x": 0,
+                "y": 8
+              },
+              "blur": 30
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "NyAzc",
+          "name": "midSpacer2",
+          "width": 1,
+          "height": 40,
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "8vJ0U",
+          "name": "ButtonArea",
+          "width": 260,
+          "layout": "vertical",
+          "gap": 14,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "GUjle",
+              "name": "StartButton",
+              "width": "fill_container",
+              "height": 52,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 90,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#1A5276",
+                    "position": 0
+                  },
+                  {
+                    "color": "#2980B9",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 26,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#2980B960",
+                "offset": {
+                  "x": 0,
+                  "y": 6
+                },
+                "blur": 16
+              },
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "kTHXl",
+                  "name": "startIcon",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "play",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "text",
+                  "id": "xwh70",
+                  "name": "startText",
+                  "fill": "#FFFFFF",
+                  "content": "Start Game",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "1b2eX",
+              "name": "DeckButton",
+              "width": "fill_container",
+              "height": 46,
+              "fill": "#FFFFFFC0",
+              "cornerRadius": 23,
+              "stroke": {
+                "thickness": 1.5,
+                "fill": "#2980B940"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "XzOXy",
+                  "name": "deckIcon",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "layers",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A5276"
+                },
+                {
+                  "type": "text",
+                  "id": "KaF81",
+                  "name": "deckText",
+                  "fill": "#1A5276",
+                  "content": "Deck Builder",
+                  "fontFamily": "Inter",
+                  "fontSize": 15,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "mPhmq",
+              "name": "SettingsButton",
+              "width": "fill_container",
+              "height": 46,
+              "fill": "#FFFFFFC0",
+              "cornerRadius": 23,
+              "stroke": {
+                "thickness": 1.5,
+                "fill": "#2980B940"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Cyi1p",
+                  "name": "settingsIcon",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "settings",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A5276"
+                },
+                {
+                  "type": "text",
+                  "id": "HpErb",
+                  "name": "settingsText",
+                  "fill": "#1A5276",
+                  "content": "Settings",
+                  "fontFamily": "Inter",
+                  "fontSize": 15,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "KwZa5",
+          "name": "versionText",
+          "width": 1,
+          "height": "fill_container",
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "text",
+          "id": "2fyXA",
+          "name": "VersionText",
+          "fill": "#8AAFCF",
+          "content": "v1.0.0",
+          "textAlign": "center",
+          "fontFamily": "Inter",
+          "fontSize": 11
+        },
+        {
+          "type": "frame",
+          "id": "XdgdD",
+          "name": "footerSpacer",
+          "width": 1,
+          "height": 30,
+          "fill": "transparent",
+          "layout": "none"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "oM6D5",
+      "x": -450,
+      "y": 904,
+      "name": "Victory Screen",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./apps/bigtech-worker/assets/images/victory_bg.png",
+        "mode": "fill"
+      },
+      "layout": "vertical",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "EZyYL",
+          "name": "vTopSpacer",
+          "width": 1,
+          "height": 160,
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "text",
+          "id": "Wh6sI",
+          "name": "VictoryTitle",
+          "fill": "#B8860B",
+          "content": "Victory!",
+          "fontFamily": "Inter",
+          "fontSize": 42,
+          "fontWeight": "800",
+          "letterSpacing": 2
+        },
+        {
+          "type": "text",
+          "id": "16IAK",
+          "name": "VictorySubtitle",
+          "fill": "#8B6914",
+          "content": "You defeated the AI Opponent",
+          "fontFamily": "Inter",
+          "fontSize": 16
+        },
+        {
+          "type": "frame",
+          "id": "7MAEt",
+          "name": "vMidSpacer",
+          "width": 1,
+          "height": 40,
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "1uvXO",
+          "name": "VictoryStats",
+          "width": 300,
+          "fill": "#FFFFFF90",
+          "cornerRadius": 20,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#F5D98060"
+          },
+          "effect": {
+            "type": "background_blur",
+            "radius": 14
+          },
+          "layout": "vertical",
+          "gap": 16,
+          "padding": 24,
+          "children": [
+            {
+              "type": "text",
+              "id": "coj44",
+              "name": "StatsTitle",
+              "fill": "#8B6914",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Battle Results",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "oooq2",
+              "name": "StatRow1",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "x7YBp",
+                  "name": "sr1Label",
+                  "fill": "#7A6B3F",
+                  "content": "Rounds Played",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "Io4UO",
+                  "name": "sr1Value",
+                  "fill": "#B8860B",
+                  "content": "8",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "K0pi9",
+              "name": "StatRow2",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "nznYW",
+                  "name": "sr2Label",
+                  "fill": "#7A6B3F",
+                  "content": "Cards Played",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "dNyrk",
+                  "name": "sr2Value",
+                  "fill": "#B8860B",
+                  "content": "15",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "mI059",
+              "name": "StatRow3",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "TIb9s",
+                  "name": "sr3Label",
+                  "fill": "#7A6B3F",
+                  "content": "Combos Triggered",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "zMNkw",
+                  "name": "sr3Value",
+                  "fill": "#B8860B",
+                  "content": "3",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "EHN6i",
+              "name": "StatRow4",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "hzhy6",
+                  "name": "sr4Label",
+                  "fill": "#7A6B3F",
+                  "content": "XP Earned",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "IGFlt",
+                  "name": "sr4Value",
+                  "fill": "#DAA520",
+                  "content": "+120",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 14,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "bhXoB",
+          "name": "vBtnSpacer",
+          "width": 1,
+          "height": 30,
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "F6a5x",
+          "name": "VictoryButtons",
+          "width": 260,
+          "layout": "vertical",
+          "gap": 12,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "8oVk9",
+              "name": "ContinueButton",
+              "width": "fill_container",
+              "height": 50,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 90,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#B8860B",
+                    "position": 0
+                  },
+                  {
+                    "color": "#DAA520",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 25,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#B8860B60",
+                "offset": {
+                  "x": 0,
+                  "y": 6
+                },
+                "blur": 16
+              },
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Yew5e",
+                  "name": "continueIcon",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "arrow-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "text",
+                  "id": "ZzC7J",
+                  "name": "continueText",
+                  "fill": "#FFFFFF",
+                  "content": "Continue",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "F0lH0",
+              "name": "HomeButton",
+              "width": "fill_container",
+              "height": 44,
+              "fill": "#FFFFFF80",
+              "cornerRadius": 22,
+              "stroke": {
+                "thickness": 1.5,
+                "fill": "#DAA52060"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "vTtIC",
+                  "name": "homeIcon",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "house",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8B6914"
+                },
+                {
+                  "type": "text",
+                  "id": "V9Gm6",
+                  "name": "homeText",
+                  "fill": "#8B6914",
+                  "content": "Back to Home",
+                  "fontFamily": "Inter",
+                  "fontSize": 15,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "JpJyj",
+      "x": 0,
+      "y": 904,
+      "name": "Defeat Screen",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./apps/bigtech-worker/assets/images/defeat_bg.png",
+        "mode": "fill"
+      },
+      "layout": "vertical",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "uuWt4",
+          "name": "dTopSpacer",
+          "width": 1,
+          "height": 200,
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "text",
+          "id": "9gGcT",
+          "name": "DefeatTitle",
+          "fill": "#C0C8D0",
+          "content": "Defeated",
+          "fontFamily": "Inter",
+          "fontSize": 38,
+          "fontWeight": "800",
+          "letterSpacing": 2
+        },
+        {
+          "type": "text",
+          "id": "5ct03",
+          "name": "DefeatSubtitle",
+          "fill": "#8899A6",
+          "content": "Better luck next time...",
+          "fontFamily": "Inter",
+          "fontSize": 16
+        },
+        {
+          "type": "frame",
+          "id": "uJBVU",
+          "name": "dMidSpacer",
+          "width": 1,
+          "height": 40,
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "T2JjK",
+          "name": "DefeatStats",
+          "width": 300,
+          "fill": "#1A2530C0",
+          "cornerRadius": 20,
+          "stroke": {
+            "thickness": 1,
+            "fill": "#3A4A5A60"
+          },
+          "effect": {
+            "type": "background_blur",
+            "radius": 14
+          },
+          "layout": "vertical",
+          "gap": 16,
+          "padding": 24,
+          "children": [
+            {
+              "type": "text",
+              "id": "21nKs",
+              "name": "StatsTitle",
+              "fill": "#8899A6",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Battle Results",
+              "textAlign": "center",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "2o3pG",
+              "name": "DStatRow1",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "OcCYb",
+                  "name": "dR1L",
+                  "fill": "#6B7B8A",
+                  "content": "Rounds Survived",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "JXAxQ",
+                  "name": "dR1V",
+                  "fill": "#8899A6",
+                  "content": "5",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "H43ud",
+              "name": "DStatRow2",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "IUWIQ",
+                  "name": "dR2L",
+                  "fill": "#6B7B8A",
+                  "content": "Cards Played",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "OZxc1",
+                  "name": "dR2V",
+                  "fill": "#8899A6",
+                  "content": "9",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ggNRS",
+              "name": "DStatRow3",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "I2J4O",
+                  "name": "dR3L",
+                  "fill": "#6B7B8A",
+                  "content": "Combos Triggered",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "RxHFa",
+                  "name": "dR3V",
+                  "fill": "#8899A6",
+                  "content": "1",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "7mqVJ",
+              "name": "DStatRow4",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "PbNNR",
+                  "name": "dR4L",
+                  "fill": "#6B7B8A",
+                  "content": "XP Earned",
+                  "fontFamily": "Inter",
+                  "fontSize": 14
+                },
+                {
+                  "type": "text",
+                  "id": "hbTiS",
+                  "name": "dR4V",
+                  "fill": "#8899A6",
+                  "content": "+45",
+                  "fontFamily": "DM Mono",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "HzeTy",
+          "name": "dBtnSpacer",
+          "width": 1,
+          "height": 30,
+          "fill": "transparent",
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "gUP3n",
+          "name": "DefeatButtons",
+          "width": 260,
+          "layout": "vertical",
+          "gap": 12,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "9RqxF",
+              "name": "RetryButton",
+              "width": "fill_container",
+              "height": 50,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 90,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#3A5068",
+                    "position": 0
+                  },
+                  {
+                    "color": "#4A6A82",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 25,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#3A506860",
+                "offset": {
+                  "x": 0,
+                  "y": 6
+                },
+                "blur": 16
+              },
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "kGJUQ",
+                  "name": "retryIcon",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "rotate-ccw",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "text",
+                  "id": "HD7mb",
+                  "name": "retryText",
+                  "fill": "#FFFFFF",
+                  "content": "Try Again",
+                  "fontFamily": "Inter",
+                  "fontSize": 17,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lxHtQ",
+              "name": "HomeButton",
+              "width": "fill_container",
+              "height": 44,
+              "fill": "#FFFFFF20",
+              "cornerRadius": 22,
+              "stroke": {
+                "thickness": 1.5,
+                "fill": "#FFFFFF30"
+              },
+              "effect": {
+                "type": "background_blur",
+                "radius": 10
+              },
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "QLtVi",
+                  "name": "dHomeIcon",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "house",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8899A6"
+                },
+                {
+                  "type": "text",
+                  "id": "xfwCi",
+                  "name": "dHomeText",
+                  "fill": "#8899A6",
+                  "content": "Back to Home",
+                  "fontFamily": "Inter",
+                  "fontSize": 15,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "accent-light": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#A78BFA"
+        },
+        {
+          "value": "#A78BFA"
+        }
+      ]
+    },
+    "accent-pink": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F472B6"
+        },
+        {
+          "value": "#F472B6"
+        }
+      ]
+    },
+    "accent-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#8B5CF6"
+        },
+        {
+          "value": "#7C3AED"
+        }
+      ]
+    },
+    "accent-teal": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#14B8A6"
+        },
+        {
+          "value": "#14B8A6"
+        }
+      ]
+    },
+    "bg-elevated": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E4E4E7"
+        },
+        {
+          "value": "#FFFFFF"
+        }
+      ]
+    },
+    "bg-interactive": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E4E4E7"
+        },
+        {
+          "value": "#F0EDFA"
+        }
+      ]
+    },
+    "bg-page": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF"
+        },
+        {
+          "value": "#F5F0EB"
+        }
+      ]
+    },
+    "bg-surface": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F4F4F5"
+        },
+        {
+          "value": "#FAFAF8"
+        }
+      ]
+    },
+    "border-default": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#D4D4D8"
+        },
+        {
+          "value": "#E8E3DD"
+        }
+      ]
+    },
+    "border-subtle": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E4E4E7"
+        },
+        {
+          "value": "#F0ECE6"
+        }
+      ]
+    },
+    "color-danger": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#EF4444"
+        },
+        {
+          "value": "#EF4444"
+        }
+      ]
+    },
+    "color-success": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#14B8A6"
+        },
+        {
+          "value": "#22C55E"
+        }
+      ]
+    },
+    "color-warning": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F59E0B"
+        },
+        {
+          "value": "#F59E0B"
+        }
+      ]
+    },
+    "rarity-common": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#A1A1AA"
+        },
+        {
+          "value": "#A1A1AA"
+        }
+      ]
+    },
+    "rarity-legendary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F472B6"
+        },
+        {
+          "value": "#F472B6"
+        }
+      ]
+    },
+    "rarity-rare": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#3B82F6"
+        },
+        {
+          "value": "#3B82F6"
+        }
+      ]
+    },
+    "rarity-uncommon": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#14B8A6"
+        },
+        {
+          "value": "#14B8A6"
+        }
+      ]
+    },
+    "text-disabled": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#A1A1AA"
+        },
+        {
+          "value": "#A3A09C"
+        }
+      ]
+    },
+    "text-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#18181B"
+        },
+        {
+          "value": "#1A1918"
+        }
+      ]
+    },
+    "text-secondary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#71717A"
+        },
+        {
+          "value": "#6D6C6A"
+        }
+      ]
+    }
+  }
+}
