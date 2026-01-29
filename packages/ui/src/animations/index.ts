@@ -21,3 +21,12 @@ export { DangerWarning } from './DangerWarning';
 export { DraggableCard } from './DraggableCard';
 
 export { useStatChanges } from './useStatChanges';
+
+// 趣味效果组件
+export {
+  FloatingEmoji,
+  ComboExplosion,
+  LevelUpCelebration,
+  DangerFlash,
+  CoinCollect,
+} from './FunEffects';

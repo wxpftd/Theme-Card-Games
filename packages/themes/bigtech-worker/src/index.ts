@@ -12,6 +12,29 @@ export {
 export { randomEventCustomHandlers } from './randomEventHandlers';
 export { bigtechSummaryTemplates } from './summaryTemplates';
 
+// 导出增强主题和趣味文案
+export {
+  enhancedUITheme,
+  gameStateEmojis,
+  feedbackMessages,
+  getStateEmoji,
+  getRandomFeedback,
+} from './enhancedTheme';
+export {
+  loadingTips,
+  turnStartMessages,
+  turnEndMessages,
+  cardPlayMessages,
+  comboTriggerMessages,
+  statChangeMessages,
+  victoryMessages,
+  defeatMessages,
+  getRandomTip,
+  getCardPlayMessage,
+  getComboMessage,
+  getStatChangeMessage,
+} from './funTexts';
+
 // 导出角色和场景模块
 export * from './characters';
 export * from './scenarios';

@@ -1,0 +1,482 @@
+import React, { memo, useMemo, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle,
+  ImageBackground,
+} from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withSequence,
+  withTiming,
+  Easing,
+  interpolate,
+} from 'react-native-reanimated';
+import { CardDefinition } from '@theme-card-games/core';
+import { useTheme } from '../theme/ThemeContext';
+import { rarityStyles, cardTypeIcons } from '../theme/enhancedStyles';
+
+interface EnhancedCardProps {
+  card: CardDefinition;
+  onPress?: () => void;
+  onLongPress?: () => void;
+  disabled?: boolean;
+  selected?: boolean;
+  faceDown?: boolean;
+  size?: 'small' | 'medium' | 'large';
+  style?: ViewStyle;
+  /** 是否显示发光效果 */
+  showGlow?: boolean;
+  /** 是否显示入场动画 */
+  animateEntry?: boolean;
+  /** 卡牌背面图片 */
+  cardBackImage?: string;
+  /** 用于 E2E 测试的标识符 */
+  testID?: string;
+}
+
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+function EnhancedCardComponent({
+  card,
+  onPress,
+  onLongPress,
+  disabled = false,
+  selected = false,
+  faceDown = false,
+  size = 'medium',
+  style,
+  showGlow = true,
+  animateEntry = false,
+  cardBackImage,
+  testID,
+}: EnhancedCardProps) {
+  const { theme } = useTheme();
+
+  // 动画值
+  const scale = useSharedValue(animateEntry ? 0.8 : 1);
+  const opacity = useSharedValue(animateEntry ? 0 : 1);
+  const rotateY = useSharedValue(faceDown ? 180 : 0);
+  const glowOpacity = useSharedValue(0);
+
+  // 入场动画
+  useEffect(() => {
+    if (animateEntry) {
+      scale.value = withSpring(1, { damping: 12, stiffness: 100 });
+      opacity.value = withTiming(1, { duration: 300 });
+    }
+  }, [animateEntry]);
+
+  // 选中状态动画
+  useEffect(() => {
+    if (selected) {
+      scale.value = withSequence(
+        withSpring(1.05, { damping: 10 }),
+        withSpring(1.02, { damping: 15 })
+      );
+      glowOpacity.value = withTiming(1, { duration: 200 });
+    } else {
+      scale.value = withSpring(1, { damping: 15 });
+      glowOpacity.value = withTiming(0, { duration: 200 });
+    }
+  }, [selected]);
+
+  // 翻转动画
+  useEffect(() => {
+    rotateY.value = withTiming(faceDown ? 180 : 0, {
+      duration: 400,
+      easing: Easing.inOut(Easing.ease),
+    });
+  }, [faceDown]);
+
+  // 计算样式
+  const sizeStyles = useMemo(() => getSizeStyles(size, theme.cardStyles), [size, theme.cardStyles]);
+  const rarity = card.rarity ?? 'common';
+  const rarityStyle = rarityStyles[rarity];
+  const typeConfig = cardTypeIcons[card.type] || cardTypeIcons.action;
+
+  // 动画样式
+  const animatedContainerStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }, { perspective: 1000 }, { rotateY: `${rotateY.value}deg` }],
+    opacity: opacity.value,
+  }));
+
+  const animatedGlowStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(glowOpacity.value, [0, 1], [0, 0.6]),
+  }));
+
+  // 卡牌背面
+  if (faceDown) {
+    return (
+      <AnimatedTouchable
+        testID={testID ? `${testID}-facedown` : undefined}
+        style={[
+          styles.card,
+          sizeStyles.card,
+          styles.faceDown,
+          { backgroundColor: theme.colors.primary },
+          animatedContainerStyle,
+          style,
+        ]}
+        disabled
+      >
+        {cardBackImage ? (
+          <ImageBackground
+            source={{ uri: cardBackImage }}
+            style={styles.cardBackImage}
+            imageStyle={{ borderRadius: 12 }}
+          >
+            <View style={styles.cardBackOverlay}>
+              <Text style={styles.faceDownText}>🎴</Text>
+            </View>
+          </ImageBackground>
+        ) : (
+          <>
+            <View style={styles.cardBackPattern}>
+              {[...Array(9)].map((_, i) => (
+                <View key={i} style={styles.patternDot} />
+              ))}
+            </View>
+            <Text style={styles.faceDownText}>🎴</Text>
+          </>
+        )}
+      </AnimatedTouchable>
+    );
+  }
+
+  return (
+    <View style={[styles.cardWrapper, sizeStyles.card]}>
+      {/* 发光效果层 */}
+      {showGlow && (
+        <Animated.View
+          style={[
+            styles.glowLayer,
+            sizeStyles.card,
+            { backgroundColor: rarityStyle.glowColor },
+            animatedGlowStyle,
+          ]}
+        />
+      )}
+
+      <AnimatedTouchable
+        testID={testID}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={`卡牌 ${card.name}`}
+        accessibilityState={{ disabled, selected }}
+        onPress={onPress}
+        onLongPress={onLongPress}
+        disabled={disabled}
+        activeOpacity={0.9}
+        style={[
+          styles.card,
+          sizeStyles.card,
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: selected ? theme.colors.accent : rarityStyle.borderColor,
+            borderWidth: selected ? 3 : 2,
+            opacity: disabled ? 0.5 : 1,
+          },
+          animatedContainerStyle,
+          style,
+        ]}
+      >
+        {/* 头部 - 渐变效果 */}
+        <View style={[styles.header, { backgroundColor: rarityStyle.borderColor }]}>
+          <View style={styles.headerContent}>
+            <Text style={[styles.typeIcon, sizeStyles.typeIcon, { color: typeConfig.color }]}>
+              {typeConfig.icon}
+            </Text>
+            <Text style={[styles.typeName, { color: '#fff' }]}>{card.type}</Text>
+          </View>
+          {card.cost !== undefined && card.cost > 0 && (
+            <View style={styles.costBadge}>
+              <Text style={styles.costText}>{card.cost}</Text>
+              <Text style={styles.costIcon}>⚡</Text>
+            </View>
+          )}
+        </View>
+
+        {/* 卡牌名称 */}
+        <View style={styles.nameContainer}>
+          <Text
+            style={[styles.name, sizeStyles.name, { color: theme.colors.text }]}
+            numberOfLines={2}
+          >
+            {card.name}
+          </Text>
+        </View>
+
+        {/* 分隔线 */}
+        <View style={[styles.divider, { backgroundColor: rarityStyle.borderColor }]} />
+
+        {/* 描述 */}
+        <View style={styles.descriptionContainer}>
+          <Text
+            style={[
+              styles.description,
+              sizeStyles.description,
+              { color: theme.colors.textSecondary },
+            ]}
+            numberOfLines={size === 'small' ? 2 : 4}
+          >
+            {card.description}
+          </Text>
+        </View>
+
+        {/* 标签 */}
+        {card.tags && card.tags.length > 0 && size !== 'small' && (
+          <View style={styles.tags}>
+            {card.tags.slice(0, 3).map((tag, index) => (
+              <View key={index} style={[styles.tag, { backgroundColor: theme.colors.background }]}>
+                <Text style={[styles.tagText, { color: theme.colors.textSecondary }]}>#{tag}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* 稀有度指示条 */}
+        <View style={styles.rarityBarContainer}>
+          <View style={[styles.rarityBar, { backgroundColor: rarityStyle.borderColor }]} />
+          <View style={[styles.rarityShimmer, { backgroundColor: rarityStyle.shimmerColor }]} />
+        </View>
+
+        {/* 稀有度角标 */}
+        {rarity !== 'common' && (
+          <View style={[styles.rarityBadge, { backgroundColor: rarityStyle.borderColor }]}>
+            <Text style={styles.rarityText}>
+              {rarity === 'legendary' ? '★' : rarity === 'rare' ? '◆' : '●'}
+            </Text>
+          </View>
+        )}
+      </AnimatedTouchable>
+    </View>
+  );
+}
+
+function getSizeStyles(
+  size: 'small' | 'medium' | 'large',
+  cardStyles: { width: number; height: number }
+) {
+  const scales = {
+    small: 0.7,
+    medium: 1,
+    large: 1.3,
+  };
+
+  const scale = scales[size];
+
+  return {
+    card: {
+      width: cardStyles.width * scale,
+      height: cardStyles.height * scale,
+    } as ViewStyle,
+    typeIcon: {
+      fontSize: 18 * scale,
+    } as TextStyle,
+    name: {
+      fontSize: 13 * scale,
+    } as TextStyle,
+    description: {
+      fontSize: 10 * scale,
+    } as TextStyle,
+  };
+}
+
+export const EnhancedCard = memo(EnhancedCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.card.id === nextProps.card.id &&
+    prevProps.selected === nextProps.selected &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.faceDown === nextProps.faceDown &&
+    prevProps.size === nextProps.size &&
+    prevProps.testID === nextProps.testID &&
+    prevProps.showGlow === nextProps.showGlow &&
+    prevProps.animateEntry === nextProps.animateEntry
+  );
+});
+
+const styles = StyleSheet.create({
+  cardWrapper: {
+    position: 'relative',
+  },
+  glowLayer: {
+    position: 'absolute',
+    top: -4,
+    left: -4,
+    right: -4,
+    bottom: -4,
+    borderRadius: 16,
+    transform: [{ scale: 1.05 }],
+  },
+  card: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  faceDown: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardBackImage: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardBackOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardBackPattern: {
+    position: 'absolute',
+    width: '80%',
+    height: '80%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    alignContent: 'space-around',
+    opacity: 0.3,
+  },
+  patternDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+  },
+  faceDownText: {
+    fontSize: 40,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  typeIcon: {
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  typeName: {
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    opacity: 0.9,
+  },
+  costBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    gap: 2,
+  },
+  costText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  costIcon: {
+    fontSize: 10,
+  },
+  nameContainer: {
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  name: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  divider: {
+    height: 1,
+    marginHorizontal: 12,
+    opacity: 0.3,
+  },
+  descriptionContainer: {
+    flex: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    justifyContent: 'center',
+  },
+  description: {
+    textAlign: 'center',
+    lineHeight: 14,
+  },
+  tags: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    paddingBottom: 6,
+    flexWrap: 'wrap',
+    gap: 4,
+  },
+  tag: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  tagText: {
+    fontSize: 9,
+    fontWeight: '500',
+  },
+  rarityBarContainer: {
+    height: 4,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  rarityBar: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  rarityShimmer: {
+    position: 'absolute',
+    top: 0,
+    left: '-50%',
+    width: '30%',
+    height: '100%',
+    opacity: 0.5,
+  },
+  rarityBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  rarityText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+});
+
+export default EnhancedCard;
