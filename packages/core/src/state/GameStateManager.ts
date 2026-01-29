@@ -18,6 +18,7 @@ import {
   DifficultyLevel,
   GameSessionStats,
   MilestoneWinConfig,
+  TurnPlayState,
 } from '../types';
 import { EventBus } from '../event';
 import { Card, Deck, Hand, EffectResolver } from '../card';
@@ -81,6 +82,9 @@ export class GameStateManager {
 
   /** 取消订阅函数 */
   private unsubscribers: (() => void)[] = [];
+
+  /** 玩家回合内出牌状态（用于策略性限制） */
+  private playerTurnPlayStates: Map<string, TurnPlayState> = new Map();
 
   constructor(options: GameStateManagerOptions) {
     this.cardDefinitions = new Map(options.cardDefinitions.map((def) => [def.id, def]));
@@ -181,6 +185,8 @@ export class GameStateManager {
       this.eventBus.on('turn_started', (event) => {
         const playerId = event.data.playerId as string;
         this.processStatusTurnStart(playerId);
+        // 重置回合出牌状态
+        this.resetTurnPlayState(playerId);
       })
     );
 
@@ -190,6 +196,131 @@ export class GameStateManager {
         this.processStatusTurnEnd(playerId);
       })
     );
+  }
+
+  /**
+   * 重置玩家回合出牌状态
+   */
+  private resetTurnPlayState(playerId: string): void {
+    this.playerTurnPlayStates.set(playerId, {
+      cardsPlayedThisTurn: 0,
+      tagsPlayedThisTurn: [],
+    });
+  }
+
+  /**
+   * 获取玩家回合出牌状态
+   */
+  getTurnPlayState(playerId: string): TurnPlayState {
+    let state = this.playerTurnPlayStates.get(playerId);
+    if (!state) {
+      state = {
+        cardsPlayedThisTurn: 0,
+        tagsPlayedThisTurn: [],
+      };
+      this.playerTurnPlayStates.set(playerId, state);
+    }
+    return state;
+  }
+
+  /**
+   * 检查玩家是否还可以出牌
+   * @returns 如果可以出牌返回 true，否则返回 false
+   */
+  canPlayCard(playerId: string, cardId?: string): boolean {
+    const { config } = this.state;
+    const turnState = this.getTurnPlayState(playerId);
+
+    // 检查出牌数量限制
+    if (config.maxCardsPerTurn !== undefined) {
+      if (turnState.cardsPlayedThisTurn >= config.maxCardsPerTurn) {
+        return false;
+      }
+    }
+
+    // 如果提供了卡牌 ID，检查互斥标签
+    if (cardId && config.mutuallyExclusiveTagGroups) {
+      const cardDef = this.cardDefinitions.get(cardId);
+      if (cardDef?.tags) {
+        for (const group of config.mutuallyExclusiveTagGroups) {
+          // 找出该卡牌属于哪些互斥标签
+          const cardTags = cardDef.tags.filter((t) => group.tags.includes(t));
+          if (cardTags.length > 0) {
+            // 检查本回合是否已打出该互斥组中其他标签的卡牌
+            const playedTags = turnState.tagsPlayedThisTurn.filter((t) => group.tags.includes(t));
+            for (const playedTag of playedTags) {
+              if (!cardTags.includes(playedTag)) {
+                // 已打出互斥标签的卡牌
+                return false;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * 获取因互斥标签被禁用的卡牌 ID 列表
+   */
+  getDisabledCardsByMutualExclusion(playerId: string): Set<string> {
+    const disabled = new Set<string>();
+    const { config } = this.state;
+    const turnState = this.getTurnPlayState(playerId);
+
+    if (!config.mutuallyExclusiveTagGroups) {
+      return disabled;
+    }
+
+    // 获取本回合已打出的互斥标签
+    const playedMutualTags = new Set<string>();
+    for (const group of config.mutuallyExclusiveTagGroups) {
+      for (const tag of turnState.tagsPlayedThisTurn) {
+        if (group.tags.includes(tag)) {
+          playedMutualTags.add(tag);
+        }
+      }
+    }
+
+    if (playedMutualTags.size === 0) {
+      return disabled;
+    }
+
+    // 检查每张卡牌
+    for (const [cardId, cardDef] of this.cardDefinitions) {
+      if (!cardDef.tags) continue;
+
+      for (const group of config.mutuallyExclusiveTagGroups) {
+        const cardTags = cardDef.tags.filter((t) => group.tags.includes(t));
+        if (cardTags.length === 0) continue;
+
+        // 检查是否与已打出的标签互斥
+        const playedGroupTags = turnState.tagsPlayedThisTurn.filter((t) => group.tags.includes(t));
+        for (const playedTag of playedGroupTags) {
+          if (!cardTags.includes(playedTag)) {
+            disabled.add(cardId);
+            break;
+          }
+        }
+      }
+    }
+
+    return disabled;
+  }
+
+  /**
+   * 获取当前回合剩余出牌数量
+   * @returns 如果没有限制返回 undefined，否则返回剩余数量
+   */
+  getRemainingCardPlays(playerId: string): number | undefined {
+    const { config } = this.state;
+    if (config.maxCardsPerTurn === undefined) {
+      return undefined;
+    }
+    const turnState = this.getTurnPlayState(playerId);
+    return Math.max(0, config.maxCardsPerTurn - turnState.cardsPlayedThisTurn);
   }
 
   /**
@@ -509,9 +640,26 @@ export class GameStateManager {
       return false;
     }
 
+    // 获取卡牌实例以获取 definitionId
+    const cardInstance = hand.getCards().find((c) => c.id === cardId);
+    const defIdToCheck = cardInstance?.definitionId ?? cardId;
+
+    // 检查出牌限制（数量和互斥标签）
+    if (!this.canPlayCard(playerId, defIdToCheck)) {
+      return false;
+    }
+
     const card = hand.playCard(cardId);
     if (!card) {
       return false;
+    }
+
+    // 更新回合出牌状态
+    const turnState = this.getTurnPlayState(playerId);
+    turnState.cardsPlayedThisTurn++;
+    const cardDef = this.cardDefinitions.get(card.definitionId);
+    if (cardDef?.tags) {
+      turnState.tagsPlayedThisTurn.push(...cardDef.tags);
     }
 
     // Resolve card effects
@@ -885,6 +1033,7 @@ export class GameStateManager {
     this.state = this.createInitialState(this.state.config);
     this.playerDecks.clear();
     this.playerHands.clear();
+    this.playerTurnPlayStates.clear();
     this.eventBus.clearHistory();
     this.comboSystem?.reset();
     this.cardUpgradeSystem?.reset();

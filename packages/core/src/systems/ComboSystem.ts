@@ -1,4 +1,11 @@
-import { ComboDefinition, ComboState, CardDefinition, GameState, ResolvedEffect } from '../types';
+import {
+  ComboDefinition,
+  ComboState,
+  CardDefinition,
+  GameState,
+  ResolvedEffect,
+  ComboPreview,
+} from '../types';
 import { EffectResolver, EffectContext } from '../card/EffectResolver';
 import { EventBus } from '../event';
 
@@ -247,6 +254,192 @@ export class ComboSystem {
    */
   getCombos(): ComboDefinition[] {
     return Array.from(this.combos.values());
+  }
+
+  /**
+   * 获取当前可触发的 combo 预览信息
+   * 分析手牌和本回合已打出的卡牌，返回哪些 combo 可以被触发以及还需要哪些卡牌
+   */
+  getAvailableCombos(
+    playerId: string,
+    handCards: { definitionId: string }[],
+    gameState: GameState
+  ): ComboPreview[] {
+    const state = this.getOrCreateState(playerId);
+    const previews: ComboPreview[] = [];
+
+    // 手牌中的卡牌 definitionId 列表
+    const handCardIds = handCards.map((c) => c.definitionId);
+    // 手牌的标签列表
+    const handTags: string[] = [];
+    for (const defId of handCardIds) {
+      const cardDef = this.cardDefinitions.get(defId);
+      if (cardDef?.tags) {
+        handTags.push(...cardDef.tags);
+      }
+    }
+
+    for (const combo of this.combos.values()) {
+      // 检查冷却
+      const lastTriggered = state.triggeredCombos.get(combo.id);
+      if (
+        lastTriggered !== undefined &&
+        combo.cooldown !== undefined &&
+        combo.cooldown > 0 &&
+        gameState.turn - lastTriggered < combo.cooldown
+      ) {
+        continue; // 还在冷却中
+      }
+
+      const preview = this.analyzeComboProgress(
+        combo,
+        state.playedCardsThisTurn,
+        state.playedTagsThisTurn,
+        handCardIds,
+        handTags
+      );
+
+      if (preview) {
+        previews.push(preview);
+      }
+    }
+
+    // 按进度排序，进度高的在前
+    return previews.sort((a, b) => b.progress - a.progress);
+  }
+
+  /**
+   * 分析单个 combo 的进度
+   */
+  private analyzeComboProgress(
+    combo: ComboDefinition,
+    playedCards: string[],
+    playedTags: string[],
+    handCardIds: string[],
+    handTags: string[]
+  ): ComboPreview | null {
+    const trigger = combo.trigger;
+
+    switch (trigger.type) {
+      case 'combination': {
+        const requiredCards = trigger.cards;
+        const playedSet = new Set(playedCards);
+        const handSet = new Set(handCardIds);
+
+        const alreadyPlayed = requiredCards.filter((c) => playedSet.has(c));
+        const stillNeeded = requiredCards.filter((c) => !playedSet.has(c));
+        const canComplete = stillNeeded.every((c) => handSet.has(c));
+
+        if (alreadyPlayed.length === 0 && !canComplete) {
+          return null; // 还没开始且手牌也不足，不显示
+        }
+
+        return {
+          combo,
+          progress: alreadyPlayed.length / requiredCards.length,
+          alreadyPlayed,
+          stillNeeded,
+          canComplete,
+        };
+      }
+
+      case 'sequence': {
+        const requiredCards = trigger.cards;
+        const playedMatch = this.getSequenceProgress(requiredCards, playedCards);
+        const stillNeeded = requiredCards.slice(playedMatch.length);
+        const handSet = new Set(handCardIds);
+        const canComplete = stillNeeded.every((c) => handSet.has(c));
+
+        if (playedMatch.length === 0 && !canComplete) {
+          return null;
+        }
+
+        return {
+          combo,
+          progress: playedMatch.length / requiredCards.length,
+          alreadyPlayed: playedMatch,
+          stillNeeded,
+          canComplete,
+        };
+      }
+
+      case 'tag_count': {
+        const requiredTag = trigger.tag;
+        const requiredCount = trigger.count;
+        const playedCount = playedTags.filter((t) => t === requiredTag).length;
+        const handCount = handTags.filter((t) => t === requiredTag).length;
+        const canComplete = playedCount + handCount >= requiredCount;
+
+        if (playedCount === 0 && !canComplete) {
+          return null;
+        }
+
+        return {
+          combo,
+          progress: playedCount / requiredCount,
+          alreadyPlayed: [], // 标签类不列出具体卡牌
+          stillNeeded: [],
+          stillNeededCount: Math.max(0, requiredCount - playedCount),
+          requiredTag,
+          canComplete,
+        };
+      }
+
+      case 'tag_sequence': {
+        const requiredTags = trigger.tags;
+        const minCount = trigger.count ?? requiredTags.length;
+        let matchedCount = 0;
+        let tagIndex = 0;
+
+        for (const tag of playedTags) {
+          if (tag === requiredTags[tagIndex]) {
+            tagIndex++;
+            matchedCount++;
+            if (tagIndex >= requiredTags.length) break;
+          }
+        }
+
+        // 检查手牌是否能补足
+        const remainingTags = requiredTags.slice(tagIndex);
+        const handTagSet = new Set(handTags);
+        const canComplete = remainingTags.every((t) => handTagSet.has(t));
+
+        if (matchedCount === 0 && !canComplete) {
+          return null;
+        }
+
+        return {
+          combo,
+          progress: matchedCount / minCount,
+          alreadyPlayed: [],
+          stillNeeded: [],
+          stillNeededCount: Math.max(0, minCount - matchedCount),
+          requiredTags: remainingTags,
+          canComplete,
+        };
+      }
+
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * 获取顺序 combo 的进度（已匹配的前缀长度）
+   */
+  private getSequenceProgress(requiredCards: string[], playedCards: string[]): string[] {
+    const matched: string[] = [];
+    let reqIndex = 0;
+
+    for (const played of playedCards) {
+      if (played === requiredCards[reqIndex]) {
+        matched.push(played);
+        reqIndex++;
+        if (reqIndex >= requiredCards.length) break;
+      }
+    }
+
+    return matched;
   }
 
   /**

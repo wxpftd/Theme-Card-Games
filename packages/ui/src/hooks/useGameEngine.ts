@@ -12,6 +12,8 @@ import {
   GameModeManager,
   createCompetitiveMode,
   AIDifficulty,
+  TurnPlayState,
+  ComboPreview,
 } from '@theme-card-games/core';
 
 /** 多人模式配置 */
@@ -88,6 +90,22 @@ export interface UseGameEngineReturn {
   // Theme
   theme: ThemeConfig;
   t: (key: string) => string;
+
+  // Turn play state (出牌限制)
+  /** 获取玩家回合出牌状态 */
+  getTurnPlayState: () => TurnPlayState;
+  /** 获取当前回合剩余出牌数量，无限制时返回 undefined */
+  remainingCardPlays: number | undefined;
+  /** 每回合最大出牌数量，无限制时返回 undefined */
+  maxCardsPerTurn: number | undefined;
+  /** 检查指定卡牌是否可以打出（考虑数量限制和互斥标签） */
+  canPlayCard: (cardId?: string) => boolean;
+  /** 获取因互斥标签被禁用的卡牌定义 ID 集合 */
+  disabledCardsByMutualExclusion: Set<string>;
+
+  // Combo preview (组合预览)
+  /** 获取当前可触发的 combo 预览列表 */
+  comboPreviews: ComboPreview[];
 }
 
 export function useGameEngine(options: UseGameEngineOptions): UseGameEngineReturn {
@@ -424,6 +442,43 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
     return modeManagerRef.current?.isAIPlayer(targetPlayerId) ?? false;
   }, []);
 
+  // Turn play state helpers
+  const getTurnPlayState = useCallback((): TurnPlayState => {
+    return (
+      engineRef.current?.getTurnPlayState(playerId) ?? {
+        cardsPlayedThisTurn: 0,
+        tagsPlayedThisTurn: [],
+      }
+    );
+  }, [playerId]);
+
+  const remainingCardPlays = useMemo(() => {
+    if (!gameState || !engineRef.current) return undefined;
+    return engineRef.current.getRemainingCardPlays(playerId);
+  }, [gameState, playerId]);
+
+  const maxCardsPerTurn = useMemo(() => {
+    return engineRef.current?.getMaxCardsPerTurn();
+  }, []);
+
+  const canPlayCardCheck = useCallback(
+    (cardId?: string): boolean => {
+      return engineRef.current?.canPlayCard(playerId, cardId) ?? false;
+    },
+    [playerId]
+  );
+
+  const disabledCardsByMutualExclusion = useMemo(() => {
+    if (!gameState || !engineRef.current) return new Set<string>();
+    return engineRef.current.getDisabledCardsByMutualExclusion(playerId);
+  }, [gameState, playerId]);
+
+  // Combo preview
+  const comboPreviews = useMemo((): ComboPreview[] => {
+    if (!gameState || !engineRef.current) return [];
+    return engineRef.current.getAvailableCombos(playerId);
+  }, [gameState, playerId]);
+
   return {
     // State
     gameState,
@@ -471,5 +526,15 @@ export function useGameEngine(options: UseGameEngineOptions): UseGameEngineRetur
     // Theme
     theme,
     t,
+
+    // Turn play state
+    getTurnPlayState,
+    remainingCardPlays,
+    maxCardsPerTurn,
+    canPlayCard: canPlayCardCheck,
+    disabledCardsByMutualExclusion,
+
+    // Combo preview
+    comboPreviews,
   };
 }

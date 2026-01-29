@@ -1684,6 +1684,16 @@ export const bigtechWorkerTheme: ThemeConfig = {
       connections: 3,
       skills: 2,
     },
+    // 策略性限制：每回合最多打3张牌
+    maxCardsPerTurn: 3,
+    // 互斥标签组：同回合不能同时打工作和休息卡
+    mutuallyExclusiveTagGroups: [
+      {
+        id: 'work-rest',
+        name: '工作与休息',
+        tags: ['work', 'rest'],
+      },
+    ],
   },
 
   cards: allCards,

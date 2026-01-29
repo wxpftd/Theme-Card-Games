@@ -31,6 +31,17 @@ export const enUS = {
   'game.noCards': 'No cards played',
   'game.endTurn': 'End Turn',
   'game.dangerWarning': 'Danger! Low health',
+  'game.cardsPlayed': 'Played {played}/{max}',
+  'game.cardLimitReached': 'Card limit reached this turn',
+  'game.mutualExclusion': 'Conflicts with cards played this turn',
+
+  // Combo preview
+  'combo.available': 'Available Combos',
+  'combo.ready': 'Ready',
+  'combo.canTrigger': 'Can Trigger',
+  'combo.need': 'Need: {cards}',
+  'combo.needCount': 'Need {count} more',
+  'combo.needTagCount': 'Need {count} {tag} cards',
 
   // Hand view
   'hand.title': 'Hand',
